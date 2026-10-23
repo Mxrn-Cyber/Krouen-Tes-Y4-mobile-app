@@ -1,5 +1,13 @@
 <resources>
-    <string name="app_name">Easy food</string>
+    <string name="app_name">Krouen Tes</string>
+    <string name="app_name_km">គ្រឿងទេស</string>
+    <string name="app_tagline">Khmer recipes in your pocket</string>
+
+    <!-- Bottom navigation -->
+    <string name="nav_home">Home</string>
+    <string name="nav_wishlist">Wishlist</string>
+    <string name="nav_category">Category</string>
+
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

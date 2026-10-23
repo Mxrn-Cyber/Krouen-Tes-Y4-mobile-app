@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">គ្រឿងទេស</string>
+    <string name="app_tagline">មុខម្ហូបខ្មែរ នៅក្នុងដៃអ្នក</string>
+    <string name="nav_home">ទំព័រដើម</string>
+    <string name="nav_wishlist">បញ្ជីចូលចិត្ត</string>
+    <string name="nav_category">ប្រភេទ</string>
+</resources>
