@@ -12,19 +12,38 @@
         android:theme="@style/Theme.EasyFood"
         android:usesCleartextTraffic="true">
         <activity
-            android:name=".ui.activites.MealActivity"
-            android:exported="false" />
-        <activity
-            android:name=".ui.activites.MealDetailesActivity"
-            android:exported="false" />
-        <activity
-            android:name=".ui.activites.MainActivity"
+            android:name=".ui.activites.SignupActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+
+        </activity>
+
+        <activity
+            android:name=".ui.activites.LoginActivity"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".ui.activites.MealActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.activites.MealDetailesActivity"
+            android:exported="false" />
+
+
+        <activity
+            android:name=".ui.activites.MainActivity"
+            android:exported="false">
+
+
         </activity>
     </application>
 

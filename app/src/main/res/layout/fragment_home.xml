@@ -14,7 +14,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
-        android:src="@drawable/loading_gif"
+        android:src="@drawable/loading_gi"
         android:visibility="gone"/>
 
 
