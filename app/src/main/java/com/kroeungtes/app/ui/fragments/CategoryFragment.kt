@@ -69,7 +69,7 @@ class CategoryFragment : Fragment(R.layout.fragment_category) {
     private fun prepareRecyclerView() {
         binding.favoriteRecyclerView.apply {
             adapter = myAdapter
-            layoutManager = GridLayoutManager(context,3,GridLayoutManager.VERTICAL,false)
+            layoutManager = GridLayoutManager(context, resources.getInteger(R.integer.category_columns), GridLayoutManager.VERTICAL, false)
         }
     }
 

@@ -5,12 +5,14 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.kroeungtes.app.R
 import com.kroeungtes.app.data.model.Meal
 import com.kroeungtes.app.databinding.MostPopularCardBinding
-import com.google.android.material.transition.Hold
 
 class MostPopularRecyclerAdapter : RecyclerView.Adapter<MostPopularRecyclerAdapter.MostPopularMealViewHolder>(){
     private var mealsList: List<Meal> = ArrayList()
+    /** Short line under the name, e.g. "Beef recipe" */
+    var subtitle: String? = null
     private lateinit var onItemClick: OnItemClick
     private lateinit var onLongItemClick:OnLongItemClick
     fun setMealList(mealsList: List<Meal>) {
@@ -30,14 +32,22 @@ class MostPopularRecyclerAdapter : RecyclerView.Adapter<MostPopularRecyclerAdapt
         RecyclerView.ViewHolder(binding.root)
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MostPopularMealViewHolder {
-        return MostPopularMealViewHolder(MostPopularCardBinding.inflate(LayoutInflater.from(parent.context)))
+        return MostPopularMealViewHolder(
+            MostPopularCardBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        )
     }
 
     override fun onBindViewHolder(holder: MostPopularMealViewHolder, position: Int) {
         val i = position
         holder.binding.apply {
+            val meal = mealsList[position]
+            val ctx = holder.itemView.context
+            tvPopularName.text = meal.strMeal
+            tvPopularDesc.text = subtitle ?: ""
+            tvPopularAuthor.text = ctx.getString(R.string.by_author, ctx.getString(R.string.default_author))
             Glide.with(holder.itemView)
-                .load(mealsList[position].strMealThumb)
+                .load(meal.strMealThumb)
+                .placeholder(R.drawable.mealtest)
                 .into(imgPopularMeal)
 
         }

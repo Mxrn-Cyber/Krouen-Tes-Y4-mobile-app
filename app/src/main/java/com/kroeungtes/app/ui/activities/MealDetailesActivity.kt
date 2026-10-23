@@ -10,6 +10,8 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import com.bumptech.glide.Glide
 import com.kroeungtes.app.R
+import com.kroeungtes.app.adapters.IngredientAdapter
+import com.kroeungtes.app.data.model.Ingredient
 import com.kroeungtes.app.data.model.MealDB
 import com.kroeungtes.app.data.model.MealDetail
 import com.kroeungtes.app.databinding.ActivityMealDetailesBinding
@@ -28,6 +30,7 @@ class MealDetailesActivity : AppCompatActivity() {
     private var mealThumb = ""
     private var ytUrl = ""
     private lateinit var dtMeal:MealDetail
+    private val ingredientAdapter = IngredientAdapter()
 
 
 
@@ -36,6 +39,10 @@ class MealDetailesActivity : AppCompatActivity() {
         detailsMVVM = ViewModelProviders.of(this)[DetailsMVVM::class.java]
         binding = ActivityMealDetailesBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        binding.rvIngredients.adapter = ingredientAdapter
+        binding.btnBack.setOnClickListener { finish() }
+        binding.btnMore.setOnClickListener { shareRecipe() }
 
         showLoading()
 
@@ -61,21 +68,39 @@ class MealDetailesActivity : AppCompatActivity() {
         binding.btnSave.setOnClickListener {
             if(isMealSavedInDatabase()){
                 deleteMeal()
-                binding.btnSave.setImageResource(R.drawable.ic_baseline_save_24)
+                showSaved(false)
                 Snackbar.make(
                     findViewById(android.R.id.content),
-                    "Meal was deleted",
+                    "Removed from Wishlist",
                 Snackbar.LENGTH_SHORT).show()
             }else{
                 saveMeal()
-                binding.btnSave.setImageResource(R.drawable.ic_saved)
+                showSaved(true)
                 Snackbar.make(
                     findViewById(android.R.id.content),
-                    "Meal saved",
+                    "Saved to Wishlist",
                     Snackbar.LENGTH_SHORT).show()
             }
         }
 
+    }
+
+    /** Green "Save" button from the slide (where the mockup shows "Follow"). */
+    private fun showSaved(saved: Boolean) {
+        binding.btnSave.apply {
+            text = getString(if (saved) R.string.saved else R.string.save)
+            setIconResource(if (saved) R.drawable.ic_bookmark_filled else R.drawable.ic_bookmark)
+            setBackgroundColor(getColor(if (saved) R.color.brand_green else R.color.brand_splash))
+        }
+    }
+
+    /** "..." button: share the recipe name + video link with other apps. */
+    private fun shareRecipe() {
+        val text = if (ytUrl.isNotBlank()) "$mealStr\n$ytUrl" else mealStr
+        startActivity(Intent.createChooser(Intent(Intent.ACTION_SEND).apply {
+            type = "text/plain"
+            putExtra(Intent.EXTRA_TEXT, text)
+        }, mealStr))
     }
 
 
@@ -85,11 +110,7 @@ class MealDetailesActivity : AppCompatActivity() {
     }
 
     private fun setFloatingButtonStatues() {
-        if(isMealSavedInDatabase()){
-            binding.btnSave.setImageResource(R.drawable.ic_saved)
-        }else{
-            binding.btnSave.setImageResource(R.drawable.ic_baseline_save_24)
-        }
+        showSaved(isMealSavedInDatabase())
     }
 
     private fun isMealSavedInDatabase(): Boolean {
@@ -119,30 +140,30 @@ class MealDetailesActivity : AppCompatActivity() {
         binding.progressBar.visibility = View.INVISIBLE
         binding.btnSave.visibility = View.VISIBLE
 
-        binding.imgYoutube.visibility = View.VISIBLE
-
     }
 
     private fun setTextsInViews(meal: MealDetail) {
         this.dtMeal = meal
-        ytUrl = meal.strYoutube
+        ytUrl = meal.strYoutube.orEmpty()
         binding.apply {
-            tvInstructions.text = "- Instructions : "
             tvContent.text = meal.strInstructions
-            tvAreaInfo.visibility = View.VISIBLE
+            tvCategoryInfo.text = meal.strCategory
+            tvAreaInfo.text = meal.strArea
+            tvAuthorPlace.text = meal.strArea
             tvCategoryInfo.visibility = View.VISIBLE
-            tvAreaInfo.text = tvAreaInfo.text.toString() + meal.strArea
-            tvCategoryInfo.text = tvCategoryInfo.text.toString() + meal.strCategory
-            imgYoutube.visibility = View.VISIBLE
+            tvAreaInfo.visibility = View.VISIBLE
+            imgYoutube.visibility = if (ytUrl.isBlank()) View.GONE else View.VISIBLE
         }
+        ingredientAdapter.submit(Ingredient.fromMeal(meal))
     }
 
 
     private fun setUpViewWithMealInformation() {
         binding.apply {
-            collapsingToolbar.title = mealStr
+            tvTitle.text = getString(R.string.how_to_make, mealStr)
             Glide.with(applicationContext)
                 .load(mealThumb)
+                .placeholder(R.drawable.mealtest)
                 .into(imgMealDetail)
         }
 

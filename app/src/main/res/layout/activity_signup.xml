@@ -1,80 +1,170 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<!-- Sign-up screen — matches the slide: food background, white card, green button -->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/img"
     tools:context=".ui.auth.SignupActivity">
 
-
-
-    <LinearLayout
+    <ImageView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical">
-        <LinearLayout
+        android:layout_height="match_parent"
+        android:importantForAccessibility="no"
+        android:scaleType="centerCrop"
+        android:src="@drawable/bg_auth" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/auth_overlay" />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:layout_marginTop="200dp"
-            android:padding="20dp">
-            <EditText
-                android:layout_width="350dp"
-                android:layout_height="60dp"
-                android:id="@+id/signup_email"
-                android:layout_marginTop="30dp"
-                android:background="@drawable/lavender_border"
-                android:padding="8dp"
-                android:hint="Email"
-                android:drawableLeft="@drawable/email_24"
-                android:drawablePadding="8dp"
-                android:textColor="@color/green"/>
-            <EditText
-                android:layout_width="350dp"
-                android:layout_height="60dp"
-                android:id="@+id/signup_password"
-                android:layout_marginTop="20dp"
-                android:background="@drawable/lavender_border"
-                android:padding="8dp"
-                android:hint="Password"
-                android:inputType="textPassword"
-                android:drawableLeft="@drawable/lock_24"
-                android:drawablePadding="8dp"
-                android:textColor="@color/green"/>
-            <EditText
-                android:layout_width="350dp"
-                android:layout_height="60dp"
-                android:id="@+id/signup_confirm"
-                android:layout_marginTop="20dp"
-                android:background="@drawable/lavender_border"
-                android:padding="8dp"
-                android:hint="Confirm Password"
-                android:inputType="textPassword"
-                android:drawableLeft="@drawable/lock_24"
-                android:drawablePadding="8dp"
-                android:textColor="@color/green"/>
-            <Button
-                android:layout_width="350dp"
-                android:layout_height="70dp"
-                android:layout_marginTop="30dp"
-                android:text="Sign Up"
-                android:id="@+id/signup_button"
-                android:textSize="18sp"
-                android:textColor="@color/green"
-                app:cornerRadius = "30dp"/>
+            android:paddingStart="@dimen/screen_padding"
+            android:paddingTop="48dp"
+            android:paddingEnd="@dimen/screen_padding"
+            android:paddingBottom="32dp">
+
             <TextView
+                android:id="@+id/signup_title"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:id="@+id/loginRedirectText"
-                android:text="Already an user? Login"
-                android:layout_gravity="center"
-                android:padding="8dp"
-                android:layout_marginTop="8dp"
-                android:textSize="18sp"
-                android:textColor="@color/green"/>
-        </LinearLayout>
-    </LinearLayout>
+                android:text="@string/welcome"
+                android:textAppearance="@style/Text.ScreenTitle"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
-</ScrollView>
+            <TextView
+                android:id="@+id/signup_subtitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:text="@string/signup_subtitle"
+                android:textAppearance="@style/Text.Body"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/signup_title" />
+
+            <!-- Card: stays max 440dp wide on tablets, full width on phones -->
+            <LinearLayout
+                android:id="@+id/signup_card"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="28dp"
+                android:background="@drawable/bg_auth_card"
+                android:elevation="2dp"
+                android:orientation="vertical"
+                android:padding="20dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/signup_subtitle"
+                app:layout_constraintWidth_max="@dimen/max_form_width">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:text="@string/sign_up"
+                    android:textAppearance="@style/Text.ScreenTitle"
+                    android:textSize="22sp" />
+
+                <TextView
+                    android:id="@+id/loginRedirectText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:padding="8dp"
+                    android:text="@string/have_account"
+                    android:textAppearance="@style/Text.Caption" />
+
+                <com.google.android.material.textfield.TextInputLayout
+                    style="@style/Widget.KrouenTes.TextField"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:hint="@string/email"
+                    app:startIconDrawable="@drawable/email_24">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/signup_email"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:autofillHints="emailAddress"
+                        android:inputType="textEmailAddress" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    style="@style/Widget.KrouenTes.TextField"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:hint="@string/password"
+                    app:endIconMode="password_toggle"
+                    app:startIconDrawable="@drawable/lock_24">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/signup_password"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:autofillHints="password"
+                        android:inputType="textPassword" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    style="@style/Widget.KrouenTes.TextField"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:hint="@string/confirm_password"
+                    app:endIconMode="password_toggle"
+                    app:startIconDrawable="@drawable/lock_24">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/signup_confirm"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="textPassword" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/signup_button"
+                    style="@style/Widget.KrouenTes.PrimaryButton"
+                    android:layout_width="match_parent"
+                    android:layout_marginTop="18dp"
+                    android:text="@string/sign_up" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_marginTop="12dp"
+                    android:layout_marginBottom="4dp"
+                    android:text="@string/or"
+                    android:textAppearance="@style/Text.Caption" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/signup_google"
+                    style="@style/Widget.KrouenTes.SocialButton"
+                    android:layout_width="match_parent"
+                    android:text="@string/continue_google"
+                    app:icon="@drawable/ic_person" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/signup_facebook"
+                    style="@style/Widget.KrouenTes.SocialButton"
+                    android:layout_width="match_parent"
+                    android:layout_marginTop="6dp"
+                    android:text="@string/continue_facebook"
+                    app:icon="@drawable/ic_person" />
+            </LinearLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </ScrollView>
+</FrameLayout>

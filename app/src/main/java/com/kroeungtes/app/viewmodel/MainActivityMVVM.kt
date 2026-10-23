@@ -10,16 +10,22 @@ import retrofit2.Response
 
 const val TAG = "MainMVVM"
 
+// TheMealDB filters for the Home rows (Khmer recipes come from Firestore in phase 2)
+const val TRENDING_INGREDIENT = "beef"
+const val RECENT_INGREDIENT = "chicken"
+
 class MainFragMVVM: ViewModel() {
     private val mutableCategory = MutableLiveData<CategoryResponse>()
     private val mutableRandomMeal = MutableLiveData<RandomMealResponse>()
     private val mutableMealsByCategory = MutableLiveData<MealsResponse>()
+    private val mutableRecentMeals = MutableLiveData<MealsResponse>()
 
 
     init {
         getRandomMeal()
         getAllCategories()
-        getMealsByCategory("beef")
+        getMealsByCategory(TRENDING_INGREDIENT)
+        getRecentMeals(RECENT_INGREDIENT)
     }
 
 
@@ -61,6 +67,20 @@ class MainFragMVVM: ViewModel() {
 
         })
     }
+
+    private fun getRecentMeals(ingredient: String) {
+        RetrofitInstance.foodApi.getMealsByCategory(ingredient).enqueue(object : Callback<MealsResponse> {
+            override fun onResponse(call: Call<MealsResponse>, response: Response<MealsResponse>) {
+                mutableRecentMeals.value = response.body()
+            }
+
+            override fun onFailure(call: Call<MealsResponse>, t: Throwable) {
+                Log.e(TAG, t.message.toString())
+            }
+        })
+    }
+
+    fun observeRecentMeals(): LiveData<MealsResponse> = mutableRecentMeals
 
     fun observeMealByCategory(): LiveData<MealsResponse> {
         return mutableMealsByCategory

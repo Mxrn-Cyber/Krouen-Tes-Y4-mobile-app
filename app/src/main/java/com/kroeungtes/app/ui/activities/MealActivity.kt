@@ -83,7 +83,7 @@ class MealActivity : AppCompatActivity() {
         myAdapter = MealRecyclerAdapter()
         binding.mealRecyclerview.apply {
             adapter = myAdapter
-            layoutManager = GridLayoutManager(context, 2, GridLayoutManager.VERTICAL, false)
+            layoutManager = GridLayoutManager(context, resources.getInteger(R.integer.meal_list_columns), GridLayoutManager.VERTICAL, false)
         }
     }
 }

@@ -123,7 +123,7 @@ class FavoriteMealsFragment : Fragment() {
     private fun prepareRecyclerView(v:View) {
         recView =v.findViewById<RecyclerView>(R.id.fav_rec_view)
         recView.adapter = myAdapter
-        recView.layoutManager = GridLayoutManager(context,2,GridLayoutManager.VERTICAL,false)
+        recView.layoutManager = GridLayoutManager(context, resources.getInteger(R.integer.wishlist_columns), GridLayoutManager.VERTICAL, false)
     }
 
     private fun onFavoriteMealClick(){

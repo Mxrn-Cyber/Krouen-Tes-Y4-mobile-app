@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Tablets / large phones in landscape -->
+    <dimen name="screen_padding">36dp</dimen>
+    <dimen name="section_gap">30dp</dimen>
+    <dimen name="card_trending_width">240dp</dimen>
+    <dimen name="card_trending_image">165dp</dimen>
+    <dimen name="card_small_width">150dp</dimen>
+    <dimen name="card_small_image">120dp</dimen>
+    <dimen name="avatar_small">26dp</dimen>
+    <dimen name="text_title">30sp</dimen>
+    <dimen name="text_section">20sp</dimen>
+    <dimen name="text_body">16sp</dimen>
+    <dimen name="text_small">14sp</dimen>
+    <dimen name="text_tiny">12sp</dimen>
+</resources>

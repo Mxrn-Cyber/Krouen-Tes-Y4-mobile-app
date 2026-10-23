@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <integer name="wishlist_columns">3</integer>
+    <integer name="category_columns">4</integer>
+    <integer name="meal_list_columns">3</integer>
+</resources>

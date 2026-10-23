@@ -16,3 +16,8 @@ local.properties
 
 # Firebase config (contains API keys) — keep local
 app/google-services.json
+
+# Gradle user home inside the project (Android Studio setting) — never commit
+/gradle/*
+!/gradle/wrapper/
+/gradle/wrapper/dists/

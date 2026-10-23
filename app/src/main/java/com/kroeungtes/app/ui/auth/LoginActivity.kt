@@ -25,6 +25,12 @@ class LoginActivity : AppCompatActivity() {
         binding = ActivityLoginBinding.inflate(layoutInflater)
         setContentView(binding.root)
         firebaseAuth = FirebaseAuth.getInstance()
+        // Social sign-in is shown in the design but not connected yet
+        val comingSoon = android.view.View.OnClickListener {
+            Toast.makeText(this, R.string.coming_soon, Toast.LENGTH_SHORT).show()
+        }
+        binding.loginGoogle.setOnClickListener(comingSoon)
+        binding.loginFacebook.setOnClickListener(comingSoon)
         binding.loginButton.setOnClickListener {
             val email = binding.loginEmail.text.toString()
             val password = binding.loginPassword.text.toString()

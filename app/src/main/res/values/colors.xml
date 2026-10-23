@@ -21,4 +21,10 @@
     <color name="purple_200">@color/brand_green_light</color>
     <color name="teal_200">@color/brand_green_light</color>
     <color name="teal_700">@color/brand_green_dark</color>
+    <!-- UI greys from the slide mockups -->
+    <color name="text_primary">#1F2A24</color>
+    <color name="text_secondary">#8A9490</color>
+    <color name="surface_soft">#F4F5F4</color>
+    <color name="divider">#E6E8E7</color>
+    <color name="auth_overlay">#CCFFFFFF</color>
 </resources>

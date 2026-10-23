@@ -7,7 +7,56 @@
     <string name="nav_home">Home</string>
     <string name="nav_wishlist">Wishlist</string>
     <string name="nav_category">Category</string>
+    <string name="nav_search">Search</string>
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+
+    <!-- Home -->
+    <string name="home_greeting">Seeking your favorite recipe and cook</string>
+    <string name="search_hint">Search here!</string>
+    <string name="trending">Trending 🔥</string>
+    <string name="your_wishlist">Your Wishlist</string>
+    <string name="recent_recipe">Recent recipe</string>
+    <string name="see_all">See all</string>
+    <string name="detail">Detail</string>
+    <string name="recipe_with">%1$s recipe</string>
+    <string name="by_author">By %1$s</string>
+    <string name="default_author">Krouen Tes</string>
+    <string name="create_recipe_soon">Create Recipe is coming in the next update</string>
+
+    <!-- Recipe page -->
+    <string name="how_to_make">How to make %1$s?</string>
+    <string name="ingredient">Ingredient</string>
+    <string name="instructions">Instructions</string>
+    <string name="watch_video">Watch video</string>
+    <string name="save">Save</string>
+    <string name="saved">Saved</string>
+    <string name="back">Back</string>
+    <string name="more">More</string>
+    <string name="category_area">%1$s · %2$s</string>
+
+    <!-- Wishlist -->
+    <string name="wishlist">Wishlist</string>
+    <string name="wishlist_empty">No saved recipes yet.
+Tap Save on a recipe to add it here.</string>
+
+    <!-- Auth -->
+    <string name="welcome">Welcome !</string>
+    <string name="welcome_back">Welcome back !</string>
+    <string name="signup_subtitle">Sign up for an account</string>
+    <string name="login_subtitle">Log in to your account</string>
+    <string name="sign_up">Sign Up</string>
+    <string name="login">Login</string>
+    <string name="log_in">Log in</string>
+    <string name="have_account">Already have an account? <b>Log in</b></string>
+    <string name="no_account">Don\'t have an account? <b>Sign up</b></string>
+    <string name="email">Email</string>
+    <string name="password">Password</string>
+    <string name="confirm_password">Confirm password</string>
+    <string name="forgot_password">Forgot Password ?</string>
+    <string name="or">or</string>
+    <string name="continue_google">Continue with Google</string>
+    <string name="continue_facebook">Continue with Facebook</string>
+    <string name="coming_soon">Coming soon</string>
 </resources>
