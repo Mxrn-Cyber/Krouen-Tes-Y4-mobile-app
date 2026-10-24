@@ -61,11 +61,12 @@ class RecipeCardAdapter(
         holder.binding.apply {
             cardName.text = item.name
             cardSubtitle.text = item.subtitle
-            cardAuthor.text = ctx.getString(R.string.by_author, author ?: ctx.getString(R.string.default_author))
+            val by = item.author ?: author
+            cardAuthor.text = if (by != null) ctx.getString(R.string.by_author, by) else ctx.getString(R.string.krouen_pick)
             Glide.with(holder.itemView)
                 .load(item.image)
-                .placeholder(R.drawable.mealtest)
-                .error(R.drawable.mealtest)
+                .placeholder(R.drawable.placeholder_image)
+                .error(R.drawable.placeholder_image)
                 .into(cardImage)
         }
         bindSaved(holder, item, animate = false)

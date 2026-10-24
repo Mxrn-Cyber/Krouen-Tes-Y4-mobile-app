@@ -34,8 +34,8 @@ class RecentRecipeAdapter(
         val ctx = holder.itemView.context
         holder.binding.apply {
             tvRecentName.text = meal.strMeal
-            tvRecentAuthor.text = ctx.getString(R.string.by_author, ctx.getString(R.string.default_author))
-            Glide.with(holder.itemView).load(meal.strMealThumb).placeholder(R.drawable.mealtest).into(imgRecent)
+            tvRecentAuthor.text = ctx.getString(R.string.krouen_pick)
+            Glide.with(holder.itemView).load(meal.strMealThumb).placeholder(R.drawable.placeholder_image).into(imgRecent)
         }
         holder.itemView.setOnClickListener { onClick(meal) }
         holder.itemView.setOnLongClickListener { onLongClick(meal); true }

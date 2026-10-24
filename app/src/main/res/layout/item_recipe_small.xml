@@ -15,7 +15,7 @@
         android:layout_height="@dimen/card_small_image"
         android:contentDescription="@null"
         android:scaleType="centerCrop"
-        android:src="@drawable/mealtest"
+        android:src="@drawable/placeholder_image"
         app:shapeAppearanceOverlay="@style/ShapeAppearance.KrouenTes.Rounded" />
 
     <TextView

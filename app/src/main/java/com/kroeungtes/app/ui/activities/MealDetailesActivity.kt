@@ -151,7 +151,7 @@ class MealDetailesActivity : AppCompatActivity() {
     private fun showHeader(name: String, image: String) {
         binding.tvTitle.text = getString(R.string.how_to_make, name)
         binding.collapsingToolbar.title = name
-        Glide.with(this).load(image).placeholder(R.drawable.mealtest).error(R.drawable.mealtest)
+        Glide.with(this).load(image).placeholder(R.drawable.placeholder_image).error(R.drawable.placeholder_image)
             .into(binding.imgMealDetail)
     }
 

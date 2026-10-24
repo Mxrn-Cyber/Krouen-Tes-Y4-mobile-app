@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Notifications (bell in the bottom bar) — empty state until push messages are added -->
+<!-- Notifications (bell tab): friendly empty state until push messages are added -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -18,19 +18,58 @@
         android:text="@string/notifications"
         android:textAppearance="@style/Text.ScreenTitle" />
 
-    <TextView
-        android:id="@+id/tv_notifications_empty"
+    <LinearLayout
+        android:id="@+id/notifications_empty"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:drawablePadding="14dp"
         android:gravity="center"
+        android:orientation="vertical"
         android:paddingStart="40dp"
         android:paddingEnd="40dp"
-        android:paddingBottom="60dp"
-        android:text="@string/notifications_empty"
-        android:textAppearance="@style/Text.Caption"
-        android:textSize="@dimen/text_body"
-        app:drawableTint="@color/brand_green_light"
-        app:drawableTopCompat="@drawable/ic_nav_bell" />
+        android:paddingBottom="48dp">
+
+        <FrameLayout
+            android:id="@+id/bell_circle"
+            android:layout_width="112dp"
+            android:layout_height="112dp"
+            android:background="@drawable/bg_circle_mint">
+
+            <ImageView
+                android:id="@+id/img_bell"
+                android:layout_width="52dp"
+                android:layout_height="52dp"
+                android:layout_gravity="center"
+                android:contentDescription="@null"
+                android:src="@drawable/ic_nav_bell"
+                app:tint="@color/brand_green" />
+        </FrameLayout>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:gravity="center"
+            android:text="@string/notifications_title"
+            android:textAppearance="@style/Text.Section" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:gravity="center"
+            android:maxWidth="320dp"
+            android:text="@string/notifications_empty"
+            android:textAppearance="@style/Text.Caption"
+            android:textSize="@dimen/text_body" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_explore"
+            style="@style/Widget.KrouenTes.PrimaryButton"
+            android:layout_width="wrap_content"
+            android:layout_marginTop="24dp"
+            android:paddingStart="28dp"
+            android:paddingEnd="28dp"
+            android:text="@string/explore_recipes" />
+    </LinearLayout>
 </LinearLayout>

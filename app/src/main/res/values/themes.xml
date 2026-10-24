@@ -9,6 +9,16 @@
         <item name="colorOnSecondary">@color/black</item>
         <item name="android:statusBarColor">@color/white</item>
         <item name="android:windowLightStatusBar">true</item>
+        <!-- Poppins everywhere (Kantumruy Pro when the phone is in Khmer) -->
+        <item name="android:fontFamily">@font/app_font</item>
+        <item name="fontFamily">@font/app_font</item>
+        <item name="textAppearanceBody1">@style/TextAppearance.KrouenTes.Body1</item>
+        <item name="textAppearanceBody2">@style/TextAppearance.KrouenTes.Body2</item>
+        <item name="textAppearanceCaption">@style/TextAppearance.KrouenTes.Caption</item>
+        <item name="textAppearanceButton">@style/TextAppearance.KrouenTes.Button</item>
+        <item name="textAppearanceSubtitle1">@style/TextAppearance.KrouenTes.Subtitle1</item>
+        <item name="textAppearanceSubtitle2">@style/TextAppearance.KrouenTes.Subtitle2</item>
+        <item name="textAppearanceHeadline6">@style/TextAppearance.KrouenTes.Headline6</item>
         <!-- White system navigation bar (gesture line) so it blends with the white bottom bar -->
         <item name="android:navigationBarColor">@color/white</item>
         <item name="android:windowLightNavigationBar" tools:targetApi="o_mr1">true</item>
@@ -38,25 +48,36 @@
     <style name="Text.ScreenTitle" parent="TextAppearance.MaterialComponents.Headline5">
         <item name="android:textSize">@dimen/text_title</item>
         <item name="android:textColor">@color/text_primary</item>
-        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:fontFamily">@font/app_font_semibold</item>
+        <item name="fontFamily">@font/app_font_semibold</item>
+        <item name="android:letterSpacing">0</item>
     </style>
     <style name="Text.Section" parent="TextAppearance.MaterialComponents.Subtitle1">
         <item name="android:textSize">@dimen/text_section</item>
         <item name="android:textColor">@color/text_primary</item>
-        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:fontFamily">@font/app_font_semibold</item>
+        <item name="fontFamily">@font/app_font_semibold</item>
+        <item name="android:letterSpacing">0</item>
     </style>
     <style name="Text.Body" parent="TextAppearance.MaterialComponents.Body2">
         <item name="android:textSize">@dimen/text_body</item>
         <item name="android:textColor">@color/text_primary</item>
+        <item name="android:fontFamily">@font/app_font</item>
+        <item name="fontFamily">@font/app_font</item>
+        <item name="android:letterSpacing">0</item>
     </style>
     <style name="Text.Caption" parent="TextAppearance.MaterialComponents.Caption">
         <item name="android:textSize">@dimen/text_small</item>
         <item name="android:textColor">@color/text_secondary</item>
+        <item name="android:fontFamily">@font/app_font</item>
+        <item name="fontFamily">@font/app_font</item>
+        <item name="android:letterSpacing">0</item>
     </style>
     <style name="Text.Link" parent="TextAppearance.MaterialComponents.Caption">
         <item name="android:textSize">@dimen/text_small</item>
         <item name="android:textColor">@color/brand_green</item>
-        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:fontFamily">@font/app_font_medium</item>
+        <item name="fontFamily">@font/app_font_medium</item>
     </style>
 
     <!-- "See all ->" link next to a section title -->
@@ -83,6 +104,8 @@
         <item name="backgroundTint">@color/brand_green</item>
         <item name="android:textColor">@color/white</item>
         <item name="cornerRadius">12dp</item>
+        <item name="android:fontFamily">@font/app_font_medium</item>
+        <item name="fontFamily">@font/app_font_medium</item>
     </style>
 
     <!-- White outlined button (Continue with Google / Facebook) -->
@@ -94,6 +117,8 @@
         <item name="strokeColor">@color/divider</item>
         <item name="cornerRadius">12dp</item>
         <item name="iconTint">@color/brand_green</item>
+        <item name="android:fontFamily">@font/app_font_medium</item>
+        <item name="fontFamily">@font/app_font_medium</item>
     </style>
 
     <!-- Rounded white text fields -->
@@ -124,6 +149,8 @@
         <item name="checkedIconVisible">false</item>
         <item name="chipMinHeight">38dp</item>
         <item name="android:textSize">@dimen/text_small</item>
+        <item name="android:fontFamily">@font/app_font_medium</item>
+        <item name="fontFamily">@font/app_font_medium</item>
     </style>
     <!-- Hides the big title inside the photo; it only shows once the header collapses -->
     <style name="Text.Collapsed.Hidden" parent="TextAppearance.AppCompat.Title">
@@ -132,6 +159,44 @@
     <style name="Text.Tab" parent="TextAppearance.Design.Tab">
         <item name="android:textAllCaps">false</item>
         <item name="android:textSize">@dimen/text_small</item>
-        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:fontFamily">@font/app_font_medium</item>
+        <item name="fontFamily">@font/app_font_medium</item>
+    </style>
+    <!-- Material text appearances with the app font -->
+    <style name="TextAppearance.KrouenTes.Body1" parent="TextAppearance.MaterialComponents.Body1">
+        <item name="android:fontFamily">@font/app_font</item>
+        <item name="fontFamily">@font/app_font</item>
+        <item name="android:letterSpacing">0</item>
+    </style>
+    <style name="TextAppearance.KrouenTes.Body2" parent="TextAppearance.MaterialComponents.Body2">
+        <item name="android:fontFamily">@font/app_font</item>
+        <item name="fontFamily">@font/app_font</item>
+        <item name="android:letterSpacing">0</item>
+    </style>
+    <style name="TextAppearance.KrouenTes.Caption" parent="TextAppearance.MaterialComponents.Caption">
+        <item name="android:fontFamily">@font/app_font</item>
+        <item name="fontFamily">@font/app_font</item>
+        <item name="android:letterSpacing">0</item>
+    </style>
+    <style name="TextAppearance.KrouenTes.Button" parent="TextAppearance.MaterialComponents.Button">
+        <item name="android:fontFamily">@font/app_font_medium</item>
+        <item name="fontFamily">@font/app_font_medium</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:letterSpacing">0</item>
+    </style>
+    <style name="TextAppearance.KrouenTes.Subtitle1" parent="TextAppearance.MaterialComponents.Subtitle1">
+        <item name="android:fontFamily">@font/app_font</item>
+        <item name="fontFamily">@font/app_font</item>
+        <item name="android:letterSpacing">0</item>
+    </style>
+    <style name="TextAppearance.KrouenTes.Subtitle2" parent="TextAppearance.MaterialComponents.Subtitle2">
+        <item name="android:fontFamily">@font/app_font_medium</item>
+        <item name="fontFamily">@font/app_font_medium</item>
+        <item name="android:letterSpacing">0</item>
+    </style>
+    <style name="TextAppearance.KrouenTes.Headline6" parent="TextAppearance.MaterialComponents.Headline6">
+        <item name="android:fontFamily">@font/app_font_semibold</item>
+        <item name="fontFamily">@font/app_font_semibold</item>
+        <item name="android:letterSpacing">0</item>
     </style>
 </resources>

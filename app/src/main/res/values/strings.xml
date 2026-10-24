@@ -23,6 +23,7 @@
     <string name="recipe_with">%1$s recipe</string>
     <string name="by_author">By %1$s</string>
     <string name="default_author">Krouen Tes</string>
+    <string name="krouen_pick">Krouen Tes pick</string>
     <string name="create_recipe_soon">Create Recipe is coming in the next update</string>
 
     <!-- Recipe page -->
@@ -104,7 +105,9 @@ Tap Save on a recipe to add it here.</string>
     <string name="nav_profile">Profile</string>
     <string name="nav_notifications">Notifications</string>
     <string name="notifications">Notifications</string>
-    <string name="notifications_empty">No notifications yet.\nWe\'ll let you know here when new Khmer recipes arrive.</string>
+    <string name="notifications_title">You\'re all caught up</string>
+    <string name="notifications_empty">No notifications yet. We\'ll let you know here when new Khmer recipes arrive.</string>
+    <string name="explore_recipes">Explore recipes</string>
     <string name="my_profile">My profile</string>
     <string name="edit_profile">Edit profile</string>
     <string name="name">Name</string>

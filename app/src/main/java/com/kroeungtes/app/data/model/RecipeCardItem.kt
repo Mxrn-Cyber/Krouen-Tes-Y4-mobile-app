@@ -9,7 +9,9 @@ data class RecipeCardItem(
     val name: String,
     val image: String?,
     val subtitle: String,
-    val isLocal: Boolean = false
+    val isLocal: Boolean = false,
+    /** Person who made it (user's own recipes). Null = picked by Krouen Tes from the recipe library. */
+    val author: String? = null
 ) {
     companion object {
         fun from(meal: Meal, subtitle: String) = RecipeCardItem(meal.idMeal, meal.strMeal, meal.strMealThumb, subtitle)
@@ -27,7 +29,7 @@ data class RecipeCardItem(
             listOf(detail.strCategory.orEmpty(), detail.strArea.orEmpty()).filter { it.isNotBlank() }.joinToString(" · ")
         )
 
-        fun from(mine: MyRecipe, subtitle: String) =
-            RecipeCardItem(mine.id, mine.title, mine.photoPath, subtitle, isLocal = true)
+        fun from(mine: MyRecipe, subtitle: String, author: String) =
+            RecipeCardItem(mine.id, mine.title, mine.photoPath, subtitle, isLocal = true, author = author)
     }
 }

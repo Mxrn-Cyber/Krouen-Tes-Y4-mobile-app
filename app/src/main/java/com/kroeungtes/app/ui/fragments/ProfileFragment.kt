@@ -67,8 +67,7 @@ class ProfileFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        val profileName = ProfileStore.load(requireContext(), defaultName()).name
-        adapter = RecipeCardAdapter(onClick = { open(it) }, author = profileName)
+        adapter = RecipeCardAdapter(onClick = { open(it) })
         binding.rvProfile.layoutManager = GridLayoutManager(requireContext(), resources.getInteger(R.integer.wishlist_columns))
         binding.rvProfile.adapter = adapter
 
@@ -120,9 +119,12 @@ class ProfileFragment : Fragment() {
 
     private fun showList(animate: Boolean) {
         val items = if (showingSaved) saved.map { RecipeCardItem.from(it, getString(R.string.your_wishlist)) }
-        else myRecipes.map {
-            RecipeCardItem.from(it, getString(R.string.serves_value, it.serves) + " · " +
-                getString(R.string.cook_time_value, it.cookMinutes))
+        else {
+            val me = ProfileStore.load(requireContext(), defaultName()).name
+            myRecipes.map {
+                RecipeCardItem.from(it, getString(R.string.serves_value, it.serves) + " · " +
+                    getString(R.string.cook_time_value, it.cookMinutes), me)
+            }
         }
         adapter.submit(items)
         if (animate) binding.rvProfile.scheduleLayoutAnimation()
@@ -142,6 +144,7 @@ class ProfileFragment : Fragment() {
                 val name = dialog.edProfileName.text?.toString()?.trim().orEmpty().ifBlank { defaultName() }
                 ProfileStore.save(requireContext(), name, dialog.edProfileBio.text?.toString()?.trim().orEmpty())
                 bindProfile()
+                showList(animate = false)
                 binding.profileCard.pop()
             }
             .setNegativeButton(R.string.cancel, null)

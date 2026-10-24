@@ -55,10 +55,10 @@ class FavoriteMealsRecyclerAdapter :
             val ctx = holder.itemView.context
             tvFavMealName.text = meal.mealName
             tvFavMealDesc.text = ctx.getString(R.string.category_area, meal.mealCategory, meal.mealCountry)
-            tvFavMealAuthor.text = ctx.getString(R.string.by_author, ctx.getString(R.string.default_author))
+            tvFavMealAuthor.text = ctx.getString(R.string.krouen_pick)
             Glide.with(holder.itemView)
                 .load(favoriteMeals[position].mealThumb)
-                .error(R.drawable.mealtest)
+                .error(R.drawable.placeholder_image)
                 .into(imgFavMeal)
         }
 

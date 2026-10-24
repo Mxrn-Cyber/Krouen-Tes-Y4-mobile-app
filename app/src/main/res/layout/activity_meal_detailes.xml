@@ -32,7 +32,7 @@
                 android:layout_height="match_parent"
                 android:contentDescription="@null"
                 android:scaleType="centerCrop"
-                android:src="@drawable/mealtest"
+                android:src="@drawable/placeholder_image"
                 app:layout_collapseMode="parallax"
                 app:layout_collapseParallaxMultiplier="0.6" />
 

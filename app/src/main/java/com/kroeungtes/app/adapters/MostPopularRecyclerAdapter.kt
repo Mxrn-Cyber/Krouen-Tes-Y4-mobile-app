@@ -44,10 +44,10 @@ class MostPopularRecyclerAdapter : RecyclerView.Adapter<MostPopularRecyclerAdapt
             val ctx = holder.itemView.context
             tvPopularName.text = meal.strMeal
             tvPopularDesc.text = subtitle ?: ""
-            tvPopularAuthor.text = ctx.getString(R.string.by_author, ctx.getString(R.string.default_author))
+            tvPopularAuthor.text = ctx.getString(R.string.krouen_pick)
             Glide.with(holder.itemView)
                 .load(meal.strMealThumb)
-                .placeholder(R.drawable.mealtest)
+                .placeholder(R.drawable.placeholder_image)
                 .into(imgPopularMeal)
 
         }

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Shown while a recipe photo loads (or if it fails): soft grey with a small fork & knife -->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item>
+        <shape android:shape="rectangle">
+            <solid android:color="#EEF2EF" />
+        </shape>
+    </item>
+    <item android:drawable="@drawable/ic_placeholder_food" android:gravity="center"
+        android:width="40dp" android:height="40dp" />
+</layer-list>

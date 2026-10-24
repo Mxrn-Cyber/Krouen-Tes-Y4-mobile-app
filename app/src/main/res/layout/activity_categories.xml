@@ -27,7 +27,7 @@
             android:id="@+id/tv_category_count"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:fontFamily="@font/myfont"
+            android:fontFamily="@font/app_font"
             android:text=""
             android:textColor="@color/accent"
             android:textStyle="bold"
