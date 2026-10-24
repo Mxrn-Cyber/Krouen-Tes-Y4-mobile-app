@@ -8,6 +8,7 @@ import com.bumptech.glide.Glide
 import com.kroeungtes.app.R
 import com.kroeungtes.app.data.model.RecipeCardItem
 import com.kroeungtes.app.databinding.ItemRecipeCardBinding
+import com.kroeungtes.app.ui.common.Images
 import com.kroeungtes.app.ui.common.pop
 import com.kroeungtes.app.ui.common.pressScale
 
@@ -64,7 +65,7 @@ class RecipeCardAdapter(
             val by = item.author ?: author
             cardAuthor.text = if (by != null) ctx.getString(R.string.by_author, by) else ctx.getString(R.string.krouen_pick)
             Glide.with(holder.itemView)
-                .load(item.image)
+                .load(Images.model(item.image))
                 .placeholder(R.drawable.placeholder_image)
                 .error(R.drawable.placeholder_image)
                 .into(cardImage)

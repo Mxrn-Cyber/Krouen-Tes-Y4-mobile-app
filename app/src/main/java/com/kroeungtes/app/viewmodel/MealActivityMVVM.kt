@@ -17,11 +17,12 @@ class MealActivityMVVM():ViewModel() {
     fun getMealsByCategory(category:String){
         RetrofitInstance.foodApi.getMealsByCategory(category).enqueue(object : Callback<MealsResponse>{
             override fun onResponse(call: Call<MealsResponse>, response: Response<MealsResponse>) {
-                mutableMeal.value = response.body()!!.meals
+                mutableMeal.value = response.body()?.meals.orEmpty()
             }
 
             override fun onFailure(call: Call<MealsResponse>, t: Throwable) {
                 Log.d(TAG,t.message.toString())
+                mutableMeal.value = emptyList()
             }
 
         })

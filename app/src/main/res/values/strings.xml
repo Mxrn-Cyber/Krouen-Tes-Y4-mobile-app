@@ -65,7 +65,7 @@ Tap Save on a recipe to add it here.</string>
     <string name="saved_to_wishlist">Saved to Wishlist</string>
     <string name="undo">Undo</string>
     <string name="no_results">No recipes found for “%1$s”</string>
-    <string name="search_start">Type a dish name, e.g. “Beef”, “Curry”, “Fish”</string>
+    <string name="search_start">Type a dish name, e.g. “Amok”, “Lok Lak”, “Curry”</string>
     <string name="portion">Portion</string>
     <string name="portion_value">×%1$d</string>
     <string name="decrease">Decrease</string>
@@ -122,4 +122,12 @@ Tap Save on a recipe to add it here.</string>
 Tap the green + to create one.</string>
     <string name="log_out">Log out</string>
     <string name="change_photo">Change photo</string>
+    <!-- Khmer recipes -->
+    <string name="khmer_dishes">Khmer dishes</string>
+    <string name="khmer_region">Cambodia</string>
+    <string name="photo_credit">Photo: %1$s · %2$s · Wikimedia Commons</string>
+    <plurals name="recipe_count">
+        <item quantity="one">%d recipe</item>
+        <item quantity="other">%d recipes</item>
+    </plurals>
 </resources>

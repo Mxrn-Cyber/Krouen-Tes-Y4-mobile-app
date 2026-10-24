@@ -18,6 +18,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import com.kroeungtes.app.R
 import com.kroeungtes.app.adapters.RecipeCardAdapter
+import com.kroeungtes.app.data.local.KhmerRecipes
 import com.kroeungtes.app.data.model.RecipeCardItem
 import com.kroeungtes.app.databinding.FragmentSearchBinding
 import com.kroeungtes.app.ui.activities.MealDetailesActivity
@@ -89,8 +90,10 @@ class SearchFragment : Fragment() {
             binding.searchProgress.visibility = if (loading == true) View.VISIBLE else View.INVISIBLE
         }
         searchMvvm.observeResults().observe(viewLifecycleOwner) { results ->
-            val list = results.orEmpty()
-            resultsAdapter.submit(list.map { RecipeCardItem.from(it) })
+            // Built-in Khmer dishes first (works offline), then TheMealDB matches
+            val khmer = KhmerRecipes.search(requireContext(), lastQuery).map { RecipeCardItem.from(it) }
+            val list = khmer + results.orEmpty().map { RecipeCardItem.from(it) }
+            resultsAdapter.submit(list)
             binding.rvSearch.scheduleLayoutAnimation()
             binding.tvSearchState.text = if (lastQuery.isBlank()) getString(R.string.search_start)
             else getString(R.string.no_results, lastQuery)

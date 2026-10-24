@@ -29,6 +29,11 @@ data class RecipeCardItem(
             listOf(detail.strCategory.orEmpty(), detail.strArea.orEmpty()).filter { it.isNotBlank() }.joinToString(" · ")
         )
 
+        fun from(khmer: KhmerRecipe) = RecipeCardItem(
+            khmer.id.toString(), khmer.name, khmer.photoUrl,
+            listOf(khmer.otherName, khmer.category).filter { it.isNotBlank() }.joinToString(" · ")
+        )
+
         fun from(mine: MyRecipe, subtitle: String, author: String) =
             RecipeCardItem(mine.id, mine.title, mine.photoPath, subtitle, isLocal = true, author = author)
     }

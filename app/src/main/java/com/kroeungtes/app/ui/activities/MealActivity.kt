@@ -1,94 +1,93 @@
 package com.kroeungtes.app.ui.activities
 
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
-import androidx.core.content.ContextCompat
-import androidx.lifecycle.Observer
+import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.GridLayoutManager
 import com.kroeungtes.app.R
-import com.kroeungtes.app.adapters.MealRecyclerAdapter
-import com.kroeungtes.app.adapters.SetOnMealClickListener
-import com.kroeungtes.app.data.model.Meal
+import com.kroeungtes.app.adapters.RecipeCardAdapter
+import com.kroeungtes.app.data.local.KhmerRecipes
+import com.kroeungtes.app.data.model.RecipeCardItem
 import com.kroeungtes.app.databinding.ActivityCategoriesBinding
-import com.kroeungtes.app.viewmodel.MealActivityMVVM
-import com.kroeungtes.app.ui.fragments.HomeFragment
+import com.kroeungtes.app.ui.common.Motion
 import com.kroeungtes.app.ui.fragments.HomeFragment.Companion.CATEGORY_NAME
 import com.kroeungtes.app.ui.fragments.HomeFragment.Companion.MEAL_ID
 import com.kroeungtes.app.ui.fragments.HomeFragment.Companion.MEAL_STR
 import com.kroeungtes.app.ui.fragments.HomeFragment.Companion.MEAL_THUMB
+import com.kroeungtes.app.viewmodel.DetailsMVVM
+import com.kroeungtes.app.viewmodel.MealActivityMVVM
 
+/** "See all" screen: the built-in Khmer dishes, or every recipe in one TheMealDB category. */
 class MealActivity : AppCompatActivity() {
-    private lateinit var mealActivityMvvm: MealActivityMVVM
     private lateinit var binding: ActivityCategoriesBinding
-    private lateinit var myAdapter: MealRecyclerAdapter
-    private var categoryNme = ""
+    private lateinit var listMvvm: MealActivityMVVM
+    private lateinit var detailsMvvm: DetailsMVVM
+    private lateinit var adapter: RecipeCardAdapter
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityCategoriesBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        mealActivityMvvm = ViewModelProviders.of(this)[MealActivityMVVM::class.java]
-        startLoading()
-        prepareRecyclerView()
-        mealActivityMvvm.getMealsByCategory(getCategory())
-        mealActivityMvvm.observeMeal().observe(this, object : Observer<List<Meal>> {
-            override fun onChanged(t: List<Meal>?) {
-                if(t==null){
-                    hideLoading()
-                    Toast.makeText(applicationContext, "No meals in this category", Toast.LENGTH_SHORT).show()
-                    onBackPressed()
-                }else {
-                    myAdapter.setCategoryList(t!!)
-                    binding.tvCategoryCount.text = categoryNme + " : " + t.size.toString()
-                    hideLoading()
+        listMvvm = ViewModelProviders.of(this)[MealActivityMVVM::class.java]
+        detailsMvvm = ViewModelProviders.of(this)[DetailsMVVM::class.java]
+
+        val category = intent.getStringExtra(CATEGORY_NAME).orEmpty()
+        val isKhmer = category == KhmerRecipes.LIST_KEY
+
+        binding.btnListBack.setOnClickListener { finish() }
+        binding.tvListTitle.text = if (isKhmer) getString(R.string.khmer_dishes) else category
+
+        adapter = RecipeCardAdapter(
+            onClick = { open(it) },
+            onSaveToggle = { item, saved ->
+                if (saved) detailsMvvm.quickSave(item.id, item.name, item.image) else detailsMvvm.deleteMealById(item.id)
+            }
+        )
+        binding.mealRecyclerview.layoutManager =
+            GridLayoutManager(this, resources.getInteger(R.integer.meal_list_columns), GridLayoutManager.VERTICAL, false)
+        binding.mealRecyclerview.adapter = adapter
+
+        detailsMvvm.observeSaveMeal().observe(this) { saved ->
+            adapter.setSavedIds(saved.orEmpty().map { it.mealId.toString() }.toSet())
+        }
+
+        if (isKhmer) {
+            show(KhmerRecipes.all(this).map { RecipeCardItem.from(it) })
+        } else {
+            binding.listLoading.visibility = View.VISIBLE
+            listMvvm.getMealsByCategory(category)
+            listMvvm.observeMeal().observe(this) { meals ->
+                binding.listLoading.visibility = View.GONE
+                if (meals.isNullOrEmpty()) {
+                    Toast.makeText(this, getString(R.string.no_results, category), Toast.LENGTH_SHORT).show()
+                    finish()
+                } else {
+                    val subtitle = getString(R.string.recipe_with, category)
+                    show(meals.map { RecipeCardItem.from(it, subtitle) })
                 }
             }
-        })
-
-        myAdapter.setOnMealClickListener(object : SetOnMealClickListener {
-            override fun setOnClickListener(meal: Meal) {
-                val intent = Intent(applicationContext, MealDetailesActivity::class.java)
-                intent.putExtra(MEAL_ID, meal.idMeal)
-                intent.putExtra(MEAL_STR, meal.strMeal)
-                intent.putExtra(MEAL_THUMB, meal.strMealThumb)
-                startActivity(intent)
-            }
-        })
-    }
-
-    private fun hideLoading() {
-        binding.apply {
-            loadingGifMeals.visibility = View.INVISIBLE
-            mealRoot.setBackgroundColor(ContextCompat.getColor(applicationContext,R.color.white))
-        }    }
-
-    private fun startLoading() {
-        binding.apply {
-            loadingGifMeals.visibility = View.VISIBLE
-            mealRoot.setBackgroundColor(ContextCompat.getColor(applicationContext,R.color.g_loading))
         }
     }
 
-    private fun getCategory(): String {
-        val tempIntent = intent
-        val x = intent.getStringExtra(CATEGORY_NAME)!!
-        categoryNme = x
-        return x
+    private fun show(items: List<RecipeCardItem>) {
+        adapter.submit(items)
+        binding.mealRecyclerview.scheduleLayoutAnimation()
+        binding.tvCategoryCount.text = resources.getQuantityString(R.plurals.recipe_count, items.size, items.size)
     }
 
-    private fun prepareRecyclerView() {
-        myAdapter = MealRecyclerAdapter()
-        binding.mealRecyclerview.apply {
-            adapter = myAdapter
-            layoutManager = GridLayoutManager(context, resources.getInteger(R.integer.meal_list_columns), GridLayoutManager.VERTICAL, false)
-        }
+    private fun open(item: RecipeCardItem) {
+        Motion.open(this, Intent(this, MealDetailesActivity::class.java).apply {
+            putExtra(MEAL_ID, item.id)
+            putExtra(MEAL_STR, item.name)
+            putExtra(MEAL_THUMB, item.image.orEmpty())
+        })
     }
 
     override fun finish() {
         super.finish()
-        com.kroeungtes.app.ui.common.Motion.closeToRight(this)
+        Motion.closeToRight(this)
     }
 }

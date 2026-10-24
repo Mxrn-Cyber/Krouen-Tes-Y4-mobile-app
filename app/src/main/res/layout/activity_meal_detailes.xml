@@ -127,6 +127,18 @@
                     android:textAppearance="@style/Text.ScreenTitle"
                     tools:text="How to make Lok Lak?" />
 
+                <!-- Name in the other language (Khmer dishes) -->
+                <TextView
+                    android:id="@+id/tv_title_other"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:textAppearance="@style/Text.Section"
+                    android:textColor="@color/brand_green"
+                    android:visibility="gone"
+                    tools:text="ឡុកឡាក់សាច់គោ"
+                    tools:visibility="visible" />
+
                 <!-- Category · Area (instead of ratings until real reviews exist) -->
                 <LinearLayout
                     android:id="@+id/meal_info"
@@ -161,6 +173,31 @@
                         tools:text="Cambodian"
                         tools:visibility="visible" />
                 </LinearLayout>
+
+                <TextView
+                    android:id="@+id/tv_description"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:lineSpacingMultiplier="1.25"
+                    android:textAppearance="@style/Text.Body"
+                    android:textColor="@color/text_secondary"
+                    android:visibility="gone"
+                    tools:text="Cambodia's best-known dish…"
+                    tools:visibility="visible" />
+
+                <!-- Photo credit for Wikimedia Commons photos (tap to open the source page) -->
+                <TextView
+                    android:id="@+id/tv_photo_credit"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:background="?attr/selectableItemBackground"
+                    android:textAppearance="@style/Text.Caption"
+                    android:textSize="@dimen/text_tiny"
+                    android:visibility="gone"
+                    tools:text="Photo: sharonang · CC0 · Wikimedia Commons"
+                    tools:visibility="visible" />
 
                 <!-- Author row + Save -->
                 <LinearLayout

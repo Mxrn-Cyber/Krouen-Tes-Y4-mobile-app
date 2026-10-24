@@ -52,6 +52,44 @@
                 app:drawableStartCompat="@drawable/ic_baseline_search_24"
                 app:drawableTint="@color/text_secondary" />
 
+            <!-- Built-in Khmer dishes (always first) -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/section_gap"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingStart="@dimen/screen_padding"
+                android:paddingEnd="8dp">
+
+                <TextView
+                    android:id="@+id/tv_khmer"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/khmer_dishes"
+                    android:textAppearance="@style/Text.Section" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btn_khmer_all"
+                    style="@style/Widget.KrouenTes.SeeAll"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+            </LinearLayout>
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rec_view_khmer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:clipToPadding="false"
+                android:layoutAnimation="@anim/layout_fade_up"
+                android:nestedScrollingEnabled="false"
+                android:orientation="horizontal"
+                android:paddingStart="@dimen/screen_padding"
+                android:paddingEnd="8dp"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+
             <!-- Category chips: tap to change the Trending row -->
             <HorizontalScrollView
                 android:layout_width="match_parent"

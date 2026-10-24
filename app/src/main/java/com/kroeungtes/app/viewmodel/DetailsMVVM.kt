@@ -3,6 +3,8 @@ package com.kroeungtes.app.viewmodel
 import android.app.Application
 import android.util.Log
 import androidx.lifecycle.*
+import com.kroeungtes.app.R
+import com.kroeungtes.app.data.local.KhmerRecipes
 import com.kroeungtes.app.data.local.MealsDatabase
 import com.kroeungtes.app.data.local.Repository
 import com.kroeungtes.app.data.model.MealDB
@@ -48,6 +50,13 @@ class DetailsMVVM(application: Application) : AndroidViewModel(application) {
      */
     fun quickSave(id: String, name: String, thumb: String?) {
         val mealId = id.toIntOrNull() ?: return
+        if (mealId < 0) {
+            // Built-in Khmer recipe: everything is already on the phone
+            val k = KhmerRecipes.find(getApplication<Application>(), mealId)
+            insertMeal(MealDB(mealId, k?.name ?: name, getApplication<Application>().getString(R.string.khmer_region),
+                k?.category.orEmpty(), k?.steps?.joinToString("\n").orEmpty(), k?.photoUrl ?: thumb.orEmpty(), ""))
+            return
+        }
         insertMeal(MealDB(mealId, name, "", "", "", thumb.orEmpty(), ""))
         RetrofitInstance.foodApi.getMealById(id).enqueue(object : Callback<RandomMealResponse> {
             override fun onResponse(call: Call<RandomMealResponse>, response: Response<RandomMealResponse>) {

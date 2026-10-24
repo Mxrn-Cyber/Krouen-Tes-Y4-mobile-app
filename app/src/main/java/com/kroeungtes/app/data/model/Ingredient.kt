@@ -1,10 +1,15 @@
 package com.kroeungtes.app.data.model
 
 /** One row of the Ingredient list on the Recipe page. */
-data class Ingredient(val name: String, val amount: String) {
+data class Ingredient(
+    val name: String,
+    val amount: String,
+    /** English name used to find a picture (Khmer recipes shown in Khmer still get a photo). */
+    val imageName: String? = null
+) {
     /** TheMealDB has a small picture for most ingredients. */
     val imageUrl: String
-        get() = "https://www.themealdb.com/images/ingredients/${name.trim().replace(" ", "%20")}-Small.png"
+        get() = "https://www.themealdb.com/images/ingredients/${(imageName ?: name).trim().replace(" ", "%20")}-Small.png"
 
     companion object {
         /** Collects the 20 strIngredientN / strMeasureN pairs, skipping empty ones. */

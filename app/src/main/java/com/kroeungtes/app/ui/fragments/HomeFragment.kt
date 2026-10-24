@@ -14,6 +14,7 @@ import com.google.android.material.snackbar.Snackbar
 import com.kroeungtes.app.R
 import com.kroeungtes.app.adapters.RecentRecipeAdapter
 import com.kroeungtes.app.adapters.RecipeCardAdapter
+import com.kroeungtes.app.data.local.KhmerRecipes
 import com.kroeungtes.app.data.model.Category
 import com.kroeungtes.app.data.model.RecipeCardItem
 import com.kroeungtes.app.databinding.FragmentHomeBinding
@@ -50,6 +51,7 @@ class HomeFragment : Fragment() {
     private lateinit var homeMvvm: MainFragMVVM
     private lateinit var detailMvvm: DetailsMVVM
 
+    private lateinit var khmerAdapter: RecipeCardAdapter
     private lateinit var trendingAdapter: RecipeCardAdapter
     private lateinit var wishlistAdapter: RecipeCardAdapter
     private val recentAdapter = RecentRecipeAdapter(
@@ -84,6 +86,14 @@ class HomeFragment : Fragment() {
         // (190 dp on a 366 dp phone like the OPPO PLE110), never wider than the dimen for this size class.
         val usable = resources.displayMetrics.widthPixels - resources.getDimensionPixelSize(R.dimen.screen_padding)
         val cardWidth = minOf(resources.getDimensionPixelSize(R.dimen.card_trending_width), (usable * 0.55f).toInt())
+        khmerAdapter = RecipeCardAdapter(
+            onClick = { openRecipe(it.id, it.name, it.image.orEmpty()) },
+            onSaveToggle = { item, saved -> toggleSave(item, saved) },
+            fixedWidthPx = cardWidth
+        )
+        binding.recViewKhmer.adapter = khmerAdapter
+        khmerAdapter.submit(KhmerRecipes.all(requireContext()).map { RecipeCardItem.from(it) })
+
         trendingAdapter = RecipeCardAdapter(
             onClick = { openRecipe(it.id, it.name, it.image.orEmpty()) },
             onLongClick = { detailMvvm.getMealByIdBottomSheet(it.id) },
@@ -109,6 +119,7 @@ class HomeFragment : Fragment() {
         }
         binding.btnTrendingAll.setOnClickListener { openList(homeMvvm.trendingCategory) }
         binding.btnRecentAll.setOnClickListener { openList(RECENT_CATEGORY) }
+        binding.btnKhmerAll.setOnClickListener { openList(KhmerRecipes.LIST_KEY) }
         binding.btnWishlistAll.setOnClickListener {
             (activity as? MainActivity)?.binding?.bottomNavigation?.selectedItemId = R.id.favoriteMeals
         }
@@ -135,6 +146,7 @@ class HomeFragment : Fragment() {
         detailMvvm.observeSaveMeal().observe(viewLifecycleOwner) { saved ->
             val list = saved.orEmpty()
             val ids = list.map { it.mealId.toString() }.toSet()
+            khmerAdapter.setSavedIds(ids)
             trendingAdapter.setSavedIds(ids)
             wishlistAdapter.setSavedIds(ids)
             wishlistAdapter.submit(list.reversed().map { RecipeCardItem.from(it, getString(R.string.your_wishlist)) })

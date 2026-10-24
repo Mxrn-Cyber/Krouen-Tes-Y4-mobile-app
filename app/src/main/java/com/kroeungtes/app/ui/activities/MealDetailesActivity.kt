@@ -12,6 +12,7 @@ import com.google.android.material.snackbar.Snackbar
 import com.kroeungtes.app.R
 import com.kroeungtes.app.adapters.IngredientAdapter
 import com.kroeungtes.app.adapters.StepAdapter
+import com.kroeungtes.app.data.local.KhmerRecipes
 import com.kroeungtes.app.data.local.MyRecipeStore
 import com.kroeungtes.app.data.local.ProfileStore
 import com.kroeungtes.app.data.model.Ingredient
@@ -20,6 +21,7 @@ import com.kroeungtes.app.data.model.MealDetail
 import com.kroeungtes.app.data.model.MyRecipe
 import com.kroeungtes.app.data.model.RecipeText
 import com.kroeungtes.app.databinding.ActivityMealDetailesBinding
+import com.kroeungtes.app.ui.common.Images
 import com.kroeungtes.app.ui.common.Motion
 import com.kroeungtes.app.ui.common.pop
 import com.kroeungtes.app.ui.fragments.HomeFragment.Companion.MEAL_ID
@@ -28,8 +30,8 @@ import com.kroeungtes.app.ui.fragments.HomeFragment.Companion.MEAL_THUMB
 import com.kroeungtes.app.viewmodel.DetailsMVVM
 
 /**
- * Recipe page. Works for TheMealDB recipes (loaded by id) and for recipes the user made
- * (ids starting with "local-", read from MyRecipeStore).
+ * Recipe page. Works for TheMealDB recipes (loaded by id), the built-in Khmer recipes
+ * (negative ids, from KhmerRecipes) and recipes the user made (ids starting with "local-").
  */
 class MealDetailesActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMealDetailesBinding
@@ -71,7 +73,11 @@ class MealDetailesActivity : AppCompatActivity() {
         updatePortionLabel()
         showHeader(mealStr, mealThumb)
 
-        if (isLocal) showLocalRecipe() else loadFromApi()
+        when {
+            isLocal -> showLocalRecipe()
+            KhmerRecipes.isKhmerId(mealId) -> showKhmerRecipe()
+            else -> loadFromApi()
+        }
     }
 
     // ---------- TheMealDB recipe ----------
@@ -92,7 +98,10 @@ class MealDetailesActivity : AppCompatActivity() {
             binding.progressBar.visibility = View.GONE
             binding.btnSave.visibility = View.VISIBLE
         }
+        setUpSaveButton()
+    }
 
+    private fun setUpSaveButton() {
         binding.btnSave.setOnClickListener {
             val nowSaved = !isMealSavedInDatabase()
             if (nowSaved) saveMeal() else detailsMVVM.deleteMealById(mealId)
@@ -127,6 +136,38 @@ class MealDetailesActivity : AppCompatActivity() {
         }
     }
 
+    // ---------- Built-in Khmer recipe ----------
+
+    private fun showKhmerRecipe() {
+        val recipe = KhmerRecipes.find(this, mealId.toInt()) ?: run { finish(); return }
+        mealStr = recipe.name
+        showHeader(recipe.name, recipe.photoUrl.orEmpty())
+        showInfo(recipe.category, getString(R.string.khmer_region))
+        if (recipe.otherName.isNotBlank()) {
+            binding.tvTitleOther.text = recipe.otherName
+            binding.tvTitleOther.visibility = View.VISIBLE
+        }
+        if (recipe.description.isNotBlank()) {
+            binding.tvDescription.text = recipe.description
+            binding.tvDescription.visibility = View.VISIBLE
+        }
+        if (!recipe.photoAuthor.isNullOrBlank()) {
+            binding.tvPhotoCredit.text = getString(R.string.photo_credit, recipe.photoAuthor, recipe.photoLicense.orEmpty())
+            binding.tvPhotoCredit.visibility = View.VISIBLE
+            recipe.photoPage?.let { page ->
+                binding.tvPhotoCredit.setOnClickListener { startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(page))) }
+            }
+        }
+        binding.tvAuthorName.text = getString(R.string.krouen_pick)
+        ingredientAdapter.submit(recipe.ingredients)
+        stepAdapter.submit(recipe.steps)
+        binding.rvIngredients.scheduleLayoutAnimation()
+        binding.imgYoutube.visibility = View.GONE
+        showSaved(isMealSavedInDatabase())
+        binding.btnSave.visibility = View.VISIBLE
+        setUpSaveButton()
+    }
+
     // ---------- Recipe made by the user ----------
 
     private fun showLocalRecipe() {
@@ -151,7 +192,7 @@ class MealDetailesActivity : AppCompatActivity() {
     private fun showHeader(name: String, image: String) {
         binding.tvTitle.text = getString(R.string.how_to_make, name)
         binding.collapsingToolbar.title = name
-        Glide.with(this).load(image).placeholder(R.drawable.placeholder_image).error(R.drawable.placeholder_image)
+        Glide.with(this).load(Images.model(image)).placeholder(R.drawable.placeholder_image).error(R.drawable.placeholder_image)
             .into(binding.imgMealDetail)
     }
 
