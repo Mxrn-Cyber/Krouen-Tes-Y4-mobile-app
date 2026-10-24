@@ -1,19 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- 5 slots: the middle one is an empty space under the green "+" button -->
+<!-- Like the mockup: Home, Wishlist, [green +], Notifications, Profile — icons only.
+     The middle slot is an empty, disabled space that sits under the + button. -->
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item android:id="@+id/homeFragment"
-        android:icon="@drawable/ic_home"
+        android:icon="@drawable/ic_nav_home"
         android:title="@string/nav_home" />
-    <item android:id="@+id/categoryFragment"
-        android:icon="@drawable/ic_category"
-        android:title="@string/nav_category" />
+    <item android:id="@+id/favoriteMeals"
+        android:icon="@drawable/ic_nav_bookmark"
+        android:title="@string/nav_wishlist" />
     <item android:id="@+id/nav_placeholder"
         android:enabled="false"
         android:title="" />
-    <item android:id="@+id/favoriteMeals"
-        android:icon="@drawable/ic_fav"
-        android:title="@string/nav_wishlist" />
+    <item android:id="@+id/notificationsFragment"
+        android:icon="@drawable/ic_nav_bell"
+        android:title="@string/nav_notifications" />
     <item android:id="@+id/profileFragment"
-        android:icon="@drawable/ic_person"
+        android:icon="@drawable/ic_nav_profile"
         android:title="@string/nav_profile" />
 </menu>

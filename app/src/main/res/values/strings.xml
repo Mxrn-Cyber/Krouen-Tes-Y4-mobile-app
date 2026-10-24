@@ -102,6 +102,9 @@ Tap Save on a recipe to add it here.</string>
 
     <!-- Profile -->
     <string name="nav_profile">Profile</string>
+    <string name="nav_notifications">Notifications</string>
+    <string name="notifications">Notifications</string>
+    <string name="notifications_empty">No notifications yet.\nWe\'ll let you know here when new Khmer recipes arrive.</string>
     <string name="my_profile">My profile</string>
     <string name="edit_profile">Edit profile</string>
     <string name="name">Name</string>

@@ -80,7 +80,10 @@ class HomeFragment : Fragment() {
     }
 
     private fun setUpLists() {
-        val cardWidth = resources.getDimensionPixelSize(R.dimen.card_trending_width)
+        // Card width follows the screen: about 55% of the usable width so the next card peeks in
+        // (190 dp on a 366 dp phone like the OPPO PLE110), never wider than the dimen for this size class.
+        val usable = resources.displayMetrics.widthPixels - resources.getDimensionPixelSize(R.dimen.screen_padding)
+        val cardWidth = minOf(resources.getDimensionPixelSize(R.dimen.card_trending_width), (usable * 0.55f).toInt())
         trendingAdapter = RecipeCardAdapter(
             onClick = { openRecipe(it.id, it.name, it.image.orEmpty()) },
             onLongClick = { detailMvvm.getMealByIdBottomSheet(it.id) },

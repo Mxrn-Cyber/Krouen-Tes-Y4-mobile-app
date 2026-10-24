@@ -28,4 +28,5 @@
     <color name="divider">#E6E8E7</color>
     <color name="auth_overlay">#CCFFFFFF</color>
     <color name="danger">#E5484D</color>
+    <color name="nav_inactive">#BDC2BF</color>
 </resources>

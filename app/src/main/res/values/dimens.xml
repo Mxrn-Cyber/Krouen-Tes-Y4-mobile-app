@@ -25,4 +25,10 @@
     <dimen name="text_tiny">10sp</dimen>
     <dimen name="recipe_header_height">300dp</dimen>
     <dimen name="profile_avatar">84dp</dimen>
+    <!-- Bottom bar with the curved cut-out around the green + -->
+    <dimen name="bottom_bar_height">64dp</dimen>
+    <dimen name="fab_cradle_margin">8dp</dimen>
+    <dimen name="fab_cradle_corner">26dp</dimen>
+    <dimen name="fab_cradle_offset">10dp</dimen>
+    <dimen name="nav_icon_size">26dp</dimen>
 </resources>

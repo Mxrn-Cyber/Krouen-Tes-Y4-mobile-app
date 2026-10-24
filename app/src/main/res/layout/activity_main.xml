@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Main screen: fragments + bottom bar with the green "+" (Create recipe) in the middle -->
+<!-- Main screen: fragments + white bottom bar with a curved cut-out around the green "+" -->
 <androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -14,32 +14,50 @@
         android:name="androidx.navigation.fragment.NavHostFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginBottom="64dp"
+        android:layout_marginBottom="@dimen/bottom_bar_height"
         app:defaultNavHost="true"
         app:navGraph="@navigation/nav_board" />
 
-    <com.google.android.material.bottomnavigation.BottomNavigationView
-        android:id="@+id/bottom_navigation"
+    <com.google.android.material.bottomappbar.BottomAppBar
+        android:id="@+id/bottom_app_bar"
         android:layout_width="match_parent"
-        android:layout_height="64dp"
+        android:layout_height="@dimen/bottom_bar_height"
         android:layout_gravity="bottom"
-        android:background="@color/white"
-        android:elevation="8dp"
-        app:itemIconTint="@color/bottom_nav_item"
-        app:itemTextColor="@color/bottom_nav_item"
-        app:labelVisibilityMode="labeled"
-        app:menu="@menu/bottom_nevigation" />
+        android:paddingStart="0dp"
+        android:paddingEnd="0dp"
+        app:backgroundTint="@color/white"
+        app:contentInsetEnd="0dp"
+        app:contentInsetStart="0dp"
+        app:contentInsetStartWithNavigation="0dp"
+        app:elevation="12dp"
+        app:fabAlignmentMode="center"
+        app:fabCradleMargin="@dimen/fab_cradle_margin"
+        app:fabCradleRoundedCornerRadius="@dimen/fab_cradle_corner"
+        app:fabCradleVerticalOffset="@dimen/fab_cradle_offset">
+
+        <com.google.android.material.bottomnavigation.BottomNavigationView
+            android:id="@+id/bottom_navigation"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@android:color/transparent"
+            app:elevation="0dp"
+            app:itemIconSize="@dimen/nav_icon_size"
+            app:itemIconTint="@color/bottom_nav_item"
+            app:itemRippleColor="@color/brand_mint"
+            app:labelVisibilityMode="unlabeled"
+            app:menu="@menu/bottom_nevigation" />
+    </com.google.android.material.bottomappbar.BottomAppBar>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fab_create"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="bottom|center_horizontal"
-        android:layout_marginBottom="30dp"
         android:contentDescription="@string/create_recipe"
-        android:elevation="10dp"
         android:src="@drawable/ic_add"
         app:backgroundTint="@color/brand_green"
-        app:fabSize="normal"
+        app:elevation="6dp"
+        app:fabCustomSize="60dp"
+        app:maxImageSize="30dp"
+        app:layout_anchor="@id/bottom_app_bar"
         app:tint="@color/white" />
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
