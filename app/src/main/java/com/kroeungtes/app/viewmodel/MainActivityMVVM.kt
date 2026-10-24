@@ -20,6 +20,9 @@ class MainFragMVVM: ViewModel() {
     private val mutableMealsByCategory = MutableLiveData<MealsResponse>()
     private val mutableRecentMeals = MutableLiveData<MealsResponse>()
 
+    /** Selected chip on Home. Declared before init{} so it is set when refresh() runs. */
+    var trendingCategory = TRENDING_CATEGORY
+        private set
 
     init {
         refresh()
@@ -50,10 +53,6 @@ class MainFragMVVM: ViewModel() {
 
         })
     }
-
-    /** Selected chip on Home. */
-    var trendingCategory = TRENDING_CATEGORY
-        private set
 
     /** Pull-to-refresh reloads everything. */
     fun refresh() {
