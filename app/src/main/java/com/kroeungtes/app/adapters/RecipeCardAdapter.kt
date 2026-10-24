@@ -9,6 +9,7 @@ import com.kroeungtes.app.R
 import com.kroeungtes.app.data.model.RecipeCardItem
 import com.kroeungtes.app.databinding.ItemRecipeCardBinding
 import com.kroeungtes.app.ui.common.Images
+import com.kroeungtes.app.ui.common.SharedImage
 import com.kroeungtes.app.ui.common.pop
 import com.kroeungtes.app.ui.common.pressScale
 
@@ -71,7 +72,10 @@ class RecipeCardAdapter(
                 .into(cardImage)
         }
         bindSaved(holder, item, animate = false)
-        holder.itemView.setOnClickListener { onClick(item) }
+        holder.itemView.setOnClickListener {
+            SharedImage.mark(holder.binding.cardImage)
+            onClick(item)
+        }
         holder.itemView.setOnLongClickListener {
             onLongClick?.invoke(item)
             onLongClick != null

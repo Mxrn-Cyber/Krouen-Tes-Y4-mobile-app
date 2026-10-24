@@ -122,7 +122,7 @@ class SearchFragment : Fragment() {
 
     private fun openRecipe(item: RecipeCardItem) {
         hideKeyboard()
-        Motion.open(requireActivity(), Intent(requireContext(), MealDetailesActivity::class.java).apply {
+        Motion.openRecipe(requireActivity(), Intent(requireContext(), MealDetailesActivity::class.java).apply {
             putExtra(MEAL_ID, item.id)
             putExtra(MEAL_STR, item.name)
             putExtra(MEAL_THUMB, item.image.orEmpty())

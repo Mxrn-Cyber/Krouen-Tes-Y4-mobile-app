@@ -11,6 +11,7 @@ import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import com.kroeungtes.app.R
+import com.kroeungtes.app.ui.common.riseIn
 import com.kroeungtes.app.ui.activities.MainActivity
 import com.kroeungtes.app.databinding.ActivityLoginBinding
 import com.google.firebase.auth.FirebaseAuth
@@ -25,6 +26,9 @@ class LoginActivity : AppCompatActivity() {
         binding = ActivityLoginBinding.inflate(layoutInflater)
         setContentView(binding.root)
         firebaseAuth = FirebaseAuth.getInstance()
+        binding.loginTitle.riseIn(delay = 0, distanceDp = 16f)
+        binding.loginSubtitle.riseIn(delay = 90, distanceDp = 16f)
+        binding.loginCard.riseIn(delay = 180, distanceDp = 48f, duration = 520)
         // Social sign-in is shown in the design but not connected yet
         val comingSoon = android.view.View.OnClickListener {
             Toast.makeText(this, R.string.coming_soon, Toast.LENGTH_SHORT).show()

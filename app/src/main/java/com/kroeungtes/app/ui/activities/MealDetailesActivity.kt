@@ -1,6 +1,7 @@
 package com.kroeungtes.app.ui.activities
 
 import android.content.Intent
+import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Bundle
 import android.view.View
@@ -8,6 +9,10 @@ import android.widget.PopupMenu
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProviders
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.DataSource
+import com.bumptech.glide.load.engine.GlideException
+import com.bumptech.glide.request.RequestListener
+import com.bumptech.glide.request.target.Target
 import com.google.android.material.snackbar.Snackbar
 import com.kroeungtes.app.R
 import com.kroeungtes.app.adapters.IngredientAdapter
@@ -24,6 +29,7 @@ import com.kroeungtes.app.databinding.ActivityMealDetailesBinding
 import com.kroeungtes.app.ui.common.Images
 import com.kroeungtes.app.ui.common.Motion
 import com.kroeungtes.app.ui.common.pop
+import com.kroeungtes.app.ui.common.riseIn
 import com.kroeungtes.app.ui.fragments.HomeFragment.Companion.MEAL_ID
 import com.kroeungtes.app.ui.fragments.HomeFragment.Companion.MEAL_STR
 import com.kroeungtes.app.ui.fragments.HomeFragment.Companion.MEAL_THUMB
@@ -43,6 +49,10 @@ class MealDetailesActivity : AppCompatActivity() {
     private var dtMeal: MealDetail? = null
     private var portion = 1
 
+    /** True when the photo flew in from a card (shared-element transition). */
+    private var usedShared = false
+    private var enterStarted = false
+
     private val stepAdapter = StepAdapter()
     private val ingredientAdapter = IngredientAdapter { checked, total ->
         binding.tvIngredientProgress.text =
@@ -56,6 +66,16 @@ class MealDetailesActivity : AppCompatActivity() {
         detailsMVVM = ViewModelProviders.of(this)[DetailsMVVM::class.java]
         binding = ActivityMealDetailesBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        // Photo "flies" in from the card: wait until it has loaded, then start the transition
+        intent.getStringExtra(Motion.EXTRA_SHARED_NAME)?.let { name ->
+            usedShared = true
+            binding.imgMealDetail.transitionName = name
+            supportPostponeEnterTransition()
+            binding.imgMealDetail.postDelayed({ startEnter() }, 600) // never wait longer than this
+        }
+        // Text and lists rise in just after the photo
+        binding.detailColumn.riseIn(delay = if (usedShared) 250 else 80, distanceDp = 36f)
 
         mealId = intent.getStringExtra(MEAL_ID).orEmpty()
         mealStr = intent.getStringExtra(MEAL_STR).orEmpty()
@@ -193,6 +213,19 @@ class MealDetailesActivity : AppCompatActivity() {
         binding.tvTitle.text = getString(R.string.how_to_make, name)
         binding.collapsingToolbar.title = name
         Glide.with(this).load(Images.model(image)).placeholder(R.drawable.placeholder_image).error(R.drawable.placeholder_image)
+            .dontAnimate()
+            .listener(object : RequestListener<Drawable> {
+                override fun onLoadFailed(e: GlideException?, model: Any?, target: Target<Drawable>?, isFirstResource: Boolean): Boolean {
+                    startEnter()
+                    return false
+                }
+
+                override fun onResourceReady(resource: Drawable?, model: Any?, target: Target<Drawable>?,
+                                             dataSource: DataSource?, isFirstResource: Boolean): Boolean {
+                    startEnter()
+                    return false
+                }
+            })
             .into(binding.imgMealDetail)
     }
 
@@ -246,8 +279,15 @@ class MealDetailesActivity : AppCompatActivity() {
         }, getString(R.string.share_recipe)))
     }
 
+    private fun startEnter() {
+        if (!usedShared || enterStarted) return
+        enterStarted = true
+        supportStartPostponedEnterTransition()
+    }
+
     override fun finish() {
         super.finish()
-        Motion.closeToRight(this)
+        // With the flying photo, Android animates the way back itself
+        if (!usedShared) Motion.closeToRight(this)
     }
 }

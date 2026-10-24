@@ -7,6 +7,7 @@ import com.bumptech.glide.Glide
 import com.kroeungtes.app.R
 import com.kroeungtes.app.data.model.Meal
 import com.kroeungtes.app.databinding.ItemRecipeSmallBinding
+import com.kroeungtes.app.ui.common.SharedImage
 import com.kroeungtes.app.ui.common.pressScale
 
 /** Small cards for the "Recent recipe" row on Home. */
@@ -37,7 +38,10 @@ class RecentRecipeAdapter(
             tvRecentAuthor.text = ctx.getString(R.string.krouen_pick)
             Glide.with(holder.itemView).load(meal.strMealThumb).placeholder(R.drawable.placeholder_image).into(imgRecent)
         }
-        holder.itemView.setOnClickListener { onClick(meal) }
+        holder.itemView.setOnClickListener {
+            SharedImage.mark(holder.binding.imgRecent)
+            onClick(meal)
+        }
         holder.itemView.setOnLongClickListener { onLongClick(meal); true }
     }
 

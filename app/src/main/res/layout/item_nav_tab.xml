@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- One tab of the bottom bar: outline icon; when selected the + sits above it and its name shows -->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="0dp"
+    android:layout_height="match_parent"
+    android:layout_weight="1"
+    android:background="?attr/selectableItemBackground">
+
+    <ImageView
+        android:id="@+id/tab_icon"
+        android:layout_width="@dimen/nav_icon_size"
+        android:layout_height="@dimen/nav_icon_size"
+        android:layout_gravity="center"
+        android:importantForAccessibility="no"
+        app:tint="@color/nav_inactive"
+        tools:src="@drawable/ic_nav_home" />
+
+    <TextView
+        android:id="@+id/tab_label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|center_horizontal"
+        android:layout_marginBottom="6dp"
+        android:alpha="0"
+        android:maxLines="1"
+        android:textAppearance="@style/Text.Link"
+        android:textSize="11sp"
+        tools:alpha="1"
+        tools:text="Home" />
+</FrameLayout>

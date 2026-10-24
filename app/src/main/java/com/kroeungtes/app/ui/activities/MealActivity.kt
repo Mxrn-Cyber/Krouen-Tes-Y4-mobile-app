@@ -79,7 +79,7 @@ class MealActivity : AppCompatActivity() {
     }
 
     private fun open(item: RecipeCardItem) {
-        Motion.open(this, Intent(this, MealDetailesActivity::class.java).apply {
+        Motion.openRecipe(this, Intent(this, MealDetailesActivity::class.java).apply {
             putExtra(MEAL_ID, item.id)
             putExtra(MEAL_STR, item.name)
             putExtra(MEAL_THUMB, item.image.orEmpty())

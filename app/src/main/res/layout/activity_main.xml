@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Main screen: fragments + white bottom bar with a curved cut-out around the green "+" -->
+<!-- Main screen: fragments + white curved bottom bar. The dip and the green "+" slide
+     under whichever tab is selected (see MainActivity / CurvedBarView). -->
 <androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -7,6 +8,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/white"
+    android:clipChildren="false"
     tools:context=".ui.activities.MainActivity">
 
     <androidx.fragment.app.FragmentContainerView
@@ -18,46 +20,39 @@
         app:defaultNavHost="true"
         app:navGraph="@navigation/nav_board" />
 
-    <com.google.android.material.bottomappbar.BottomAppBar
-        android:id="@+id/bottom_app_bar"
+    <!-- Bottom bar: drawn bar + tab row + the moving green button -->
+    <FrameLayout
+        android:id="@+id/bottom_bar"
         android:layout_width="match_parent"
-        android:layout_height="@dimen/bottom_bar_height"
-        android:layout_gravity="bottom"
-        android:paddingStart="0dp"
-        android:paddingEnd="0dp"
-        app:backgroundTint="@color/white"
-        app:contentInsetEnd="0dp"
-        app:contentInsetStart="0dp"
-        app:contentInsetStartWithNavigation="0dp"
-        app:elevation="12dp"
-        app:fabAlignmentMode="center"
-        app:fabCradleMargin="@dimen/fab_cradle_margin"
-        app:fabCradleRoundedCornerRadius="@dimen/fab_cradle_corner"
-        app:fabCradleVerticalOffset="@dimen/fab_cradle_offset">
-
-        <com.google.android.material.bottomnavigation.BottomNavigationView
-            android:id="@+id/bottom_navigation"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:background="@android:color/transparent"
-            app:elevation="0dp"
-            app:itemIconSize="@dimen/nav_icon_size"
-            app:itemIconTint="@color/bottom_nav_item"
-            app:itemRippleColor="@color/brand_mint"
-            app:labelVisibilityMode="unlabeled"
-            app:menu="@menu/bottom_nevigation" />
-    </com.google.android.material.bottomappbar.BottomAppBar>
-
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/fab_create"
-        android:layout_width="wrap_content"
+        android:layoutDirection="ltr"
         android:layout_height="wrap_content"
-        android:contentDescription="@string/create_recipe"
-        android:src="@drawable/ic_add"
-        app:backgroundTint="@color/brand_green"
-        app:elevation="6dp"
-        app:fabCustomSize="60dp"
-        app:maxImageSize="30dp"
-        app:layout_anchor="@id/bottom_app_bar"
-        app:tint="@color/white" />
+        android:layout_gravity="bottom"
+        android:clipChildren="false"
+        android:clipToPadding="false">
+
+        <com.kroeungtes.app.ui.common.CurvedBarView
+            android:id="@+id/curved_bar"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+        <LinearLayout
+            android:id="@+id/tab_row"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/bottom_bar_height"
+            android:layout_marginTop="@dimen/bar_top_space"
+            android:orientation="horizontal" />
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/fab_create"
+            android:layout_width="@dimen/fab_size"
+            android:layout_height="@dimen/fab_size"
+            android:layout_gravity="top|start"
+            android:contentDescription="@string/create_recipe"
+            android:src="@drawable/ic_add"
+            app:backgroundTint="@color/brand_green"
+            app:elevation="6dp"
+            app:fabCustomSize="@dimen/fab_size"
+            app:maxImageSize="28dp"
+            app:tint="@color/white" />
+    </FrameLayout>
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

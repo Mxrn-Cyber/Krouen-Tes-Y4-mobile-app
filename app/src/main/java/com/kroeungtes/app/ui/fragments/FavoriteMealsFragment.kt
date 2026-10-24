@@ -22,6 +22,7 @@ import com.kroeungtes.app.data.model.RecipeCardItem
 import com.kroeungtes.app.databinding.FragmentFavoriteMealsBinding
 import com.kroeungtes.app.ui.activities.MealDetailesActivity
 import com.kroeungtes.app.ui.common.Motion
+import com.kroeungtes.app.ui.common.aboveBar
 import com.kroeungtes.app.ui.common.fadeVisible
 import com.kroeungtes.app.ui.dialogs.MealBottomDialog
 import com.kroeungtes.app.ui.fragments.HomeFragment.Companion.CATEGORY_NAME
@@ -78,7 +79,7 @@ class FavoriteMealsFragment : Fragment() {
     private fun removeWithUndo(id: String) {
         val meal = savedMeals.firstOrNull { it.mealId.toString() == id } ?: return
         detailsMVVM.deleteMeal(meal)
-        Snackbar.make(requireView(), R.string.removed_from_wishlist, Snackbar.LENGTH_LONG)
+        Snackbar.make(requireView(), R.string.removed_from_wishlist, Snackbar.LENGTH_LONG).aboveBar()
             .setAction(R.string.undo) { detailsMVVM.insertMeal(meal) }
             .show()
     }
@@ -146,7 +147,7 @@ class FavoriteMealsFragment : Fragment() {
     }
 
     private fun openRecipe(item: RecipeCardItem) {
-        Motion.open(requireActivity(), Intent(context, MealDetailesActivity::class.java).apply {
+        Motion.openRecipe(requireActivity(), Intent(context, MealDetailesActivity::class.java).apply {
             putExtra(MEAL_ID, item.id)
             putExtra(MEAL_STR, item.name)
             putExtra(MEAL_THUMB, item.image.orEmpty())

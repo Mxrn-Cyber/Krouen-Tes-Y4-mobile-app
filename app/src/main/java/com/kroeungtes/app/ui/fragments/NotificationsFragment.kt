@@ -22,7 +22,7 @@ class NotificationsFragment : Fragment(R.layout.fragment_notifications) {
         circle.setOnClickListener { ring(bell) }
 
         view.findViewById<View>(R.id.btn_explore).setOnClickListener {
-            (activity as? MainActivity)?.binding?.bottomNavigation?.selectedItemId = R.id.homeFragment
+            (activity as? MainActivity)?.selectTab(R.id.homeFragment)
         }
     }
 

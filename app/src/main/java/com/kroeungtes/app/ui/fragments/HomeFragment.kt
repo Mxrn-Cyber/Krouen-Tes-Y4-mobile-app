@@ -22,8 +22,10 @@ import com.kroeungtes.app.ui.activities.MainActivity
 import com.kroeungtes.app.ui.activities.MealActivity
 import com.kroeungtes.app.ui.activities.MealDetailesActivity
 import com.kroeungtes.app.ui.common.Motion
+import com.kroeungtes.app.ui.common.aboveBar
 import com.kroeungtes.app.ui.common.fadeVisible
 import com.kroeungtes.app.ui.common.pressScale
+import com.kroeungtes.app.ui.common.riseIn
 import com.kroeungtes.app.ui.common.startSkeletonPulse
 import com.kroeungtes.app.ui.dialogs.MealBottomDialog
 import com.kroeungtes.app.viewmodel.DetailsMVVM
@@ -79,6 +81,10 @@ class HomeFragment : Fragment() {
         setUpClicks()
         observeData()
         showSkeleton(true)
+        if (savedInstanceState == null) {
+            binding.tvGreeting.riseIn(delay = 0, distanceDp = 14f)
+            binding.searchBar.riseIn(delay = 90, distanceDp = 14f)
+        }
     }
 
     private fun setUpLists() {
@@ -121,7 +127,7 @@ class HomeFragment : Fragment() {
         binding.btnRecentAll.setOnClickListener { openList(RECENT_CATEGORY) }
         binding.btnKhmerAll.setOnClickListener { openList(KhmerRecipes.LIST_KEY) }
         binding.btnWishlistAll.setOnClickListener {
-            (activity as? MainActivity)?.binding?.bottomNavigation?.selectedItemId = R.id.favoriteMeals
+            (activity as? MainActivity)?.selectTab(R.id.favoriteMeals)
         }
         binding.swipeRefresh.setColorSchemeResources(R.color.brand_green)
         binding.swipeRefresh.setOnRefreshListener { homeMvvm.refresh() }
@@ -185,6 +191,12 @@ class HomeFragment : Fragment() {
                 }
             }
             group.addView(chip)
+            // Chips pop in one after another
+            chip.scaleX = 0.7f
+            chip.scaleY = 0.7f
+            chip.alpha = 0f
+            chip.animate().scaleX(1f).scaleY(1f).alpha(1f).setStartDelay(40L * group.childCount)
+                .setDuration(260).setInterpolator(android.view.animation.OvershootInterpolator(2f)).start()
         }
     }
 
@@ -194,7 +206,7 @@ class HomeFragment : Fragment() {
         Snackbar.make(binding.root,
             if (saved) R.string.saved_to_wishlist else R.string.removed_from_wishlist,
             Snackbar.LENGTH_SHORT
-        ).setAction(R.string.undo) {
+        ).aboveBar().setAction(R.string.undo) {
             if (saved) detailMvvm.deleteMealById(item.id) else detailMvvm.quickSave(item.id, item.name, item.image)
         }.show()
     }
@@ -213,7 +225,7 @@ class HomeFragment : Fragment() {
     }
 
     private fun openRecipe(id: String, name: String, thumb: String) {
-        Motion.open(requireActivity(), Intent(requireContext(), MealDetailesActivity::class.java).apply {
+        Motion.openRecipe(requireActivity(), Intent(requireContext(), MealDetailesActivity::class.java).apply {
             putExtra(MEAL_ID, id)
             putExtra(MEAL_STR, name)
             putExtra(MEAL_THUMB, thumb)

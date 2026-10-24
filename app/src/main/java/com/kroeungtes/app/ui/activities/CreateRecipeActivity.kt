@@ -20,6 +20,7 @@ import com.kroeungtes.app.databinding.ItemIngredientInputBinding
 import com.kroeungtes.app.ui.common.Motion
 import com.kroeungtes.app.ui.common.pop
 import com.kroeungtes.app.ui.common.pressScale
+import com.kroeungtes.app.ui.common.riseIn
 
 /**
  * Create recipe (slide screen): photo, name, Serves, Cook time, ingredient rows, steps.
@@ -89,6 +90,7 @@ class CreateRecipeActivity : AppCompatActivity() {
         }
         rows.add(row)
         binding.ingredientRows.addView(row.root)
+        if (focus) row.root.riseIn(distanceDp = 12f, duration = 280)
         if (focus) row.edIngredientName.requestFocus()
     }
 

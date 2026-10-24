@@ -19,6 +19,8 @@
         <item name="textAppearanceSubtitle1">@style/TextAppearance.KrouenTes.Subtitle1</item>
         <item name="textAppearanceSubtitle2">@style/TextAppearance.KrouenTes.Subtitle2</item>
         <item name="textAppearanceHeadline6">@style/TextAppearance.KrouenTes.Headline6</item>
+        <!-- Lets a recipe photo fly from its card into the Recipe page -->
+        <item name="android:windowActivityTransitions">true</item>
         <!-- White system navigation bar (gesture line) so it blends with the white bottom bar -->
         <item name="android:navigationBarColor">@color/white</item>
         <item name="android:windowLightNavigationBar" tools:targetApi="o_mr1">true</item>
