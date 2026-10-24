@@ -21,6 +21,8 @@ import com.kroeungtes.app.ui.common.Motion
 import com.kroeungtes.app.ui.common.pop
 import com.kroeungtes.app.ui.common.pressScale
 import com.kroeungtes.app.ui.common.riseIn
+import com.kroeungtes.app.ui.common.EdgeToEdge
+import com.kroeungtes.app.ui.common.padForSystemBars
 
 /**
  * Create recipe (slide screen): photo, name, Serves, Cook time, ingredient rows, steps.
@@ -40,8 +42,10 @@ class CreateRecipeActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        EdgeToEdge.light(this)
         binding = ActivityCreateRecipeBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        binding.root.padForSystemBars(ime = true)
 
         binding.btnClose.setOnClickListener { finish() }
         binding.photoBox.setOnClickListener { pickPhoto.launch("image/*") }

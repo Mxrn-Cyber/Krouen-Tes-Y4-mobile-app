@@ -21,7 +21,7 @@ import retrofit2.Response
 
 class DetailsMVVM(application: Application) : AndroidViewModel(application) {
     private val mutableMealDetail = MutableLiveData<List<MealDetail>>()
-    private val mutableMealBottomSheet = MutableLiveData<List<MealDetail>>()
+    private val mutableMealBottomSheet = MutableLiveData<List<MealDetail>?>()
     private  var allMeals: LiveData<List<MealDB>>
     private  var repository: Repository
 
@@ -132,7 +132,7 @@ class DetailsMVVM(application: Application) : AndroidViewModel(application) {
         mutableMealBottomSheet.value = null
     }
 
-    fun observeMealBottomSheet(): LiveData<List<MealDetail>> {
+    fun observeMealBottomSheet(): LiveData<List<MealDetail>?> {
         return mutableMealBottomSheet
     }
 

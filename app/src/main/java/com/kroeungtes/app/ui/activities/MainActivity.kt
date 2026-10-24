@@ -5,17 +5,23 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import android.view.animation.OvershootInterpolator
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.doOnLayout
+import androidx.core.view.updateLayoutParams
+import androidx.core.view.updatePadding
 import android.view.animation.PathInterpolator
 import androidx.navigation.NavController
 import androidx.navigation.NavOptions
 import androidx.navigation.fragment.NavHostFragment
 import com.kroeungtes.app.R
 import com.kroeungtes.app.databinding.ActivityMainBinding
+import com.kroeungtes.app.ui.common.EdgeToEdge
 import com.kroeungtes.app.ui.common.Motion
 import com.kroeungtes.app.ui.common.pop
 
@@ -42,8 +48,10 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        EdgeToEdge.light(this)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        applyInsets()
 
         // FragmentContainerView: get the NavController from the host fragment
         val navHost = supportFragmentManager.findFragmentById(R.id.frag_host) as NavHostFragment
@@ -74,6 +82,46 @@ class MainActivity : AppCompatActivity() {
             selected = -1
             moveTo(start, animate = false)
         }
+        // If the bar gets wider or narrower later (e.g. the 3-button bar moves to the side),
+        // put the dip and the + back above the selected tab.
+        binding.tabRow.addOnLayoutChangeListener { _, left, _, right, _, oldLeft, _, oldRight, _ ->
+            if (right - left != oldRight - oldLeft && selected >= 0) snapToSelected()
+        }
+    }
+
+    /**
+     * Edge-to-edge: the pages start below the status bar, and the white bar
+     * reaches down behind the gesture bar so there's no gap at the bottom.
+     */
+    private fun applyInsets() {
+        val barHeight = resources.getDimensionPixelSize(R.dimen.bottom_bar_height)
+        ViewCompat.setOnApplyWindowInsetsListener(binding.root) { _, insets ->
+            val bars = insets.getInsets(
+                WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.displayCutout()
+            )
+            val keyboard = insets.getInsets(WindowInsetsCompat.Type.ime()).bottom
+            binding.fragHost.updatePadding(left = bars.left, top = bars.top, right = bars.right)
+            binding.fragHost.updateLayoutParams<ViewGroup.MarginLayoutParams> {
+                bottomMargin = maxOf(barHeight + bars.bottom, keyboard)
+            }
+            binding.bottomBar.updateLayoutParams<ViewGroup.MarginLayoutParams> {
+                leftMargin = bars.left
+                rightMargin = bars.right
+            }
+            binding.curvedBar.bottomInset = bars.bottom
+            WindowInsetsCompat.CONSUMED
+        }
+    }
+
+    /** Puts the dip and the + straight above the selected tab, without animation. */
+    private fun snapToSelected() {
+        val tabWidth = binding.tabRow.width / tabs.size.toFloat()
+        val x = tabWidth * selected + tabWidth / 2f
+        slide?.cancel()
+        val fabWidth = binding.fabCreate.width.takeIf { it > 0 }
+            ?: resources.getDimensionPixelSize(R.dimen.fab_size)
+        binding.curvedBar.notchCenterX = x
+        binding.fabCreate.translationX = x - fabWidth / 2f
     }
 
     /** Used by other screens, e.g. Home "See all" → Wishlist. */
@@ -103,7 +151,7 @@ class MainActivity : AppCompatActivity() {
         }
         val options = NavOptions.Builder()
             .setLaunchSingleTop(true)
-            .setPopUpTo(navController.graph.startDestination, false)
+            .setPopUpTo(navController.graph.startDestinationId, false)
             .setEnterAnim(R.anim.tab_enter)
             .setExitAnim(R.anim.tab_exit)
             .setPopEnterAnim(R.anim.tab_enter)

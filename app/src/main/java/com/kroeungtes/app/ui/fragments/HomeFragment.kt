@@ -7,7 +7,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProviders
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.chip.Chip
 import com.google.android.material.snackbar.Snackbar
@@ -65,8 +65,8 @@ class HomeFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        homeMvvm = ViewModelProviders.of(this)[MainFragMVVM::class.java]
-        detailMvvm = ViewModelProviders.of(this)[DetailsMVVM::class.java]
+        homeMvvm = ViewModelProvider(this)[MainFragMVVM::class.java]
+        detailMvvm = ViewModelProvider(this)[DetailsMVVM::class.java]
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {

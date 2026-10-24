@@ -13,7 +13,7 @@ import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProviders
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import com.kroeungtes.app.R
@@ -45,8 +45,8 @@ class SearchFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        searchMvvm = ViewModelProviders.of(this)[SearchMVVM::class.java]
-        detailsMvvm = ViewModelProviders.of(this)[DetailsMVVM::class.java]
+        searchMvvm = ViewModelProvider(this)[SearchMVVM::class.java]
+        detailsMvvm = ViewModelProvider(this)[DetailsMVVM::class.java]
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {

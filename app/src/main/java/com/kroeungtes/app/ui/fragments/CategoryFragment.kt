@@ -6,8 +6,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProviders
+import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.GridLayoutManager
 import com.kroeungtes.app.R
 import com.kroeungtes.app.adapters.CategoriesRecyclerAdapter
@@ -28,7 +27,7 @@ class CategoryFragment : Fragment(R.layout.fragment_category) {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         myAdapter = CategoriesRecyclerAdapter()
-        categoryMvvm = ViewModelProviders.of(this)[CategoryMVVM::class.java]
+        categoryMvvm = ViewModelProvider(this)[CategoryMVVM::class.java]
     }
 
     override fun onCreateView(
@@ -58,12 +57,9 @@ class CategoryFragment : Fragment(R.layout.fragment_category) {
     }
 
     private fun observeCategories() {
-        categoryMvvm.observeCategories().observe(viewLifecycleOwner,object : Observer<List<Category>>{
-            override fun onChanged(t: List<Category>?) {
-                myAdapter.setCategoryList(t!!)
-            }
-
-        })
+        categoryMvvm.observeCategories().observe(viewLifecycleOwner) { categories ->
+            myAdapter.setCategoryList(categories)
+        }
     }
 
     private fun prepareRecyclerView() {

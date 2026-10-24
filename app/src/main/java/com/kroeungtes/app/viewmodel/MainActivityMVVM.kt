@@ -32,7 +32,7 @@ class MainFragMVVM: ViewModel() {
     private fun getAllCategories() {
         RetrofitInstance.foodApi.getCategories().enqueue(object : Callback<CategoryResponse> {
             override fun onResponse(call: Call<CategoryResponse>, response: Response<CategoryResponse>) {
-                mutableCategory.value = response.body()
+                mutableCategory.value = response.body() ?: return
             }
 
             override fun onFailure(call: Call<CategoryResponse>, t: Throwable) {
@@ -44,7 +44,7 @@ class MainFragMVVM: ViewModel() {
     private fun getRandomMeal() {
         RetrofitInstance.foodApi.getRandomMeal().enqueue(object : Callback<RandomMealResponse> {
             override fun onResponse(call: Call<RandomMealResponse>, response: Response<RandomMealResponse>) {
-                mutableRandomMeal.value = response.body()
+                mutableRandomMeal.value = response.body() ?: return
             }
 
             override fun onFailure(call: Call<RandomMealResponse>, t: Throwable) {
@@ -70,7 +70,7 @@ class MainFragMVVM: ViewModel() {
 
         RetrofitInstance.foodApi.getMealsByCategory(category).enqueue(object : Callback<MealsResponse> {
             override fun onResponse(call: Call<MealsResponse>, response: Response<MealsResponse>) {
-                mutableMealsByCategory.value = response.body()
+                mutableMealsByCategory.value = response.body() ?: MealsResponse(emptyList())
             }
 
             override fun onFailure(call: Call<MealsResponse>, t: Throwable) {
@@ -84,7 +84,7 @@ class MainFragMVVM: ViewModel() {
     private fun getRecentMeals(category: String) {
         RetrofitInstance.foodApi.getMealsByCategory(category).enqueue(object : Callback<MealsResponse> {
             override fun onResponse(call: Call<MealsResponse>, response: Response<MealsResponse>) {
-                mutableRecentMeals.value = response.body()
+                mutableRecentMeals.value = response.body() ?: MealsResponse(emptyList())
             }
 
             override fun onFailure(call: Call<MealsResponse>, t: Throwable) {

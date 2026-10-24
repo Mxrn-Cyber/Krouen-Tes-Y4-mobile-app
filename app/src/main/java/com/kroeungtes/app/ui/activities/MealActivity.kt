@@ -5,7 +5,7 @@ import android.os.Bundle
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.ViewModelProviders
+import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.GridLayoutManager
 import com.kroeungtes.app.R
 import com.kroeungtes.app.adapters.RecipeCardAdapter
@@ -13,6 +13,8 @@ import com.kroeungtes.app.data.local.KhmerRecipes
 import com.kroeungtes.app.data.model.RecipeCardItem
 import com.kroeungtes.app.databinding.ActivityCategoriesBinding
 import com.kroeungtes.app.ui.common.Motion
+import com.kroeungtes.app.ui.common.EdgeToEdge
+import com.kroeungtes.app.ui.common.padForSystemBars
 import com.kroeungtes.app.ui.fragments.HomeFragment.Companion.CATEGORY_NAME
 import com.kroeungtes.app.ui.fragments.HomeFragment.Companion.MEAL_ID
 import com.kroeungtes.app.ui.fragments.HomeFragment.Companion.MEAL_STR
@@ -29,10 +31,12 @@ class MealActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        EdgeToEdge.light(this)
         binding = ActivityCategoriesBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        listMvvm = ViewModelProviders.of(this)[MealActivityMVVM::class.java]
-        detailsMvvm = ViewModelProviders.of(this)[DetailsMVVM::class.java]
+        binding.root.padForSystemBars()
+        listMvvm = ViewModelProvider(this)[MealActivityMVVM::class.java]
+        detailsMvvm = ViewModelProvider(this)[DetailsMVVM::class.java]
 
         val category = intent.getStringExtra(CATEGORY_NAME).orEmpty()
         val isKhmer = category == KhmerRecipes.LIST_KEY

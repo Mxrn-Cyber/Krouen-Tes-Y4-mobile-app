@@ -20,6 +20,7 @@
         android:background="@color/auth_overlay" />
 
     <ScrollView
+        android:id="@+id/auth_scroll"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:fillViewport="true">

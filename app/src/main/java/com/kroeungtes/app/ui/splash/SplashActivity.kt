@@ -12,6 +12,8 @@ import com.kroeungtes.app.databinding.ActivitySplashBinding
 import com.kroeungtes.app.ui.activities.MainActivity
 import com.kroeungtes.app.ui.auth.LoginActivity
 import com.kroeungtes.app.ui.common.riseIn
+import com.kroeungtes.app.ui.common.EdgeToEdge
+import com.kroeungtes.app.ui.common.padForSystemBars
 
 /**
  * Loading screen (User Flow step 1).
@@ -33,8 +35,10 @@ class SplashActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        EdgeToEdge.light(this)
         binding = ActivitySplashBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        binding.root.padForSystemBars()
 
         // Logo grows in with a small bounce, then the tagline rises
         binding.splashLogo.apply {

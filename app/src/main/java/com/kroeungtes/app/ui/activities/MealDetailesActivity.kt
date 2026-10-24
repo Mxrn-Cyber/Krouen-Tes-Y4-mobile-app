@@ -7,12 +7,14 @@ import android.os.Bundle
 import android.view.View
 import android.widget.PopupMenu
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.ViewModelProviders
+import androidx.core.view.WindowCompat
+import androidx.lifecycle.ViewModelProvider
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.DataSource
 import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.target.Target
+import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.snackbar.Snackbar
 import com.kroeungtes.app.R
 import com.kroeungtes.app.adapters.IngredientAdapter
@@ -26,8 +28,10 @@ import com.kroeungtes.app.data.model.MealDetail
 import com.kroeungtes.app.data.model.MyRecipe
 import com.kroeungtes.app.data.model.RecipeText
 import com.kroeungtes.app.databinding.ActivityMealDetailesBinding
+import com.kroeungtes.app.ui.common.EdgeToEdge
 import com.kroeungtes.app.ui.common.Images
 import com.kroeungtes.app.ui.common.Motion
+import com.kroeungtes.app.ui.common.padForSystemBars
 import com.kroeungtes.app.ui.common.pop
 import com.kroeungtes.app.ui.common.riseIn
 import com.kroeungtes.app.ui.fragments.HomeFragment.Companion.MEAL_ID
@@ -63,9 +67,12 @@ class MealDetailesActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        detailsMVVM = ViewModelProviders.of(this)[DetailsMVVM::class.java]
+        EdgeToEdge.light(this)
+        detailsMVVM = ViewModelProvider(this)[DetailsMVVM::class.java]
         binding = ActivityMealDetailesBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        binding.detailScroll.padForSystemBars(top = false)
+        setUpStatusBarIcons()
 
         // Photo "flies" in from the card: wait until it has loaded, then start the transition
         intent.getStringExtra(Motion.EXTRA_SHARED_NAME)?.let { name ->
@@ -83,7 +90,7 @@ class MealDetailesActivity : AppCompatActivity() {
 
         binding.rvIngredients.adapter = ingredientAdapter
         binding.rvSteps.adapter = stepAdapter
-        binding.btnBack.setOnClickListener { onBackPressed() }
+        binding.btnBack.setOnClickListener { onBackPressedDispatcher.onBackPressed() }
         binding.btnMore.setOnClickListener { showMoreMenu(it) }
         binding.btnPortionMinus.setOnClickListener { changePortion(-1) }
         binding.btnPortionPlus.setOnClickListener { changePortion(+1) }
@@ -289,5 +296,20 @@ class MealDetailesActivity : AppCompatActivity() {
         super.finish()
         // With the flying photo, Android animates the way back itself
         if (!usedShared) Motion.closeToRight(this)
+    }
+
+    /** White status-bar icons over the photo; dark ones once the header has collapsed to white. */
+    private fun setUpStatusBarIcons() {
+        val controller = WindowCompat.getInsetsController(window, window.decorView)
+        controller.isAppearanceLightStatusBars = false
+        var darkIcons = false
+        binding.appBar.addOnOffsetChangedListener(AppBarLayout.OnOffsetChangedListener { _, offset ->
+            val bar = binding.collapsingToolbar
+            val collapsed = bar.height + offset < bar.scrimVisibleHeightTrigger
+            if (collapsed != darkIcons) {
+                darkIcons = collapsed
+                controller.isAppearanceLightStatusBars = collapsed
+            }
+        })
     }
 }

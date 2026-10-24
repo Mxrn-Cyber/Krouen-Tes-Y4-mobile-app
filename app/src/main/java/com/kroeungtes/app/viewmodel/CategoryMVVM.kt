@@ -21,7 +21,7 @@ class CategoryMVVM : ViewModel() {
     private fun getCategories(){
         RetrofitInstance.foodApi.getCategories().enqueue(object : Callback<CategoryResponse>{
             override fun onResponse(call: Call<CategoryResponse>, response: Response<CategoryResponse>) {
-                categories.value = response.body()!!.categories
+                categories.value = response.body()?.categories ?: return
             }
 
             override fun onFailure(call: Call<CategoryResponse>, t: Throwable) {

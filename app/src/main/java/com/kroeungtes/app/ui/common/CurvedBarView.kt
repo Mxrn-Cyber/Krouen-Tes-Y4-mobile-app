@@ -39,6 +39,10 @@ class CurvedBarView @JvmOverloads constructor(
 
     val notchDepth: Float get() = notchRadius * 1.25f
 
+    /** Height of the phone's gesture / button bar. The white bar grows down behind it (edge-to-edge). */
+    var bottomInset = 0
+        set(value) { if (field != value) { field = value; requestLayout(); invalidate() } }
+
     private val path = Path()
     private val paint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         color = Color.WHITE
@@ -51,9 +55,9 @@ class CurvedBarView @JvmOverloads constructor(
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.P) setLayerType(LAYER_TYPE_SOFTWARE, null)
     }
 
-    /** Only as tall as the space above the bar + the bar itself (not the whole screen). */
+    /** Only as tall as the space above the bar + the bar itself + the gesture bar (not the whole screen). */
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
-        val wanted = (barTop + resources.getDimension(R.dimen.bottom_bar_height)).toInt()
+        val wanted = (barTop + resources.getDimension(R.dimen.bottom_bar_height)).toInt() + bottomInset
         setMeasuredDimension(
             getDefaultSize(suggestedMinimumWidth, widthMeasureSpec),
             resolveSize(wanted, heightMeasureSpec)

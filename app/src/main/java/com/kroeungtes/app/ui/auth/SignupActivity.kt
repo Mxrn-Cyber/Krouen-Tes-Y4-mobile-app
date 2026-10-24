@@ -6,6 +6,8 @@ import android.os.Bundle
 import android.widget.Toast
 import com.kroeungtes.app.R
 import com.kroeungtes.app.ui.common.riseIn
+import com.kroeungtes.app.ui.common.EdgeToEdge
+import com.kroeungtes.app.ui.common.marginForSystemBars
 import com.kroeungtes.app.ui.activities.MainActivity
 import com.kroeungtes.app.databinding.ActivitySignupBinding
 import com.google.firebase.auth.FirebaseAuth
@@ -15,8 +17,10 @@ class SignupActivity : AppCompatActivity() {
     private lateinit var firebaseAuth: FirebaseAuth
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        EdgeToEdge.light(this)
         binding = ActivitySignupBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        binding.authScroll.marginForSystemBars(ime = true)
         firebaseAuth = FirebaseAuth.getInstance()
         binding.signupTitle.riseIn(delay = 0, distanceDp = 16f)
         binding.signupSubtitle.riseIn(delay = 90, distanceDp = 16f)

@@ -12,6 +12,8 @@ import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import com.kroeungtes.app.R
 import com.kroeungtes.app.ui.common.riseIn
+import com.kroeungtes.app.ui.common.EdgeToEdge
+import com.kroeungtes.app.ui.common.marginForSystemBars
 import com.kroeungtes.app.ui.activities.MainActivity
 import com.kroeungtes.app.databinding.ActivityLoginBinding
 import com.google.firebase.auth.FirebaseAuth
@@ -23,8 +25,10 @@ class LoginActivity : AppCompatActivity() {
     @SuppressLint("MissingInflatedId")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        EdgeToEdge.light(this)
         binding = ActivityLoginBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        binding.authScroll.marginForSystemBars(ime = true)
         firebaseAuth = FirebaseAuth.getInstance()
         binding.loginTitle.riseIn(delay = 0, distanceDp = 16f)
         binding.loginSubtitle.riseIn(delay = 90, distanceDp = 16f)
