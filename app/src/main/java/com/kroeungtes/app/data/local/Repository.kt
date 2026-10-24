@@ -11,7 +11,7 @@ class Repository(private val mealDao: Dao) {
         mealDao.insertFavorite(meal)
     }
 
-    suspend fun getMealById(mealId: String): MealDB {
+    suspend fun getMealById(mealId: String): MealDB? {
         return mealDao.getMealById(mealId)
     }
 

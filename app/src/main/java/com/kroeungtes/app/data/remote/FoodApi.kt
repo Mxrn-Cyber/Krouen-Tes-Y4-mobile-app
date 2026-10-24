@@ -10,8 +10,13 @@ interface FoodApi {
     @GET("categories.php")
     fun getCategories(): Call<CategoryResponse>
 
-    @GET("filter.php?")
-    fun getMealsByCategory(@Query("i") category:String):Call<MealsResponse>
+    /** Meals in a category, e.g. "Beef", "Seafood" (used by Home chips, Category tab, See all). */
+    @GET("filter.php")
+    fun getMealsByCategory(@Query("c") category: String): Call<MealsResponse>
+
+    /** Meals that use an ingredient, e.g. "chicken". */
+    @GET("filter.php")
+    fun getMealsByIngredient(@Query("i") ingredient: String): Call<MealsResponse>
 
     @GET ("random.php")
     fun getRandomMeal():Call<RandomMealResponse>

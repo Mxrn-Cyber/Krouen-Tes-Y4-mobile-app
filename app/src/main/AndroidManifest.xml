@@ -40,6 +40,12 @@
         <activity
             android:name=".ui.activities.MealDetailesActivity"
             android:exported="false" />
+
+        <!-- 4. Create recipe (green + button) -->
+        <activity
+            android:name=".ui.activities.CreateRecipeActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
     </application>
 
 </manifest>

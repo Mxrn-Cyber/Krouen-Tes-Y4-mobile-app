@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Shared recipe card (Home rows, Wishlist, Search, Profile): photo with save button,
+     name + "Detail ->", short line, author -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginEnd="12dp"
+    android:layout_marginBottom="16dp"
+    android:background="?attr/selectableItemBackground"
+    android:orientation="vertical">
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/card_trending_image">
+
+        <com.google.android.material.imageview.ShapeableImageView
+            android:id="@+id/card_image"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:contentDescription="@null"
+            android:scaleType="centerCrop"
+            android:src="@drawable/mealtest"
+            app:shapeAppearanceOverlay="@style/ShapeAppearance.KrouenTes.Rounded" />
+
+        <ImageButton
+            android:id="@+id/card_save"
+            android:layout_width="34dp"
+            android:layout_height="34dp"
+            android:layout_gravity="top|end"
+            android:layout_margin="8dp"
+            android:background="@drawable/bg_circle_white"
+            android:contentDescription="@string/save"
+            android:elevation="2dp"
+            android:padding="7dp"
+            android:scaleType="fitCenter"
+            android:src="@drawable/ic_bookmark"
+            app:tint="@color/brand_green" />
+    </FrameLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/card_name"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:textAppearance="@style/Text.Body"
+            android:textStyle="bold"
+            tools:text="Lok Lak" />
+
+        <TextView
+            android:id="@+id/card_detail"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:drawablePadding="2dp"
+            android:text="@string/detail"
+            android:textAppearance="@style/Text.Link"
+            app:drawableEndCompat="@drawable/ic_arrow_forward"
+            app:drawableTint="@color/brand_green" />
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/card_subtitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="2dp"
+        android:ellipsize="end"
+        android:maxLines="1"
+        android:textAppearance="@style/Text.Caption"
+        tools:text="Beef · Khmer" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="6dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <com.google.android.material.imageview.ShapeableImageView
+            android:id="@+id/card_avatar"
+            android:layout_width="@dimen/avatar_small"
+            android:layout_height="@dimen/avatar_small"
+            android:contentDescription="@null"
+            android:scaleType="centerCrop"
+            android:src="@drawable/logo_krouen_tes"
+            app:shapeAppearanceOverlay="@style/ShapeAppearance.KrouenTes.Circle" />
+
+        <TextView
+            android:id="@+id/card_author"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="6dp"
+            android:layout_weight="1"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:textAppearance="@style/Text.Caption"
+            android:textSize="@dimen/text_tiny"
+            tools:text="By Krouen Tes" />
+    </LinearLayout>
+</LinearLayout>

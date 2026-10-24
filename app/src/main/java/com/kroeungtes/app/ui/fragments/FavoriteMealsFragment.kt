@@ -1,152 +1,160 @@
 package com.kroeungtes.app.ui.fragments
 
 import android.content.Intent
-import com.kroeungtes.app.ui.dialogs.MealBottomDialog
+import android.graphics.Canvas
+import android.graphics.Paint
+import android.graphics.RectF
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.lifecycle.Observer
+import androidx.core.content.ContextCompat
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.snackbar.Snackbar
 import com.kroeungtes.app.R
-import com.kroeungtes.app.adapters.FavoriteMealsRecyclerAdapter
-import com.kroeungtes.app.data.model.Meal
+import com.kroeungtes.app.adapters.RecipeCardAdapter
 import com.kroeungtes.app.data.model.MealDB
-import com.kroeungtes.app.data.model.MealDetail
+import com.kroeungtes.app.data.model.RecipeCardItem
 import com.kroeungtes.app.databinding.FragmentFavoriteMealsBinding
-import com.kroeungtes.app.viewmodel.DetailsMVVM
 import com.kroeungtes.app.ui.activities.MealDetailesActivity
-import com.kroeungtes.app.ui.fragments.HomeFragment
+import com.kroeungtes.app.ui.common.Motion
+import com.kroeungtes.app.ui.common.fadeVisible
+import com.kroeungtes.app.ui.dialogs.MealBottomDialog
 import com.kroeungtes.app.ui.fragments.HomeFragment.Companion.CATEGORY_NAME
 import com.kroeungtes.app.ui.fragments.HomeFragment.Companion.MEAL_AREA
 import com.kroeungtes.app.ui.fragments.HomeFragment.Companion.MEAL_ID
 import com.kroeungtes.app.ui.fragments.HomeFragment.Companion.MEAL_NAME
 import com.kroeungtes.app.ui.fragments.HomeFragment.Companion.MEAL_STR
 import com.kroeungtes.app.ui.fragments.HomeFragment.Companion.MEAL_THUMB
-import com.google.android.material.snackbar.Snackbar
+import com.kroeungtes.app.viewmodel.DetailsMVVM
+import kotlin.math.abs
 
-
+/** Wishlist grid: swipe a card left/right to remove (with Undo), or tap its bookmark. */
 class FavoriteMealsFragment : Fragment() {
-    lateinit var recView:RecyclerView
-    lateinit var fBinding:FragmentFavoriteMealsBinding
-    private lateinit var myAdapter:FavoriteMealsRecyclerAdapter
+
+    private var _binding: FragmentFavoriteMealsBinding? = null
+    private val binding get() = _binding!!
     private lateinit var detailsMVVM: DetailsMVVM
+    private lateinit var adapter: RecipeCardAdapter
+    private var savedMeals: List<MealDB> = emptyList()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        myAdapter = FavoriteMealsRecyclerAdapter()
         detailsMVVM = ViewModelProviders.of(this)[DetailsMVVM::class.java]
     }
 
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        fBinding = FragmentFavoriteMealsBinding.inflate(inflater,container,false)
-        return fBinding.root
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+        _binding = FragmentFavoriteMealsBinding.inflate(inflater, container, false)
+        return binding.root
     }
-
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        adapter = RecipeCardAdapter(
+            onClick = { openRecipe(it) },
+            onLongClick = { detailsMVVM.getMealByIdBottomSheet(it.id) },
+            onSaveToggle = { item, saved -> if (!saved) removeWithUndo(item.id) }
+        )
+        binding.favRecView.layoutManager =
+            GridLayoutManager(context, resources.getInteger(R.integer.wishlist_columns), GridLayoutManager.VERTICAL, false)
+        binding.favRecView.adapter = adapter
+        attachSwipeToRemove()
 
-        prepareRecyclerView(view)
-        onFavoriteMealClick()
-        onFavoriteLongMealClick()
+        detailsMVVM.observeSaveMeal().observe(viewLifecycleOwner) { saved ->
+            val firstLoad = savedMeals.isEmpty()
+            savedMeals = saved.orEmpty().reversed()
+            adapter.submit(savedMeals.map { RecipeCardItem.from(it, getString(R.string.your_wishlist)) })
+            adapter.setSavedIds(savedMeals.map { it.mealId.toString() }.toSet())
+            if (firstLoad) binding.favRecView.scheduleLayoutAnimation()
+            binding.tvFavEmpty.fadeVisible(savedMeals.isEmpty())
+        }
         observeBottomDialog()
+    }
 
-        detailsMVVM.observeSaveMeal().observe(viewLifecycleOwner,object : Observer<List<MealDB>>{
-            override fun onChanged(t: List<MealDB>?) {
-                myAdapter.setFavoriteMealsList(t!!)
-                if(t.isEmpty())
-                    fBinding.tvFavEmpty.visibility = View.VISIBLE
+    private fun removeWithUndo(id: String) {
+        val meal = savedMeals.firstOrNull { it.mealId.toString() == id } ?: return
+        detailsMVVM.deleteMeal(meal)
+        Snackbar.make(requireView(), R.string.removed_from_wishlist, Snackbar.LENGTH_LONG)
+            .setAction(R.string.undo) { detailsMVVM.insertMeal(meal) }
+            .show()
+    }
 
-                else
-                    fBinding.tvFavEmpty.visibility = View.GONE
+    /** Swipe either way: a red "delete" background follows the card. */
+    private fun attachSwipeToRemove() {
+        val red = ContextCompat.getColor(requireContext(), R.color.danger)
+        val paint = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = red }
+        val icon = ContextCompat.getDrawable(requireContext(), R.drawable.ic_delete)
+        val radius = resources.getDimension(R.dimen.corner_card)
 
-            }
-        })
-
-        val itemTouchHelper = object : ItemTouchHelper.SimpleCallback(
-            ItemTouchHelper.UP or ItemTouchHelper.DOWN,
-            ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT
-        ){
-            override fun onMove(
-                recyclerView: RecyclerView,
-                viewHolder: RecyclerView.ViewHolder,
-                target: RecyclerView.ViewHolder
-            ): Boolean {
-                return true
-            }
+        val callback = object : ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT) {
+            override fun onMove(rv: RecyclerView, vh: RecyclerView.ViewHolder, target: RecyclerView.ViewHolder) = false
 
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
                 val position = viewHolder.adapterPosition
-                val favoriteMeal = myAdapter.getMelaByPosition(position)
-                detailsMVVM.deleteMeal(favoriteMeal)
-                showDeleteSnackBar(favoriteMeal)
+                if (position == RecyclerView.NO_POSITION) return
+                removeWithUndo(adapter.itemAt(position).id)
+            }
+
+            override fun onChildDraw(
+                c: Canvas, rv: RecyclerView, vh: RecyclerView.ViewHolder,
+                dX: Float, dY: Float, actionState: Int, isCurrentlyActive: Boolean
+            ) {
+                val item = vh.itemView
+                if (dX != 0f) {
+                    val rect = if (dX > 0) RectF(item.left.toFloat(), item.top.toFloat(), item.left + dX, item.bottom.toFloat())
+                    else RectF(item.right + dX, item.top.toFloat(), item.right.toFloat(), item.bottom.toFloat())
+                    c.drawRoundRect(rect, radius, radius, paint)
+                    icon?.let {
+                        val size = (item.height / 5).coerceAtMost(72)
+                        val top = item.top + (item.height - size) / 2
+                        val left = if (dX > 0) item.left + size / 2 else item.right - size - size / 2
+                        it.setBounds(left, top, left + size, top + size)
+                        it.alpha = (255 * (abs(dX) / item.width).coerceIn(0.3f, 1f)).toInt()
+                        it.draw(c)
+                    }
+                }
+                item.alpha = 1f - (abs(dX) / item.width) * 0.4f
+                super.onChildDraw(c, rv, vh, dX, dY, actionState, isCurrentlyActive)
+            }
+
+            override fun clearView(rv: RecyclerView, vh: RecyclerView.ViewHolder) {
+                vh.itemView.alpha = 1f
+                super.clearView(rv, vh)
             }
         }
-
-        ItemTouchHelper(itemTouchHelper).attachToRecyclerView(recView)
-
-    }
-
-    private fun showDeleteSnackBar(favoriteMeal:MealDB) {
-        Snackbar.make(requireView(),"Meal was deleted",Snackbar.LENGTH_LONG).apply {
-            setAction("undo",View.OnClickListener {
-                detailsMVVM.insertMeal(favoriteMeal)
-            }).show()
-        }
+        ItemTouchHelper(callback).attachToRecyclerView(binding.favRecView)
     }
 
     private fun observeBottomDialog() {
-        detailsMVVM.observeMealBottomSheet().observe(viewLifecycleOwner,object : Observer<List<MealDetail>>{
-            override fun onChanged(t: List<MealDetail>?) {
-                val bottomDialog = MealBottomDialog()
-                val b = Bundle()
-                b.putString(CATEGORY_NAME,t!![0].strCategory)
-                b.putString(MEAL_AREA,t[0].strArea)
-                b.putString(MEAL_NAME,t[0].strMeal)
-                b.putString(MEAL_THUMB,t[0].strMealThumb)
-                b.putString(MEAL_ID,t[0].idMeal)
-                bottomDialog.arguments = b
-                bottomDialog.show(childFragmentManager,"Favorite bottom dialog")
-            }
+        detailsMVVM.observeMealBottomSheet().observe(viewLifecycleOwner) { details ->
+            val meal = details?.firstOrNull() ?: return@observe
+            MealBottomDialog().apply {
+                arguments = Bundle().apply {
+                    putString(CATEGORY_NAME, meal.strCategory)
+                    putString(MEAL_AREA, meal.strArea)
+                    putString(MEAL_NAME, meal.strMeal)
+                    putString(MEAL_THUMB, meal.strMealThumb)
+                    putString(MEAL_ID, meal.idMeal)
+                }
+            }.show(childFragmentManager, "Favorite bottom dialog")
+            detailsMVVM.consumeBottomSheet()
+        }
+    }
 
+    private fun openRecipe(item: RecipeCardItem) {
+        Motion.open(requireActivity(), Intent(context, MealDetailesActivity::class.java).apply {
+            putExtra(MEAL_ID, item.id)
+            putExtra(MEAL_STR, item.name)
+            putExtra(MEAL_THUMB, item.image.orEmpty())
         })
     }
 
-    private fun prepareRecyclerView(v:View) {
-        recView =v.findViewById<RecyclerView>(R.id.fav_rec_view)
-        recView.adapter = myAdapter
-        recView.layoutManager = GridLayoutManager(context, resources.getInteger(R.integer.wishlist_columns), GridLayoutManager.VERTICAL, false)
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
-
-    private fun onFavoriteMealClick(){
-        myAdapter.setOnFavoriteMealClickListener(object : FavoriteMealsRecyclerAdapter.OnFavoriteClickListener{
-            override fun onFavoriteClick(meal: MealDB) {
-                val intent = Intent(context, MealDetailesActivity::class.java)
-                intent.putExtra(MEAL_ID,meal.mealId.toString())
-                intent.putExtra(MEAL_STR,meal.mealName)
-                intent.putExtra(MEAL_THUMB,meal.mealThumb)
-                startActivity(intent)
-            }
-
-        })
-    }
-
-    private fun onFavoriteLongMealClick() {
-        myAdapter.setOnFavoriteLongClickListener(object : FavoriteMealsRecyclerAdapter.OnFavoriteLongClickListener{
-            override fun onFavoriteLongCLick(meal: MealDB) {
-                detailsMVVM.getMealByIdBottomSheet(meal.mealId.toString())
-            }
-
-        })
-    }
-
-
 }

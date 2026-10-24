@@ -1,8 +1,6 @@
 package com.kroeungtes.app.viewmodel
 
-import android.content.Context
 import android.util.Log
-import android.widget.Toast
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -13,27 +11,37 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
+/** Live search: every query returns the full list of matches (empty list = nothing found). */
 class SearchMVVM : ViewModel() {
-    private var searchedMealLiveData = MutableLiveData<MealDetail>()
+    private val results = MutableLiveData<List<MealDetail>>()
+    private val loading = MutableLiveData(false)
+    private var lastCall: Call<RandomMealResponse>? = null
 
+    fun search(query: String) {
+        lastCall?.cancel()
+        if (query.isBlank()) {
+            results.value = emptyList()
+            loading.value = false
+            return
+        }
+        loading.value = true
+        lastCall = RetrofitInstance.foodApi.getMealByName(query.trim()).also { call ->
+            call.enqueue(object : Callback<RandomMealResponse> {
+                override fun onResponse(call: Call<RandomMealResponse>, response: Response<RandomMealResponse>) {
+                    results.value = response.body()?.meals.orEmpty()
+                    loading.value = false
+                }
 
-    fun searchMealDetail(name: String,context: Context?) {
-        RetrofitInstance.foodApi.getMealByName(name).enqueue(object : Callback<RandomMealResponse> {
-            override fun onResponse(call: Call<RandomMealResponse>, response: Response<RandomMealResponse>) {
-                if (response.body()?.meals == null)
-                    Toast.makeText(context?.applicationContext, "No such a meal", Toast.LENGTH_SHORT).show()
-                else
-                    searchedMealLiveData.value = response.body()!!.meals[0]
-            }
-
-            override fun onFailure(call: Call<RandomMealResponse>, t: Throwable) {
-                Log.e(TAG, t.message.toString())
-            }
-
-        })
+                override fun onFailure(call: Call<RandomMealResponse>, t: Throwable) {
+                    if (call.isCanceled) return
+                    Log.e(TAG, t.message.toString())
+                    results.value = emptyList()
+                    loading.value = false
+                }
+            })
+        }
     }
 
-    fun observeSearchLiveData(): LiveData<MealDetail> {
-        return searchedMealLiveData
-    }
+    fun observeResults(): LiveData<List<MealDetail>> = results
+    fun observeLoading(): LiveData<Boolean> = loading
 }

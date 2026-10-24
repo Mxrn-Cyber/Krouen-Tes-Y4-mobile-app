@@ -86,4 +86,9 @@ class MealActivity : AppCompatActivity() {
             layoutManager = GridLayoutManager(context, resources.getInteger(R.integer.meal_list_columns), GridLayoutManager.VERTICAL, false)
         }
     }
+
+    override fun finish() {
+        super.finish()
+        com.kroeungtes.app.ui.common.Motion.closeToRight(this)
+    }
 }

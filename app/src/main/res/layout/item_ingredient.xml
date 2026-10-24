@@ -7,6 +7,7 @@
     android:layout_height="wrap_content"
     android:layout_marginBottom="10dp"
     android:background="@drawable/bg_soft_row"
+    android:foreground="?attr/selectableItemBackground"
     android:gravity="center_vertical"
     android:minHeight="64dp"
     android:orientation="horizontal"
@@ -52,4 +53,12 @@
         android:gravity="end"
         android:textAppearance="@style/Text.Caption"
         tools:text="200g" />
+
+    <ImageView
+        android:id="@+id/img_check"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_marginStart="12dp"
+        android:contentDescription="@null"
+        android:src="@drawable/ic_circle_outline" />
 </LinearLayout>

@@ -113,4 +113,22 @@
         <item name="cornerFamily">rounded</item>
         <item name="cornerSize">50%</item>
     </style>
+    <!-- Category chips on Home (green when selected) -->
+    <style name="Widget.KrouenTes.Chip" parent="Widget.MaterialComponents.Chip.Choice">
+        <item name="chipBackgroundColor">@color/chip_bg</item>
+        <item name="android:textColor">@color/chip_text</item>
+        <item name="chipStrokeWidth">0dp</item>
+        <item name="checkedIconVisible">false</item>
+        <item name="chipMinHeight">38dp</item>
+        <item name="android:textSize">@dimen/text_small</item>
+    </style>
+    <!-- Hides the big title inside the photo; it only shows once the header collapses -->
+    <style name="Text.Collapsed.Hidden" parent="TextAppearance.AppCompat.Title">
+        <item name="android:textColor">@android:color/transparent</item>
+    </style>
+    <style name="Text.Tab" parent="TextAppearance.Design.Tab">
+        <item name="android:textAllCaps">false</item>
+        <item name="android:textSize">@dimen/text_small</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+    </style>
 </resources>

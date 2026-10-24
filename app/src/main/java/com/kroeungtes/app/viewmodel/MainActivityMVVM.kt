@@ -10,9 +10,9 @@ import retrofit2.Response
 
 const val TAG = "MainMVVM"
 
-// TheMealDB filters for the Home rows (Khmer recipes come from Firestore in phase 2)
-const val TRENDING_INGREDIENT = "beef"
-const val RECENT_INGREDIENT = "chicken"
+// TheMealDB categories for the Home rows (Khmer recipes come from Firestore in phase 2)
+const val TRENDING_CATEGORY = "Beef"
+const val RECENT_CATEGORY = "Chicken"
 
 class MainFragMVVM: ViewModel() {
     private val mutableCategory = MutableLiveData<CategoryResponse>()
@@ -22,10 +22,7 @@ class MainFragMVVM: ViewModel() {
 
 
     init {
-        getRandomMeal()
-        getAllCategories()
-        getMealsByCategory(TRENDING_INGREDIENT)
-        getRecentMeals(RECENT_INGREDIENT)
+        refresh()
     }
 
 
@@ -54,6 +51,22 @@ class MainFragMVVM: ViewModel() {
         })
     }
 
+    /** Selected chip on Home. */
+    var trendingCategory = TRENDING_CATEGORY
+        private set
+
+    /** Pull-to-refresh reloads everything. */
+    fun refresh() {
+        getAllCategories()
+        loadTrending(trendingCategory)
+        getRecentMeals(RECENT_CATEGORY)
+    }
+
+    fun loadTrending(category: String) {
+        trendingCategory = category
+        getMealsByCategory(category)
+    }
+
     private fun getMealsByCategory(category:String) {
 
         RetrofitInstance.foodApi.getMealsByCategory(category).enqueue(object : Callback<MealsResponse> {
@@ -63,19 +76,21 @@ class MainFragMVVM: ViewModel() {
 
             override fun onFailure(call: Call<MealsResponse>, t: Throwable) {
                 Log.e(TAG, t.message.toString())
+                mutableMealsByCategory.value = MealsResponse(emptyList())
             }
 
         })
     }
 
-    private fun getRecentMeals(ingredient: String) {
-        RetrofitInstance.foodApi.getMealsByCategory(ingredient).enqueue(object : Callback<MealsResponse> {
+    private fun getRecentMeals(category: String) {
+        RetrofitInstance.foodApi.getMealsByCategory(category).enqueue(object : Callback<MealsResponse> {
             override fun onResponse(call: Call<MealsResponse>, response: Response<MealsResponse>) {
                 mutableRecentMeals.value = response.body()
             }
 
             override fun onFailure(call: Call<MealsResponse>, t: Throwable) {
                 Log.e(TAG, t.message.toString())
+                mutableRecentMeals.value = MealsResponse(emptyList())
             }
         })
     }

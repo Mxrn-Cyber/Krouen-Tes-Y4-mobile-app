@@ -8,7 +8,7 @@ import com.kroeungtes.app.data.model.MealDetail
 
 @Dao
 interface Dao {
-    @Insert
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertFavorite(meal: MealDB)
 
     @Update
@@ -18,7 +18,7 @@ interface Dao {
     fun getAllSavedMeals():LiveData<List<MealDB>>
 
     @Query("SELECT * FROM meal_information WHERE mealId =:id")
-    fun getMealById(id:String):MealDB
+    fun getMealById(id:String):MealDB?
 
     @Query("DELETE FROM meal_information WHERE mealId =:id")
     fun deleteMealById(id:String)

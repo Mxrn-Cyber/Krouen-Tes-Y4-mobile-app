@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Home screen — follows the slide: greeting, search, Trending, Your Wishlist, Recent recipe -->
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<!-- Home — slide layout + interaction: pull to refresh, category chips, skeleton loading,
+     save from cards, staggered fade-in -->
+<androidx.swiperefreshlayout.widget.SwipeRefreshLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/root_home"
+    android:id="@+id/swipe_refresh"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/white"
@@ -14,10 +15,9 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:clipToPadding="false"
-        android:paddingBottom="40dp">
+        android:paddingBottom="48dp">
 
         <LinearLayout
-            android:id="@+id/home_content"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
@@ -32,7 +32,7 @@
                 android:text="@string/home_greeting"
                 android:textAppearance="@style/Text.Section" />
 
-            <!-- Search bar: opens the Search screen -->
+            <!-- Search bar: opens live search -->
             <TextView
                 android:id="@+id/search_bar"
                 android:layout_width="match_parent"
@@ -52,132 +52,243 @@
                 app:drawableStartCompat="@drawable/ic_baseline_search_24"
                 app:drawableTint="@color/text_secondary" />
 
-            <LinearLayout
+            <!-- Category chips: tap to change the Trending row -->
+            <HorizontalScrollView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/section_gap"
-                android:gravity="center_vertical"
-                android:orientation="horizontal"
-                android:paddingStart="@dimen/screen_padding"
-                android:paddingEnd="8dp">
-
-                <TextView
-                    android:id="@+id/tv_trending"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="@string/trending"
-                    android:textAppearance="@style/Text.Section" />
-
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btn_trending_all"
-                    style="@style/Widget.KrouenTes.SeeAll"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" />
-            </LinearLayout>
-
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/rec_view_meals_popular"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
+                android:layout_marginTop="14dp"
                 android:clipToPadding="false"
-                android:nestedScrollingEnabled="false"
-                android:orientation="horizontal"
                 android:paddingStart="@dimen/screen_padding"
-                android:paddingEnd="8dp"
-                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+                android:paddingEnd="@dimen/screen_padding"
+                android:scrollbars="none">
 
-            <!-- Hidden until the user saves at least one recipe -->
-            <LinearLayout
-                android:id="@+id/wishlist_section"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:visibility="gone">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/section_gap"
-                android:gravity="center_vertical"
-                android:orientation="horizontal"
-                android:paddingStart="@dimen/screen_padding"
-                android:paddingEnd="8dp">
-
-                <TextView
-                    android:id="@+id/tv_wishlist"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="@string/your_wishlist"
-                    android:textAppearance="@style/Text.Section" />
-
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btn_wishlist_all"
-                    style="@style/Widget.KrouenTes.SeeAll"
+                <com.google.android.material.chip.ChipGroup
+                    android:id="@+id/chip_group"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" />
-            </LinearLayout>
-
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/rec_view_wishlist"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:clipToPadding="false"
-                android:nestedScrollingEnabled="false"
-                android:orientation="horizontal"
-                android:paddingStart="@dimen/screen_padding"
-                android:paddingEnd="8dp"
-                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
-
-            </LinearLayout>
+                    android:layout_height="wrap_content"
+                    app:chipSpacingHorizontal="8dp"
+                    app:selectionRequired="true"
+                    app:singleLine="true"
+                    app:singleSelection="true" />
+            </HorizontalScrollView>
 
             <LinearLayout
+                android:id="@+id/home_content"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/section_gap"
-                android:gravity="center_vertical"
-                android:orientation="horizontal"
-                android:paddingStart="@dimen/screen_padding"
-                android:paddingEnd="8dp">
+                android:orientation="vertical">
 
-                <TextView
-                    android:id="@+id/tv_recent"
-                    android:layout_width="0dp"
+                <LinearLayout
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="@string/recent_recipe"
-                    android:textAppearance="@style/Text.Section" />
+                    android:layout_marginTop="@dimen/section_gap"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:paddingStart="@dimen/screen_padding"
+                    android:paddingEnd="8dp">
 
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btn_recent_all"
-                    style="@style/Widget.KrouenTes.SeeAll"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" />
+                    <TextView
+                        android:id="@+id/tv_trending"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="@string/trending"
+                        android:textAppearance="@style/Text.Section" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btn_trending_all"
+                        style="@style/Widget.KrouenTes.SeeAll"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+                </LinearLayout>
+
+                <!-- Skeleton shown while Trending loads -->
+                <HorizontalScrollView
+                    android:id="@+id/skeleton"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:paddingStart="@dimen/screen_padding"
+                    android:scrollbars="none">
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+
+                        <LinearLayout
+                            android:layout_width="@dimen/card_trending_width"
+                            android:layout_height="wrap_content"
+                            android:layout_marginEnd="12dp"
+                            android:orientation="vertical">
+
+                            <View
+                                android:layout_width="match_parent"
+                                android:layout_height="@dimen/card_trending_image"
+                                android:background="@drawable/bg_skeleton" />
+
+                            <View
+                                android:layout_width="120dp"
+                                android:layout_height="12dp"
+                                android:layout_marginTop="10dp"
+                                android:background="@drawable/bg_skeleton" />
+
+                            <View
+                                android:layout_width="80dp"
+                                android:layout_height="10dp"
+                                android:layout_marginTop="8dp"
+                                android:background="@drawable/bg_skeleton" />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="@dimen/card_trending_width"
+                            android:layout_height="wrap_content"
+                            android:layout_marginEnd="12dp"
+                            android:orientation="vertical">
+
+                            <View
+                                android:layout_width="match_parent"
+                                android:layout_height="@dimen/card_trending_image"
+                                android:background="@drawable/bg_skeleton" />
+
+                            <View
+                                android:layout_width="120dp"
+                                android:layout_height="12dp"
+                                android:layout_marginTop="10dp"
+                                android:background="@drawable/bg_skeleton" />
+
+                            <View
+                                android:layout_width="80dp"
+                                android:layout_height="10dp"
+                                android:layout_marginTop="8dp"
+                                android:background="@drawable/bg_skeleton" />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="@dimen/card_trending_width"
+                            android:layout_height="wrap_content"
+                            android:layout_marginEnd="12dp"
+                            android:orientation="vertical">
+
+                            <View
+                                android:layout_width="match_parent"
+                                android:layout_height="@dimen/card_trending_image"
+                                android:background="@drawable/bg_skeleton" />
+
+                            <View
+                                android:layout_width="120dp"
+                                android:layout_height="12dp"
+                                android:layout_marginTop="10dp"
+                                android:background="@drawable/bg_skeleton" />
+
+                            <View
+                                android:layout_width="80dp"
+                                android:layout_height="10dp"
+                                android:layout_marginTop="8dp"
+                                android:background="@drawable/bg_skeleton" />
+                        </LinearLayout>
+
+                    </LinearLayout>
+                </HorizontalScrollView>
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/rec_view_meals_popular"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:clipToPadding="false"
+                    android:layoutAnimation="@anim/layout_fade_up"
+                    android:nestedScrollingEnabled="false"
+                    android:orientation="horizontal"
+                    android:paddingStart="@dimen/screen_padding"
+                    android:paddingEnd="8dp"
+                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+
+                <!-- Hidden until the user saves at least one recipe -->
+                <LinearLayout
+                    android:id="@+id/wishlist_section"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:visibility="gone">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/section_gap"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:paddingStart="@dimen/screen_padding"
+                    android:paddingEnd="8dp">
+
+                    <TextView
+                        android:id="@+id/tv_wishlist"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="@string/your_wishlist"
+                        android:textAppearance="@style/Text.Section" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btn_wishlist_all"
+                        style="@style/Widget.KrouenTes.SeeAll"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+                </LinearLayout>
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/rec_view_wishlist"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:clipToPadding="false"
+                    android:layoutAnimation="@anim/layout_fade_up"
+                    android:nestedScrollingEnabled="false"
+                    android:orientation="horizontal"
+                    android:paddingStart="@dimen/screen_padding"
+                    android:paddingEnd="8dp"
+                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/section_gap"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:paddingStart="@dimen/screen_padding"
+                    android:paddingEnd="8dp">
+
+                    <TextView
+                        android:id="@+id/tv_recent"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="@string/recent_recipe"
+                        android:textAppearance="@style/Text.Section" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btn_recent_all"
+                        style="@style/Widget.KrouenTes.SeeAll"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+                </LinearLayout>
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/rec_view_recent"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:clipToPadding="false"
+                    android:layoutAnimation="@anim/layout_fade_up"
+                    android:nestedScrollingEnabled="false"
+                    android:orientation="horizontal"
+                    android:paddingStart="@dimen/screen_padding"
+                    android:paddingEnd="8dp"
+                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+
             </LinearLayout>
-
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/rec_view_recent"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:clipToPadding="false"
-                android:nestedScrollingEnabled="false"
-                android:orientation="horizontal"
-                android:paddingStart="@dimen/screen_padding"
-                android:paddingEnd="8dp"
-                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
-
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
-
-    <ProgressBar
-        android:id="@+id/loading"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:indeterminateTint="@color/brand_green"
-        android:visibility="gone" />
-</FrameLayout>
+</androidx.swiperefreshlayout.widget.SwipeRefreshLayout>

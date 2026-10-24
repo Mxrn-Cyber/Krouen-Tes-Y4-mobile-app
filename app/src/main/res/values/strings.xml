@@ -59,4 +59,61 @@ Tap Save on a recipe to add it here.</string>
     <string name="continue_google">Continue with Google</string>
     <string name="continue_facebook">Continue with Facebook</string>
     <string name="coming_soon">Coming soon</string>
+    <!-- Interactive -->
+    <string name="removed_from_wishlist">Removed from Wishlist</string>
+    <string name="saved_to_wishlist">Saved to Wishlist</string>
+    <string name="undo">Undo</string>
+    <string name="no_results">No recipes found for “%1$s”</string>
+    <string name="search_start">Type a dish name, e.g. “Beef”, “Curry”, “Fish”</string>
+    <string name="portion">Portion</string>
+    <string name="portion_value">×%1$d</string>
+    <string name="decrease">Decrease</string>
+    <string name="increase">Increase</string>
+    <string name="ingredients_ready">%1$d / %2$d ready</string>
+    <string name="steps">Steps</string>
+    <string name="step_number">%1$d</string>
+    <string name="tap_to_tick">Tap to tick off as you cook</string>
+    <string name="share_recipe">Share recipe</string>
+    <string name="delete_recipe">Delete recipe</string>
+    <string name="recipe_deleted">Recipe deleted</string>
+    <string name="cook_time_value">%1$d min</string>
+    <string name="serves_value">Serves %1$d</string>
+    <string name="my_recipe">My recipe</string>
+
+    <!-- Create recipe -->
+    <string name="create_recipe">Create recipe</string>
+    <string name="add_photo">Tap to add a photo</string>
+    <string name="recipe_title_hint">Recipe name, e.g. Fish Amok</string>
+    <string name="serves">Serves</string>
+    <string name="cook_time">Cook time</string>
+    <string name="ingredients">Ingredients</string>
+    <string name="item_name">Item name</string>
+    <string name="quantity">Quantity</string>
+    <string name="add_new_ingredient">Add new ingredient</string>
+    <string name="remove">Remove</string>
+    <string name="steps_hint">One step per line</string>
+    <string name="video_link_hint">Video link (optional)</string>
+    <string name="submit">Submit</string>
+    <string name="need_title">Please add a recipe name</string>
+    <string name="need_ingredient">Add at least one ingredient</string>
+    <string name="recipe_created">Recipe saved to My Profile</string>
+    <string name="pick">Pick</string>
+    <string name="cancel">Cancel</string>
+
+    <!-- Profile -->
+    <string name="nav_profile">Profile</string>
+    <string name="my_profile">My profile</string>
+    <string name="edit_profile">Edit profile</string>
+    <string name="name">Name</string>
+    <string name="bio">About you</string>
+    <string name="bio_empty">Tell people what you love to cook</string>
+    <string name="stat_recipes">Recipes</string>
+    <string name="stat_saved">Saved</string>
+    <string name="stat_videos">Videos</string>
+    <string name="tab_recipe">Recipe</string>
+    <string name="tab_saved">Saved</string>
+    <string name="no_my_recipes">You have no recipes yet.
+Tap the green + to create one.</string>
+    <string name="log_out">Log out</string>
+    <string name="change_photo">Change photo</string>
 </resources>

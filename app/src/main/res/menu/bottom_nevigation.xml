@@ -13,7 +13,7 @@
     <item android:id="@+id/favoriteMeals"
         android:icon="@drawable/ic_fav"
         android:title="@string/nav_wishlist" />
-    <item android:id="@+id/searchFragment"
-        android:icon="@drawable/ic_search"
-        android:title="@string/nav_search" />
+    <item android:id="@+id/profileFragment"
+        android:icon="@drawable/ic_person"
+        android:title="@string/nav_profile" />
 </menu>

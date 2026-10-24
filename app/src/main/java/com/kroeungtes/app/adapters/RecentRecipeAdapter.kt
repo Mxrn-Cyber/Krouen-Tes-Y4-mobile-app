@@ -7,6 +7,7 @@ import com.bumptech.glide.Glide
 import com.kroeungtes.app.R
 import com.kroeungtes.app.data.model.Meal
 import com.kroeungtes.app.databinding.ItemRecipeSmallBinding
+import com.kroeungtes.app.ui.common.pressScale
 
 /** Small cards for the "Recent recipe" row on Home. */
 class RecentRecipeAdapter(
@@ -25,6 +26,7 @@ class RecentRecipeAdapter(
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) = ViewHolder(
         ItemRecipeSmallBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+            .also { it.root.pressScale() }
     )
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {

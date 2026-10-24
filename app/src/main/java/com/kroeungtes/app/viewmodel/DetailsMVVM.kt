@@ -42,6 +42,31 @@ class DetailsMVVM(application: Application) : AndroidViewModel(application) {
         }
     }
 
+    /**
+     * Save straight from a recipe card: store what we have right away,
+     * then replace it with the full details (category, area, video...) when they arrive.
+     */
+    fun quickSave(id: String, name: String, thumb: String?) {
+        val mealId = id.toIntOrNull() ?: return
+        insertMeal(MealDB(mealId, name, "", "", "", thumb.orEmpty(), ""))
+        RetrofitInstance.foodApi.getMealById(id).enqueue(object : Callback<RandomMealResponse> {
+            override fun onResponse(call: Call<RandomMealResponse>, response: Response<RandomMealResponse>) {
+                val d = response.body()?.meals?.firstOrNull() ?: return
+                // Only fill in details if the user didn't unsave it in the meantime
+                viewModelScope.launch(Dispatchers.IO) {
+                    if (repository.getMealById(id) != null) {
+                        repository.insertFavoriteMeal(MealDB(mealId, d.strMeal, d.strArea.orEmpty(), d.strCategory.orEmpty(),
+                            d.strInstructions.orEmpty(), d.strMealThumb.orEmpty(), d.strYoutube.orEmpty()))
+                    }
+                }
+            }
+
+            override fun onFailure(call: Call<RandomMealResponse>, t: Throwable) {
+                Log.e(TAG, t.message.toString())
+            }
+        })
+    }
+
     fun deleteMeal(meal:MealDB) = viewModelScope.launch(Dispatchers.IO) {
         repository.deleteMeal(meal)
     }
@@ -49,7 +74,7 @@ class DetailsMVVM(application: Application) : AndroidViewModel(application) {
     fun getMealById(id: String) {
         RetrofitInstance.foodApi.getMealById(id).enqueue(object : Callback<RandomMealResponse> {
             override fun onResponse(call: Call<RandomMealResponse>, response: Response<RandomMealResponse>) {
-                mutableMealDetail.value = response.body()!!.meals
+                mutableMealDetail.value = response.body()?.meals ?: return
             }
 
             override fun onFailure(call: Call<RandomMealResponse>, t: Throwable) {
@@ -79,7 +104,7 @@ class DetailsMVVM(application: Application) : AndroidViewModel(application) {
     fun getMealByIdBottomSheet(id: String) {
         RetrofitInstance.foodApi.getMealById(id).enqueue(object : Callback<RandomMealResponse> {
             override fun onResponse(call: Call<RandomMealResponse>, response: Response<RandomMealResponse>) {
-                mutableMealBottomSheet.value = response.body()!!.meals
+                mutableMealBottomSheet.value = response.body()?.meals ?: return
             }
 
             override fun onFailure(call: Call<RandomMealResponse>, t: Throwable) {
@@ -91,6 +116,11 @@ class DetailsMVVM(application: Application) : AndroidViewModel(application) {
 
     fun observeMealDetail(): LiveData<List<MealDetail>> {
         return mutableMealDetail
+    }
+
+    /** Clear after showing so the sheet doesn't reopen when the screen is rebuilt. */
+    fun consumeBottomSheet() {
+        mutableMealBottomSheet.value = null
     }
 
     fun observeMealBottomSheet(): LiveData<List<MealDetail>> {

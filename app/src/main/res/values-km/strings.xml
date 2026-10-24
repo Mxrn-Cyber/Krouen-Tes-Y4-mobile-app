@@ -5,4 +5,14 @@
     <string name="nav_wishlist">បញ្ជីចូលចិត្ត</string>
     <string name="nav_category">ប្រភេទ</string>
     <string name="nav_search">ស្វែងរក</string>
+    <string name="nav_profile">ប្រវត្តិរូប</string>
+    <string name="trending">ពេញនិយម 🔥</string>
+    <string name="your_wishlist">បញ្ជីចូលចិត្តរបស់អ្នក</string>
+    <string name="recent_recipe">រូបមន្តថ្មីៗ</string>
+    <string name="see_all">មើលទាំងអស់</string>
+    <string name="ingredient">គ្រឿងផ្សំ</string>
+    <string name="steps">ជំហាន</string>
+    <string name="create_recipe">បង្កើតរូបមន្ត</string>
+    <string name="my_profile">ប្រវត្តិរូបរបស់ខ្ញុំ</string>
+    <string name="submit">បញ្ជូន</string>
 </resources>
