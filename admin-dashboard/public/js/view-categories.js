@@ -1,13 +1,10 @@
-// Categories: add, rename (English + Khmer), reorder, hide, choose an icon and where dishes come from.
+// Categories: add, rename (English + Khmer), reorder, hide, choose an icon, mark 18+.
 import { h, toast, openModal, confirmDialog, field, slugify } from './ui.js';
-import { SOURCE_TYPES } from './defaults.js';
 
 export async function renderCategories(view, ctx) {
   const { store } = ctx;
   const [categories, recipes] = await Promise.all([store.listCategories(), store.listRecipes()]);
   const countFor = id => recipes.filter(r => r.categoryId === id).length;
-  const sourceLabel = c => (SOURCE_TYPES.find(([k]) => k === c.source?.type) || SOURCE_TYPES[0])[1] +
-    (c.source?.value ? `: ${c.source.value}` : '');
 
   const reload = () => renderCategories(view, ctx);
 
@@ -43,7 +40,7 @@ export async function renderCategories(view, ctx) {
     h('td', { class: 'emoji', text: c.icon || '·' }),
     h('td', { class: 'two-line' }, h('strong', { text: c.nameEn }), h('span', { class: 'km', text: c.nameKm || '—' })),
     h('td', { text: countFor(c.id) }),
-    h('td', { class: 'muted', text: sourceLabel(c) + (c.adultOnly ? ' · 18+' : '') }),
+    h('td', { class: 'muted', text: c.adultOnly ? '18+' : '—' }),
     h('td', {}, h('span', { class: `pill ${c.hidden ? 'hidden' : 'active'}`, text: c.hidden ? 'Hidden' : 'Visible' })),
     h('td', { class: 'actions' },
       h('button', { class: 'icon-btn', title: 'Move up', 'aria-label': `Move ${c.nameEn} up`, disabled: i === 0, onClick: () => move(i, -1) }, '↑'),
@@ -55,37 +52,21 @@ export async function renderCategories(view, ctx) {
 
   function editCategory(existing) {
     const isNew = !existing;
-    const c = existing ? { ...existing, source: { ...(existing.source || { type: 'none', value: '' }) } }
-      : { id: '', nameEn: '', nameKm: '', icon: '', hidden: false, adultOnly: false, order: categories.length + 1, source: { type: 'none', value: '' } };
+    const c = existing ? { ...existing }
+      : { id: '', nameEn: '', nameKm: '', icon: '', hidden: false, adultOnly: false, order: categories.length + 1 };
     const nameEn = h('input', { value: c.nameEn, maxlength: 40, required: true });
     const nameKm = h('input', { value: c.nameKm, maxlength: 40, class: 'km' });
     const icon = h('input', { value: c.icon, maxlength: 4, placeholder: '🍲' });
     const idInput = h('input', { value: c.id, maxlength: 40, disabled: !isNew });
     if (isNew) nameEn.addEventListener('input', () => { if (!idInput.dataset.touched) idInput.value = slugify(nameEn.value); });
     idInput.addEventListener('input', () => (idInput.dataset.touched = '1'));
-    const sourceType = h('select', {}, SOURCE_TYPES.map(([k, label]) => h('option', { value: k, selected: k === c.source.type }, label)));
-    const sourceValue = h('input', { value: c.source.value, placeholder: 'e.g. Seafood' });
-    const sourceHint = h('div', { class: 'hint' });
     const adult = h('input', { type: 'checkbox', checked: c.adultOnly });
     const hidden = h('input', { type: 'checkbox', checked: c.hidden });
     const error = h('div', { class: 'error-text' });
-    const syncSource = () => {
-      const t = sourceType.value;
-      sourceValue.parentElement.hidden = !(t === 'mealCategory' || t === 'mealSearch');
-      sourceHint.textContent = t === 'mealSearch' ? 'Words to search for, separated by commas (e.g. cookie, biscuit).'
-        : t === 'mealCategory' ? 'A TheMealDB category name, e.g. Seafood, Dessert, Vegetarian.'
-          : t === 'cocktails' ? 'Cocktails always ask “Are you 18 or older?” first.' : '';
-      if (t === 'cocktails') adult.checked = true;
-    };
-    sourceType.addEventListener('change', syncSource);
 
     const body = h('div', {},
       h('div', { class: 'row' }, field('Name (English)', nameEn), field('Name (Khmer)', nameKm)),
       h('div', { class: 'row' }, field('Icon (emoji)', icon), field('ID', idInput, isNew ? 'Used in links; can’t change later.' : 'Can’t be changed.')),
-      h('div', { class: 'section-title', text: 'Dishes' }),
-      field('Show', sourceType),
-      h('div', { class: 'field' }, h('label', { text: 'Online source' }), sourceValue),
-      sourceHint,
       h('div', { class: 'section-title', text: 'Visibility' }),
       h('label', { class: 'check' }, adult, 'Adults only (asks “18 or older?”)'),
       h('label', { class: 'check' }, hidden, 'Hide from the app'),
@@ -102,12 +83,9 @@ export async function renderCategories(view, ctx) {
             if (!id) { error.textContent = 'Enter an ID (letters and numbers).'; return false; }
             if (id === 'all') { error.textContent = '“all” is used by the app for “All”. Choose another ID.'; return false; }
             if (isNew && categories.some(x => x.id === id)) { error.textContent = 'That ID is already used.'; return false; }
-            const t = sourceType.value;
-            if ((t === 'mealCategory' || t === 'mealSearch') && !sourceValue.value.trim()) { error.textContent = 'Enter what to look for online.'; return false; }
             await store.saveCategory({
               ...c, id, nameEn: nameEn.value.trim(), nameKm: nameKm.value.trim(), icon: icon.value.trim(),
-              adultOnly: adult.checked || t === 'cocktails', hidden: hidden.checked,
-              source: { type: t, value: (t === 'mealCategory' || t === 'mealSearch') ? sourceValue.value.trim() : '' }
+              adultOnly: adult.checked, hidden: hidden.checked
             });
             toast(isNew ? 'Category added' : 'Category saved');
             reload();
@@ -115,20 +93,19 @@ export async function renderCategories(view, ctx) {
         }
       ]
     });
-    syncSource();
     nameEn.focus();
   }
 
   view.replaceChildren(
     h('div', { class: 'view-head' },
       h('div', {}, h('h1', { text: 'Categories' }),
-        h('p', { class: 'muted', text: 'The chips on the app’s Categories tab, in this order. Changes reach phones within seconds.' })),
+        h('p', { class: 'muted', text: 'The chips on the app’s Home and Categories tabs, in this order. Put recipes in a category on the Recipes page.' })),
       h('button', { class: 'btn btn-primary', onClick: () => editCategory(null) }, '+ New category')),
     h('div', { class: 'table-card' },
       categories.length
         ? h('table', {},
-          h('thead', {}, h('tr', {}, ['', 'Name', 'Recipes', 'Online source', 'In app', ''].map(t => h('th', { text: t })))),
+          h('thead', {}, h('tr', {}, ['', 'Name', 'Recipes', 'Age', 'In app', ''].map(t => h('th', { text: t })))),
           h('tbody', {}, rows))
-        : h('div', { class: 'empty', text: 'No categories yet. Import the built-in content on Overview, or add one.' }))
+        : h('div', { class: 'empty', text: 'No categories yet. Import the sample content on Overview, or add one.' }))
   );
 }

@@ -1,31 +1,23 @@
-// The categories the Android app ships with (same names, icons and online sources).
-// Used by "Import built-in content" when the database is empty.
+// A starting set of categories (names and icons), added by "Import sample content".
+// Edit, hide or delete them on the Categories page.
 export const DEFAULT_CATEGORIES = [
-  { id: 'beef', nameEn: 'Beef', nameKm: 'សាច់គោ', icon: '🥩', source: { type: 'mealCategory', value: 'Beef' } },
-  { id: 'chicken', nameEn: 'Chicken', nameKm: 'សាច់មាន់', icon: '🍗', source: { type: 'mealCategory', value: 'Chicken' } },
-  { id: 'pork', nameEn: 'Pork', nameKm: 'សាច់ជ្រូក', icon: '🥓', source: { type: 'mealCategory', value: 'Pork' } },
-  { id: 'fish', nameEn: 'Fish', nameKm: 'ត្រី', icon: '🐟', source: { type: 'mealSearch', value: 'fish' } },
-  { id: 'seafood', nameEn: 'Seafood', nameKm: 'គ្រឿងសមុទ្រ', icon: '🦀', source: { type: 'mealCategory', value: 'Seafood' } },
-  { id: 'soup', nameEn: 'Soup', nameKm: 'សម្ល', icon: '🍲', source: { type: 'mealSearch', value: 'soup' } },
-  { id: 'noodles', nameEn: 'Noodles', nameKm: 'មី និងគុយទាវ', icon: '🍜', source: { type: 'mealSearch', value: 'noodle' } },
-  { id: 'salad', nameEn: 'Salad', nameKm: 'ញាំ និងសាឡាដ', icon: '🥗', source: { type: 'mealSearch', value: 'salad' } },
-  { id: 'dessert', nameEn: 'Dessert', nameKm: 'បង្អែម', icon: '🍮', source: { type: 'mealCategory', value: 'Dessert' } },
-  { id: 'cookies', nameEn: 'Cookies', nameKm: 'នំខូគី', icon: '🍪', source: { type: 'mealSearch', value: 'cookie, biscuit' } },
-  { id: 'vegetarian', nameEn: 'Vegetarian', nameKm: 'អាហារបួស', icon: '🥦', source: { type: 'mealCategory', value: 'Vegetarian' } },
-  { id: 'vegan', nameEn: 'Vegan', nameKm: 'អាហារបួសសុទ្ធ', icon: '🌱', source: { type: 'mealCategory', value: 'Vegan' } },
-  { id: 'breakfast', nameEn: 'Breakfast', nameKm: 'អាហារពេលព្រឹក', icon: '🍳', source: { type: 'mealCategory', value: 'Breakfast' } },
-  { id: 'pasta', nameEn: 'Pasta', nameKm: 'ប៉ាស្តា', icon: '🍝', source: { type: 'mealCategory', value: 'Pasta' } },
-  { id: 'drinks', nameEn: 'Drinks', nameKm: 'ភេសជ្ជៈ', icon: '☕', source: { type: 'drinks', value: '' } },
-  { id: 'cocktails', nameEn: 'Cocktails 18+', nameKm: 'ស្រាក្រឡុក 18+', icon: '🍸', source: { type: 'cocktails', value: '' }, adultOnly: true }
+  { id: 'beef', nameEn: 'Beef', nameKm: 'សាច់គោ', icon: '🥩' },
+  { id: 'chicken', nameEn: 'Chicken', nameKm: 'សាច់មាន់', icon: '🍗' },
+  { id: 'pork', nameEn: 'Pork', nameKm: 'សាច់ជ្រូក', icon: '🥓' },
+  { id: 'fish', nameEn: 'Fish', nameKm: 'ត្រី', icon: '🐟' },
+  { id: 'seafood', nameEn: 'Seafood', nameKm: 'គ្រឿងសមុទ្រ', icon: '🦀' },
+  { id: 'soup', nameEn: 'Soup', nameKm: 'សម្ល', icon: '🍲' },
+  { id: 'noodles', nameEn: 'Noodles', nameKm: 'មី និងគុយទាវ', icon: '🍜' },
+  { id: 'salad', nameEn: 'Salad', nameKm: 'ញាំ និងសាឡាដ', icon: '🥗' },
+  { id: 'dessert', nameEn: 'Dessert', nameKm: 'បង្អែម', icon: '🍮' },
+  { id: 'cookies', nameEn: 'Cookies', nameKm: 'នំខូគី', icon: '🍪' },
+  { id: 'vegetarian', nameEn: 'Vegetarian', nameKm: 'អាហារបួស', icon: '🥦' },
+  { id: 'vegan', nameEn: 'Vegan', nameKm: 'អាហារបួសសុទ្ធ', icon: '🌱' },
+  { id: 'breakfast', nameEn: 'Breakfast', nameKm: 'អាហារពេលព្រឹក', icon: '🍳' },
+  { id: 'pasta', nameEn: 'Pasta', nameKm: 'ប៉ាស្តា', icon: '🍝' },
+  { id: 'drinks', nameEn: 'Drinks', nameKm: 'ភេសជ្ជៈ', icon: '☕' },
+  { id: 'cocktails', nameEn: 'Cocktails 18+', nameKm: 'ស្រាក្រឡុក 18+', icon: '🍸', adultOnly: true }
 ].map((c, i) => ({ hidden: false, adultOnly: false, ...c, order: i + 1 }));
-
-export const SOURCE_TYPES = [
-  ['none', 'Only our recipes'],
-  ['mealCategory', 'Also TheMealDB category'],
-  ['mealSearch', 'Also TheMealDB name search'],
-  ['drinks', 'Drinks from TheCocktailDB (no alcohol)'],
-  ['cocktails', 'Cocktails from TheCocktailDB (18+)']
-];
 
 /** Region for the built-in recipes (only where a source ties the dish to a place). */
 export const BUILT_IN_REGIONS = { '-110': 'coast' };

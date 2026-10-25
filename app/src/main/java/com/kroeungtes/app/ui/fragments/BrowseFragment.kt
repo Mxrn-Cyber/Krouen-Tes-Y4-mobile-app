@@ -13,8 +13,8 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 import com.kroeungtes.app.R
 import com.kroeungtes.app.adapters.RecipeCardAdapter
-import com.kroeungtes.app.data.browse.Countries
 import com.kroeungtes.app.data.browse.FoodType
+import com.kroeungtes.app.data.browse.Region
 import com.kroeungtes.app.data.browse.SortBy
 import com.kroeungtes.app.data.cloud.CloudContent
 import com.kroeungtes.app.data.local.AgeGate
@@ -32,8 +32,8 @@ import com.kroeungtes.app.viewmodel.BrowseMVVM
 import com.kroeungtes.app.viewmodel.DetailsMVVM
 
 /**
- * Categories tab: filter dishes by type (chips) and country, and sort them
- * (name, quickest, fewest ingredients, serves most). Cocktails ask "18 or older?" first.
+ * Categories tab: the dashboard's recipes filtered by category (chips) and region, and sorted
+ * (name, quickest, fewest ingredients, serves most). 18+ categories ask "18 or older?" first.
  */
 class BrowseFragment : Fragment() {
 
@@ -44,7 +44,7 @@ class BrowseFragment : Fragment() {
     private lateinit var detailsMvvm: DetailsMVVM
     private lateinit var adapter: RecipeCardAdapter
 
-    /** Chip view id → the type it stands for. */
+    /** Chip view id → the category it stands for. */
     private val chipTypes = mutableMapOf<Int, FoodType>()
     /** The categories the chips were last built from (they come from the admin dashboard). */
     private var chipsFor: List<FoodType>? = null
@@ -75,11 +75,8 @@ class BrowseFragment : Fragment() {
             chipsFor = list
             buildTypeChips(list, browseMvvm.observeState().value?.type ?: FoodType.ALL)
         }
-        binding.btnCountry.setOnClickListener { pickCountry() }
+        binding.btnRegion.setOnClickListener { pickRegion() }
         binding.btnSort.setOnClickListener { pickSort() }
-        binding.tvBrowseHint.setOnClickListener {
-            if (browseMvvm.observeState().value?.offline == true) browseMvvm.retry()
-        }
 
         detailsMvvm.observeSaveMeal().observe(viewLifecycleOwner) { saved ->
             adapter.setSavedIds(saved.orEmpty().map { it.mealId.toString() }.toSet())
@@ -144,14 +141,15 @@ class BrowseFragment : Fragment() {
         _binding?.typeChips?.check(id)
     }
 
-    private fun pickCountry() {
-        val current = browseMvvm.observeState().value?.country
-        val labels = listOf(getString(R.string.all_countries)) + Countries.ALL.map { it.label(khmer) }
-        val checked = if (current == null) 0 else Countries.ALL.indexOf(current) + 1
+    private fun pickRegion() {
+        val current = browseMvvm.observeState().value?.region
+        val regions = Region.entries
+        val labels = listOf(getString(R.string.all_regions)) + regions.map { getString(it.label) }
+        val checked = if (current == null) 0 else regions.indexOf(current) + 1
         MaterialAlertDialogBuilder(requireContext())
-            .setTitle(R.string.pick_country)
+            .setTitle(R.string.pick_region)
             .setSingleChoiceItems(labels.toTypedArray(), checked) { dialog, which ->
-                browseMvvm.setCountry(if (which == 0) null else Countries.ALL[which - 1])
+                browseMvvm.setRegion(if (which == 0) null else regions[which - 1])
                 dialog.dismiss()
             }
             .show()
@@ -177,9 +175,8 @@ class BrowseFragment : Fragment() {
         // Keep the checked chip in step when the list goes back to "All" by itself
         val checked = chipTypes[b.typeChips.checkedChipId]
         if (checked != null && checked.id != s.type.id) selectChip(s.type)
-        b.btnCountry.text = s.country?.label(khmer) ?: getString(R.string.all_countries)
-        // Drinks don't have a country
-        b.btnCountry.visibility = if (s.type.drink != null) View.GONE else View.VISIBLE
+
+        b.btnRegion.text = s.region?.let { getString(it.label) } ?: getString(R.string.all_regions)
         b.btnSort.text = getString(s.sort.label)
         b.browseLoading.visibility = if (s.loading) View.VISIBLE else View.GONE
 
@@ -188,13 +185,9 @@ class BrowseFragment : Fragment() {
         b.tvBrowseCount.text = resources.getQuantityString(R.plurals.recipe_count, s.items.size, s.items.size)
         b.tvBrowseEmpty.visibility = if (!s.loading && s.items.isEmpty()) View.VISIBLE else View.GONE
 
-        val hints = buildList {
-            if (s.offline) add(getString(R.string.browse_offline))
-            if (s.type == FoodType.ALL && s.country == null && !s.offline) add(getString(R.string.browse_pick_hint))
-            if (s.someUnsorted && !s.loading) add(getString(R.string.browse_unsorted))
-        }
-        b.tvBrowseHint.text = hints.joinToString("\n")
-        b.tvBrowseHint.visibility = if (hints.isEmpty()) View.GONE else View.VISIBLE
+        // First start without internet: nothing to show until the recipes arrive
+        b.tvBrowseHint.text = getString(R.string.content_waiting)
+        b.tvBrowseHint.visibility = if (s.loading) View.VISIBLE else View.GONE
     }
 
     private fun toggleSave(item: RecipeCardItem, saved: Boolean) {

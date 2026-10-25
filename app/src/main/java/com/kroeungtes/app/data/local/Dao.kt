@@ -4,7 +4,6 @@ import androidx.lifecycle.LiveData
 import androidx.room.*
 import androidx.room.Dao
 import com.kroeungtes.app.data.model.MealDB
-import com.kroeungtes.app.data.model.MealDetail
 
 @Dao
 interface Dao {
@@ -25,6 +24,10 @@ interface Dao {
 
     @Delete
     fun deleteMeal(meal:MealDB)
+
+    /** Rows saved from the old TheMealDB lists (positive ids); dashboard recipes are negative. */
+    @Query("DELETE FROM meal_information WHERE mealId >= 0")
+    fun deleteWorldDishes()
 
 
 

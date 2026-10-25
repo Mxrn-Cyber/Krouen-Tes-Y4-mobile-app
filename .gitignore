@@ -25,3 +25,5 @@ app/google-services.json
 # Admin dashboard: local Firebase config and deploy cache
 admin-dashboard/public/js/config.js
 admin-dashboard/.firebase/
+admin-dashboard/firebase-debug.log
+*-debug.log

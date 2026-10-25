@@ -20,7 +20,7 @@ class KrouenTesApp : Application() {
 
     override fun onCreate() {
         super.onCreate()
-        // Categories and recipes from the admin dashboard (built-in content until they arrive)
+        // Everything the app shows comes from the admin dashboard (Firestore)
         CloudContent.start()
         registerActivityLifecycleCallbacks(object : ActivityLifecycleCallbacks {
             override fun onActivityCreated(activity: Activity, savedInstanceState: Bundle?) = Unit

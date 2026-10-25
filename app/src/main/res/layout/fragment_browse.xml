@@ -59,13 +59,13 @@
         android:paddingEnd="@dimen/screen_padding">
 
         <com.google.android.material.button.MaterialButton
-            android:id="@+id/btn_country"
+            android:id="@+id/btn_region"
             style="@style/Widget.MaterialComponents.Button.OutlinedButton"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginEnd="8dp"
             android:layout_weight="1"
-            android:contentDescription="@string/pick_country"
+            android:contentDescription="@string/pick_region"
             android:ellipsize="end"
             android:maxLines="1"
             android:textAllCaps="false"
@@ -75,7 +75,7 @@
             app:iconSize="18dp"
             app:iconTint="@color/brand_green"
             app:strokeColor="@color/divider"
-            tools:text="All countries" />
+            tools:text="All regions" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btn_sort"
@@ -106,7 +106,7 @@
         android:paddingBottom="4dp"
         android:textAppearance="@style/Text.Caption"
         android:visibility="gone"
-        tools:text="Showing Khmer dishes. Pick a type or a country to see more."
+        tools:text="Connect to the internet to load the recipes."
         tools:visibility="visible" />
 
     <com.google.android.material.progressindicator.LinearProgressIndicator

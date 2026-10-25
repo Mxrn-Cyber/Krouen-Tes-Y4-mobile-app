@@ -14,9 +14,9 @@ import com.google.android.material.snackbar.Snackbar
 import com.kroeungtes.app.R
 import com.kroeungtes.app.adapters.RecentRecipeAdapter
 import com.kroeungtes.app.adapters.RecipeCardAdapter
+import com.kroeungtes.app.data.browse.FoodType
 import com.kroeungtes.app.data.cloud.CloudContent
 import com.kroeungtes.app.data.local.KhmerRecipes
-import com.kroeungtes.app.data.model.Category
 import com.kroeungtes.app.data.model.RecipeCardItem
 import com.kroeungtes.app.databinding.FragmentHomeBinding
 import com.kroeungtes.app.ui.activities.MainActivity
@@ -28,13 +28,12 @@ import com.kroeungtes.app.ui.common.fadeVisible
 import com.kroeungtes.app.ui.common.pressScale
 import com.kroeungtes.app.ui.common.riseIn
 import com.kroeungtes.app.ui.common.startSkeletonPulse
-import com.kroeungtes.app.ui.dialogs.MealBottomDialog
 import com.kroeungtes.app.viewmodel.DetailsMVVM
 import com.kroeungtes.app.viewmodel.MainFragMVVM
 
 /**
- * Home (User Flow step 3), laid out like the slide and made interactive:
- * pull to refresh, category chips, skeleton loading, save from cards, staggered fade-in.
+ * Home (User Flow step 3). Everything on it comes from the admin dashboard:
+ * Featured dishes, a row per category chip, the Wishlist and the newest recipes.
  */
 class HomeFragment : Fragment() {
 
@@ -45,6 +44,9 @@ class HomeFragment : Fragment() {
         const val CATEGORY_NAME = " com.kroeungtes.app.ui.fragments.categoryName"
         const val MEAL_STR = " com.kroeungtes.app.ui.fragments.strMeal"
         const val MEAL_AREA = " com.kroeungtes.app.ui.fragments.strArea"
+
+        /** How many of the newest recipes the "Recent recipe" row shows. */
+        private const val RECENT_COUNT = 12
     }
 
     private var _binding: FragmentHomeBinding? = null
@@ -56,15 +58,14 @@ class HomeFragment : Fragment() {
     private lateinit var khmerAdapter: RecipeCardAdapter
     private lateinit var trendingAdapter: RecipeCardAdapter
     private lateinit var wishlistAdapter: RecipeCardAdapter
-    private val recentAdapter = RecentRecipeAdapter(
-        onClick = { openRecipe(it.idMeal, it.strMeal, it.strMealThumb) },
-        onLongClick = { detailMvvm.getMealByIdBottomSheet(it.idMeal) }
-    )
+    private val recentAdapter = RecentRecipeAdapter(onClick = { openRecipe(it) })
     private var skeletonPulse: ValueAnimator? = null
-    private var chipsBuilt = false
-    /** Groups the Trending / Recent rows last showed (only a new group scrolls back and animates). */
-    private var shownTrending: String? = null
-    private var shownRecent: String? = null
+
+    /** Chip view id → category; and what the chips / category row last showed. */
+    private val chipTypes = mutableMapOf<Int, FoodType>()
+    private var chipsFor: List<FoodType>? = null
+    private var shownCategory: String? = null
+    private val khmer: Boolean get() = KhmerRecipes.isKhmerLanguage()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -79,13 +80,11 @@ class HomeFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        chipsBuilt = false
-        shownTrending = null
-        shownRecent = null
+        chipsFor = null
+        shownCategory = null
         setUpLists()
         setUpClicks()
         observeData()
-        showSkeleton(true)
         if (savedInstanceState == null) {
             binding.tvGreeting.riseIn(delay = 0, distanceDp = 14f)
             binding.searchBar.riseIn(delay = 90, distanceDp = 14f)
@@ -97,26 +96,15 @@ class HomeFragment : Fragment() {
         // (190 dp on a 366 dp phone like the OPPO PLE110), never wider than the dimen for this size class.
         val usable = resources.displayMetrics.widthPixels - resources.getDimensionPixelSize(R.dimen.screen_padding)
         val cardWidth = minOf(resources.getDimensionPixelSize(R.dimen.card_trending_width), (usable * 0.55f).toInt())
-        khmerAdapter = RecipeCardAdapter(
-            onClick = { openRecipe(it.id, it.name, it.image.orEmpty()) },
+        fun cards() = RecipeCardAdapter(
+            onClick = { openRecipe(it) },
             onSaveToggle = { item, saved -> toggleSave(item, saved) },
             fixedWidthPx = cardWidth
         )
+        khmerAdapter = cards()
+        trendingAdapter = cards()
+        wishlistAdapter = cards()
         binding.recViewKhmer.adapter = khmerAdapter
-        submitKhmer()
-
-        trendingAdapter = RecipeCardAdapter(
-            onClick = { openRecipe(it.id, it.name, it.image.orEmpty()) },
-            onLongClick = { detailMvvm.getMealByIdBottomSheet(it.id) },
-            onSaveToggle = { item, saved -> toggleSave(item, saved) },
-            fixedWidthPx = cardWidth
-        )
-        wishlistAdapter = RecipeCardAdapter(
-            onClick = { openRecipe(it.id, it.name, it.image.orEmpty()) },
-            onLongClick = { detailMvvm.getMealByIdBottomSheet(it.id) },
-            onSaveToggle = { item, saved -> toggleSave(item, saved) },
-            fixedWidthPx = cardWidth
-        )
         binding.recViewMealsPopular.adapter = trendingAdapter
         binding.recViewWishlist.adapter = wishlistAdapter
         binding.recViewRecent.adapter = recentAdapter
@@ -128,84 +116,93 @@ class HomeFragment : Fragment() {
             val nav = findNavController()
             if (nav.currentDestination?.id == R.id.homeFragment) nav.navigate(R.id.action_homeFragment_to_searchFragment)
         }
-        binding.btnTrendingAll.setOnClickListener { openList(homeMvvm.trendingCategory) }
-        binding.btnRecentAll.setOnClickListener { openList(homeMvvm.recentCategory) }
         binding.btnKhmerAll.setOnClickListener { openList(KhmerRecipes.LIST_KEY) }
+        binding.btnTrendingAll.setOnClickListener { shownCategory?.let { openList(it) } }
+        binding.btnRecentAll.setOnClickListener { openList(KhmerRecipes.NEWEST_KEY) }
         binding.btnWishlistAll.setOnClickListener {
             (activity as? MainActivity)?.selectTab(R.id.favoriteMeals)
         }
+        // Content is live already; pulling just redraws it
         binding.swipeRefresh.setColorSchemeResources(R.color.brand_green)
-        binding.swipeRefresh.setOnRefreshListener { homeMvvm.refresh() }
+        binding.swipeRefresh.setOnRefreshListener {
+            showAll()
+            binding.swipeRefresh.isRefreshing = false
+        }
     }
 
     private fun observeData() {
-        // Khmer dishes published or edited in the admin dashboard, and the admins' pick
-        // for this row, show up without a restart
-        KhmerRecipes.changes.observe(viewLifecycleOwner) { submitKhmer() }
-        CloudContent.home.observe(viewLifecycleOwner) { submitKhmer() }
-        homeMvvm.observeCategories().observe(viewLifecycleOwner) { response ->
-            buildChips(response?.categories.orEmpty())
-        }
-        homeMvvm.observeMealByCategory().observe(viewLifecycleOwner) { response ->
-            val subtitle = getString(R.string.recipe_with, homeMvvm.trendingCategory)
-            trendingAdapter.submit(response?.meals.orEmpty().map { RecipeCardItem.from(it, subtitle) })
-            // A hidden dish going away shouldn't jump the row back to the start
-            if (shownTrending != homeMvvm.trendingCategory || binding.swipeRefresh.isRefreshing) {
-                shownTrending = homeMvvm.trendingCategory
-                binding.recViewMealsPopular.scheduleLayoutAnimation()
-                binding.recViewMealsPopular.scrollToPosition(0)
-            }
-            // Admins may have changed which group is first: keep the checked chip in step
-            checkChip(homeMvvm.trendingCategory)
-            showSkeleton(false)
-            binding.swipeRefresh.isRefreshing = false
-        }
-        homeMvvm.observeRecentMeals().observe(viewLifecycleOwner) { response ->
-            recentAdapter.submit(response?.meals.orEmpty().reversed().take(12))
-            if (shownRecent != homeMvvm.recentCategory) {
-                shownRecent = homeMvvm.recentCategory
-                binding.recViewRecent.scheduleLayoutAnimation()
-            }
-        }
+        // Anything admins change in the dashboard shows up without a restart
+        KhmerRecipes.changes.observe(viewLifecycleOwner) { showAll() }
+        CloudContent.home.observe(viewLifecycleOwner) { showAll() }
+        CloudContent.loaded.observe(viewLifecycleOwner) { showAll() }
+        CloudContent.categories.observe(viewLifecycleOwner) { showAll() }
+
         detailMvvm.observeSaveMeal().observe(viewLifecycleOwner) { saved ->
-            val list = saved.orEmpty()
-            val ids = list.map { it.mealId.toString() }.toSet()
+            val ids = saved.orEmpty().map { it.mealId.toString() }.toSet()
             khmerAdapter.setSavedIds(ids)
             trendingAdapter.setSavedIds(ids)
             wishlistAdapter.setSavedIds(ids)
-            wishlistAdapter.submit(list.reversed().map { RecipeCardItem.from(it, getString(R.string.your_wishlist)) })
-            binding.wishlistSection.fadeVisible(list.isNotEmpty())
         }
-        detailMvvm.observeMealBottomSheet().observe(viewLifecycleOwner) { details ->
-            val meal = details?.firstOrNull() ?: return@observe
-            MealBottomDialog().apply {
-                arguments = Bundle().apply {
-                    putString(CATEGORY_NAME, meal.strCategory)
-                    putString(MEAL_AREA, meal.strArea)
-                    putString(MEAL_NAME, meal.strMeal)
-                    putString(MEAL_THUMB, meal.strMealThumb)
-                    putString(MEAL_ID, meal.idMeal)
-                }
-            }.show(childFragmentManager, "BottomSheetDialog")
-            detailMvvm.consumeBottomSheet()
+        detailMvvm.savedRecipes.observe(viewLifecycleOwner) { list ->
+            wishlistAdapter.submit(list.orEmpty().map { RecipeCardItem.from(it, getString(R.string.your_wishlist)) })
+            binding.wishlistSection.fadeVisible(!list.isNullOrEmpty())
         }
     }
 
-    /** One chip per TheMealDB category; the selected one fills the Trending row. */
-    private fun buildChips(categories: List<Category>) {
-        if (chipsBuilt || categories.isEmpty()) return
-        chipsBuilt = true
+    private fun showAll() {
+        val ctx = context ?: return
+        val b = _binding ?: return
+        val loaded = CloudContent.loaded.value == true
+        showSkeleton(!loaded)
+
+        val featured = CloudContent.homeKhmerDishes(ctx)
+        khmerAdapter.submit(featured.map { RecipeCardItem.from(it) })
+        b.tvHomeEmpty.visibility = if (loaded && featured.isEmpty()) View.VISIBLE else View.GONE
+        b.tvHomeEmpty.text = getString(R.string.home_empty)
+        b.btnKhmerAll.visibility = if (featured.isEmpty()) View.GONE else View.VISIBLE
+
+        // Category chips + the row for the chosen one (18+ categories stay on the Categories tab)
+        val categories = CloudContent.currentCategories().filter { !it.adultOnly }
+        if (categories != chipsFor) {
+            chipsFor = categories
+            buildChips(categories)
+        }
+        val selected = homeMvvm.selectedCategory(categories)
+        checkChip(selected)
+        b.chipScroll.visibility = if (categories.isEmpty()) View.GONE else View.VISIBLE
+        b.trendingHeader.visibility = if (selected == null) View.GONE else View.VISIBLE
+        b.recViewMealsPopular.visibility = if (selected == null || !loaded) View.GONE else View.VISIBLE
+        if (selected != null) {
+            b.tvTrending.text = selected.chipLabel(khmer)
+            val dishes = KhmerRecipes.inCategory(ctx, selected.id)
+            trendingAdapter.submit(dishes.map { RecipeCardItem.from(it, selected.label(khmer)) })
+            if (shownCategory != selected.id) {
+                shownCategory = selected.id
+                b.recViewMealsPopular.scheduleLayoutAnimation()
+                b.recViewMealsPopular.scrollToPosition(0)
+            }
+        } else {
+            shownCategory = null
+        }
+
+        val newest = KhmerRecipes.newest(ctx).take(RECENT_COUNT)
+        recentAdapter.submit(newest.map { RecipeCardItem.from(it) })
+    }
+
+    /** One chip per dashboard category; the selected one fills the row below. */
+    private fun buildChips(categories: List<FoodType>) {
         val group = binding.chipGroup
         group.removeAllViews()
-        categories.forEach { category ->
+        chipTypes.clear()
+        categories.forEach { type ->
             val chip = layoutInflater.inflate(R.layout.item_category_chip, group, false) as Chip
             chip.id = View.generateViewId()
-            chip.text = category.strCategory
-            chip.isChecked = category.strCategory == homeMvvm.trendingCategory
+            chip.text = type.chipLabel(khmer)
+            chipTypes[chip.id] = type
             chip.setOnClickListener {
-                if (homeMvvm.trendingCategory != category.strCategory) {
-                    showSkeleton(true)
-                    homeMvvm.loadTrending(category.strCategory)
+                if (shownCategory != type.id) {
+                    homeMvvm.pickedCategory = type.id
+                    showAll()
                 }
             }
             group.addView(chip)
@@ -218,16 +215,11 @@ class HomeFragment : Fragment() {
         }
     }
 
-    private fun submitKhmer() {
-        val ctx = context ?: return
-        khmerAdapter.submit(CloudContent.homeKhmerDishes(ctx).map { RecipeCardItem.from(it) })
-    }
-
-    private fun checkChip(category: String) {
+    private fun checkChip(selected: FoodType?) {
         val group = _binding?.chipGroup ?: return
         for (i in 0 until group.childCount) {
             val chip = group.getChildAt(i) as? Chip ?: continue
-            chip.isChecked = chip.text == category
+            chip.isChecked = chipTypes[chip.id]?.id == selected?.id
         }
     }
 
@@ -242,33 +234,36 @@ class HomeFragment : Fragment() {
         }.show()
     }
 
+    /** Pulsing grey cards until the recipes arrive on the very first start. */
     private fun showSkeleton(show: Boolean) {
+        val b = _binding ?: return
+        if (show == (b.skeleton.visibility == View.VISIBLE) && (skeletonPulse != null) == show) return
         skeletonPulse?.cancel()
-        binding.skeleton.alpha = 1f
+        skeletonPulse = null
+        b.skeleton.alpha = 1f
         if (show) {
-            binding.skeleton.visibility = View.VISIBLE
-            binding.recViewMealsPopular.visibility = View.INVISIBLE
-            skeletonPulse = binding.skeleton.startSkeletonPulse()
+            b.skeleton.visibility = View.VISIBLE
+            skeletonPulse = b.skeleton.startSkeletonPulse()
         } else {
-            binding.skeleton.visibility = View.GONE
-            binding.recViewMealsPopular.visibility = View.VISIBLE
+            b.skeleton.visibility = View.GONE
         }
     }
 
-    private fun openRecipe(id: String, name: String, thumb: String) {
+    private fun openRecipe(item: RecipeCardItem) {
         Motion.openRecipe(requireActivity(), Intent(requireContext(), MealDetailesActivity::class.java).apply {
-            putExtra(MEAL_ID, id)
-            putExtra(MEAL_STR, name)
-            putExtra(MEAL_THUMB, thumb)
+            putExtra(MEAL_ID, item.id)
+            putExtra(MEAL_STR, item.name)
+            putExtra(MEAL_THUMB, item.image.orEmpty())
         })
     }
 
-    private fun openList(category: String) {
-        Motion.open(requireActivity(), Intent(requireContext(), MealActivity::class.java).putExtra(CATEGORY_NAME, category))
+    private fun openList(key: String) {
+        Motion.open(requireActivity(), Intent(requireContext(), MealActivity::class.java).putExtra(CATEGORY_NAME, key))
     }
 
     override fun onDestroyView() {
         skeletonPulse?.cancel()
+        skeletonPulse = null
         super.onDestroyView()
         _binding = null
     }

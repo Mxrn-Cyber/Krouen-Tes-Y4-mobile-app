@@ -17,7 +17,7 @@
     <string name="submit">បញ្ជូន</string>
     <string name="nav_notifications">ការជូនដំណឹង</string>
     <string name="krouen_pick">ជ្រើសរើសដោយ គ្រឿងទេស</string>
-    <string name="khmer_dishes">មុខម្ហូបខ្មែរ</string>
+    <string name="khmer_dishes">ម្ហូបពិសេស</string>
     <string name="khmer_region">កម្ពុជា</string>
     <string name="photo_credit">រូបថត៖ %1$s · %2$s · Wikimedia Commons</string>
     <string name="how_to_make">របៀបធ្វើ %1$s</string>
@@ -57,23 +57,25 @@
     </plurals>
 
     <!-- Categories tab (filter + sort) -->
-    <string name="all_countries">គ្រប់ប្រទេស</string>
-    <string name="pick_country">ជ្រើសរើសប្រទេស</string>
     <string name="sort_title">តម្រៀបតាម</string>
     <string name="sort_name">ឈ្មោះ ក–អ</string>
     <string name="sort_quickest">ធ្វើលឿនជាងគេ</string>
     <string name="sort_fewest">គ្រឿងផ្សំតិចជាងគេ</string>
     <string name="sort_serves">សម្រាប់មនុស្សច្រើនជាងគេ</string>
-    <string name="browse_pick_hint">កំពុងបង្ហាញម្ហូបខ្មែរ។ ជ្រើសរើសប្រភេទ ឬប្រទេស ដើម្បីមើលម្ហូបពីជុំវិញពិភពលោក។</string>
-    <string name="browse_offline">គ្មានអ៊ីនធឺណិត៖ បង្ហាញតែម្ហូបខ្មែរក្នុងកម្មវិធី។ ចុចទីនេះដើម្បីព្យាយាមម្ដងទៀត។</string>
-    <string name="browse_unsorted">ម្ហូបខ្លះពីអ៊ីនធឺណិតមិនមានព័ត៌មាននេះ ដូច្នេះបង្ហាញនៅខាងក្រោយគេ។</string>
-    <string name="browse_empty">រកមិនឃើញម្ហូបទេ។ សាកល្បងប្រភេទ ឬប្រទេសផ្សេង។</string>
+    <string name="all_regions">គ្រប់តំបន់</string>
+    <string name="pick_region">ជ្រើសរើសតំបន់</string>
+    <string name="region_everywhere">ទូទាំងប្រទេសកម្ពុជា</string>
+    <string name="region_coast">តំបន់ឆ្នេរ (កំពត កែប)</string>
+    <string name="region_north">ភាគខាងជើង</string>
+    <string name="region_northwest">ភាគពាយ័ព្យ</string>
+    <string name="region_uplands">តំបន់ខ្ពង់រាប</string>
+    <string name="content_waiting">សូមភ្ជាប់អ៊ីនធឺណិត ដើម្បីទាញយករូបមន្ត។</string>
+    <string name="home_empty">មិនទាន់មានរូបមន្តនៅឡើយទេ។ រូបមន្តខ្មែរថ្មីៗនឹងបង្ហាញនៅទីនេះឆាប់ៗ។</string>
+    <string name="browse_empty">មិនទាន់មានរូបមន្តនៅទីនេះទេ។ សាកល្បងប្រភេទ ឬតំបន់ផ្សេង។</string>
     <string name="age_check_title">តើអ្នកមានអាយុ ១៨ ឆ្នាំឡើងទេ?</string>
     <string name="age_check_message">ស្រាក្រឡុកមានជាតិអាល់កុល។ សម្រាប់តែមនុស្សពេញវ័យអាយុ ១៨ ឆ្នាំឡើងប៉ុណ្ណោះ។</string>
     <string name="age_check_yes">បាទ/ចាស ខ្ញុំអាយុ ១៨+</string>
     <string name="age_check_no">ទេ</string>
-    <string name="drink_source">រូបមន្តពី TheCocktailDB</string>
-    <string name="drink_load_failed">មិនអាចផ្ទុកភេសជ្ជៈនេះបានទេ។ សូមពិនិត្យអ៊ីនធឺណិត។</string>
 
     <!-- Splash + Log in / Sign up (redesign) -->
     <string name="app_name_other">Krouen Tes</string>

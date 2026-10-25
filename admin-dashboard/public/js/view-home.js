@@ -1,14 +1,10 @@
-// Home page of the app: which Khmer dishes the first row shows (and their order),
-// and which TheMealDB groups fill the "Trending" and "Recent recipe" rows.
+// Home page of the app: which recipes the Featured row shows (and their order),
+// and which category chip is selected first. "Recent recipe" always shows the newest recipes.
 import { h, toast, field } from './ui.js';
-import { mealCategories } from './online.js';
-
-const DEFAULT_TRENDING = 'Beef';
-const DEFAULT_RECENT = 'Chicken';
 
 export async function renderHome(view, ctx) {
   const { store } = ctx;
-  const [settings, recipes] = await Promise.all([store.getHomeSettings(), store.listRecipes()]);
+  const [settings, recipes, categories] = await Promise.all([store.getHomeSettings(), store.listRecipes(), store.listCategories()]);
   const published = recipes.filter(r => r.status === 'published' && typeof r.numId === 'number')
     .sort((a, b) => b.numId - a.numId); // same order the app uses (first built-in first)
   const byNum = new Map(published.map(r => [r.numId, r]));
@@ -23,7 +19,7 @@ export async function renderHome(view, ctx) {
 
   function drawPick() {
     if (mode === 'all') {
-      pickBox.replaceChildren(h('p', { class: 'hint', text: `All ${published.length} published Khmer recipes show, in the usual order.` }));
+      pickBox.replaceChildren(h('p', { class: 'hint', text: `All ${published.length} published recipes show, oldest first.` }));
       return;
     }
     const rest = published.filter(r => !featured.includes(r.numId));
@@ -56,34 +52,19 @@ export async function renderHome(view, ctx) {
   }
   drawPick();
 
-  // ----- Trending / Recent rows -----
-  let categories = [];
-  let listError = '';
-  try {
-    categories = await mealCategories();
-  } catch (e) {
-    listError = e.message;
-  }
-  const pickCategory = (current, fallback) => {
-    const value = current || fallback;
-    if (!categories.length) return h('input', { value, maxlength: 40 });
-    const options = categories.includes(value) ? categories : [value, ...categories];
-    return h('select', {}, options.map(c => h('option', { value: c, selected: c === value }, c)));
-  };
-  const trending = pickCategory(settings.trendingCategory, DEFAULT_TRENDING);
-  const recent = pickCategory(settings.recentCategory, DEFAULT_RECENT);
+  // ----- First category chip -----
+  const visible = categories.filter(c => !c.hidden && !c.adultOnly);
+  const firstCategory = h('select', {},
+    h('option', { value: '' }, visible.length ? `The first one (${visible[0].nameEn})` : 'The first one'),
+    visible.map(c => h('option', { value: c.id, selected: c.id === settings.firstCategory }, `${c.icon || ''} ${c.nameEn}`.trim())));
 
   const save = h('button', { class: 'btn btn-primary' }, 'Save Home page');
   save.addEventListener('click', async () => {
-    const trendingValue = trending.value.trim();
-    const recentValue = recent.value.trim();
-    if (!trendingValue || !recentValue) return toast('Choose a group for both rows', 'error');
     save.disabled = true;
     try {
       await store.saveHomeSettings({
         featured: mode === 'pick' ? featured : [],
-        trendingCategory: trendingValue,
-        recentCategory: recentValue
+        firstCategory: firstCategory.value || null
       });
       toast('Home page saved. Phones update within seconds.');
     } catch (e) {
@@ -96,21 +77,20 @@ export async function renderHome(view, ctx) {
   view.replaceChildren(
     h('div', { class: 'view-head' },
       h('div', {}, h('h1', { text: 'Home page' }),
-        h('p', { class: 'muted', text: 'What people see first when they open the app. Hidden online dishes never show here.' })),
+        h('p', { class: 'muted', text: 'What people see first when they open the app. Only published recipes show.' })),
       save),
     h('div', { class: 'card', style: 'margin-bottom:14px' },
-      h('h2', { class: 'card-title', text: '1. Khmer dishes row' }),
+      h('h2', { class: 'card-title', text: '1. Featured dishes row' }),
       published.length
         ? h('div', {},
-          h('label', { class: 'check' }, modeAll, 'Show all published Khmer recipes'),
+          h('label', { class: 'check' }, modeAll, 'Show all published recipes'),
           h('label', { class: 'check' }, modePick, 'Choose which recipes show, and their order'),
           pickBox)
-        : h('p', { class: 'hint', text: 'No published Khmer recipes yet. Add or publish some on Recipes.' })),
+        : h('p', { class: 'hint', text: 'No published recipes yet. Add or publish some on Recipes.' })),
     h('div', { class: 'card' },
-      h('h2', { class: 'card-title', text: '2. World dishes rows' }),
-      listError ? h('div', { class: 'callout warn', text: `${listError} You can type a TheMealDB group name instead.` }) : null,
-      h('div', { class: 'row' },
-        field('“Trending” row (and the chip selected first)', trending, 'People can still tap other chips.'),
-        field('“Recent recipe” row', recent)))
+      h('h2', { class: 'card-title', text: '2. Category row' }),
+      field('Category chip selected first', firstCategory,
+        'Its recipes fill the row under the chips. People can tap other chips. 18+ categories don’t show on Home.'),
+      h('p', { class: 'hint', text: '“Recent recipe” always shows the newest published recipes.' }))
   );
 }

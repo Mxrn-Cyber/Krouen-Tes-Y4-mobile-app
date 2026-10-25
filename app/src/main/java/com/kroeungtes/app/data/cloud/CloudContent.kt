@@ -1,41 +1,31 @@
 package com.kroeungtes.app.data.cloud
 
-import android.util.Log
 import android.content.Context
+import android.util.Log
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
-import com.kroeungtes.app.data.browse.DrinkKind
+import com.google.firebase.firestore.MetadataChanges
 import com.kroeungtes.app.data.browse.FoodType
 import com.kroeungtes.app.data.local.KhmerRecipes
 import com.kroeungtes.app.data.model.KhmerRecipe
-import com.kroeungtes.app.viewmodel.RECENT_CATEGORY
-import com.kroeungtes.app.viewmodel.TRENDING_CATEGORY
 import java.util.Date
 
 /**
- * Categories and recipes that admins manage in the web dashboard (Firestore).
- * Listens for changes, so edits reach the app within seconds. Firestore keeps an offline copy;
- * before the first download (or if the database is empty) the built-in content is used.
+ * Everything the app shows comes from the admin web dashboard (Firestore): categories, recipes,
+ * the Home page setup and notifications. Listens for changes, so edits reach the app within seconds.
+ * Firestore keeps an offline copy for when there is no internet.
  */
 object CloudContent {
     private const val TAG = "CloudContent"
 
-    private val categoriesLive = MutableLiveData(FoodType.DEFAULTS)
-
-    /** Visible categories in the admins' order (without "All"). */
-    val categories: LiveData<List<FoodType>> get() = categoriesLive
-
-    fun currentCategories(): List<FoodType> = categoriesLive.value ?: FoodType.DEFAULTS
-
     /** Home page set up by admins (dashboard → Home page). */
     data class HomeSettings(
-        /** Khmer recipe ids for the first row, in order; empty = all published recipes. */
+        /** Recipe ids for the Featured row, in order; empty = every recipe. */
         val featured: List<Int> = emptyList(),
-        val trendingCategory: String = TRENDING_CATEGORY,
-        val recentCategory: String = RECENT_CATEGORY
+        /** Category chip selected first on Home; null = the first category. */
+        val firstCategory: String? = null
     )
 
     /** News for the Notifications tab (dashboard → Notifications). */
@@ -44,7 +34,7 @@ object CloudContent {
         private val titleEn: String, private val titleKm: String,
         private val bodyEn: String, private val bodyKm: String,
         val imageUrl: String?,
-        /** A Khmer recipe to open when tapped. */
+        /** A recipe to open when tapped. */
         val recipeId: Int?,
         val publishedAt: Date?
     ) {
@@ -52,13 +42,17 @@ object CloudContent {
         fun body(khmer: Boolean) = if (khmer) bodyKm.ifBlank { bodyEn } else bodyEn.ifBlank { bodyKm }
     }
 
-    private val hiddenLive = MutableLiveData<Set<String>>(emptySet())
+    private val categoriesLive = MutableLiveData<List<FoodType>>(emptyList())
+    private val loadedLive = MutableLiveData(false)
     private val homeLive = MutableLiveData(HomeSettings())
     private val announcementsLive = MutableLiveData<List<Announcement>>(emptyList())
 
-    /** Card ids of world dishes admins hid ("52772", "drink-11007"). */
-    val hiddenDishes: LiveData<Set<String>> get() = hiddenLive
-    fun hiddenNow(): Set<String> = hiddenLive.value.orEmpty()
+    /** Visible categories in the admins' order (without "All"). */
+    val categories: LiveData<List<FoodType>> get() = categoriesLive
+    fun currentCategories(): List<FoodType> = categoriesLive.value.orEmpty()
+
+    /** False until the recipes have arrived once (from the internet or the offline copy). */
+    val loaded: LiveData<Boolean> get() = loadedLive
 
     val home: LiveData<HomeSettings> get() = homeLive
     fun homeNow(): HomeSettings = homeLive.value ?: HomeSettings()
@@ -66,7 +60,7 @@ object CloudContent {
     /** Published notifications, newest first. */
     val announcements: LiveData<List<Announcement>> get() = announcementsLive
 
-    /** The Khmer dishes row on Home: the admins' picks in their order, or every recipe. */
+    /** The Featured row on Home: the admins' picks in their order, or every recipe. */
     fun homeKhmerDishes(context: Context): List<KhmerRecipe> {
         val all = KhmerRecipes.all(context)
         val picked = homeNow().featured.mapNotNull { id -> all.firstOrNull { it.id == id } }
@@ -74,16 +68,8 @@ object CloudContent {
     }
 
     private var started = false
-    /** Admins have added categories, so the dashboard content is in use. */
-    private var managed = false
-    private var publishedDocs: List<Map<String, Any?>> = emptyList()
-    private var recipesLoaded = false
 
-    private fun pushRecipes() {
-        if (recipesLoaded) KhmerRecipes.setCloud(publishedDocs, managed)
-    }
-
-    /** Call once when the app starts (categories and published recipes are public). */
+    /** Call once when the app starts (all of this is public, read-only content). */
     fun start() {
         if (started) return
         started = true
@@ -94,35 +80,26 @@ object CloudContent {
                 Log.w(TAG, "Categories not loaded", error)
                 return@addSnapshotListener
             }
-            val docs = snap?.documents.orEmpty()
-            managed = docs.isNotEmpty()
-            pushRecipes()
-            // Nothing in the database yet: use the built-in list
-            if (docs.isEmpty()) {
-                categoriesLive.value = FoodType.DEFAULTS
-                return@addSnapshotListener
-            }
-            categoriesLive.value = docs.mapNotNull { toFoodType(it) }
+            categoriesLive.value = snap?.documents.orEmpty()
+                .mapNotNull { toFoodType(it) }
                 .sortedBy { it.first }
                 .map { it.second }
         }
 
-        db.collection("recipes").whereEqualTo("status", "published").addSnapshotListener { snap, error ->
+        // Metadata changes too: an empty offline copy followed by an empty answer from the
+        // internet only changes "from cache", and that is what tells us loading has finished
+        db.collection("recipes").whereEqualTo("status", "published")
+            .addSnapshotListener(MetadataChanges.INCLUDE) { snap, error ->
             if (error != null) {
                 Log.w(TAG, "Recipes not loaded", error)
+                // Stop waiting: screens show "no recipes" instead of loading forever
+                markLoaded()
                 return@addSnapshotListener
             }
-            publishedDocs = snap?.documents.orEmpty().mapNotNull { it.data }
-            recipesLoaded = true
-            pushRecipes()
-        }
-
-        db.collection("hiddenDishes").addSnapshotListener { snap, error ->
-            if (error != null) {
-                Log.w(TAG, "Hidden dishes not loaded", error)
-                return@addSnapshotListener
-            }
-            hiddenLive.value = snap?.documents.orEmpty().map { it.id }.toSet()
+            val docs = snap?.documents.orEmpty()
+            KhmerRecipes.setCloud(docs.mapNotNull { it.data })
+            // An empty offline copy on the very first start isn't an answer yet: wait for the internet
+            if (docs.isNotEmpty() || snap?.metadata?.isFromCache == false) markLoaded()
         }
 
         db.collection("settings").document("home").addSnapshotListener { snap, error ->
@@ -130,11 +107,9 @@ object CloudContent {
                 Log.w(TAG, "Home settings not loaded", error)
                 return@addSnapshotListener
             }
-            val defaults = HomeSettings()
             homeLive.value = HomeSettings(
                 featured = (snap?.get("featured") as? List<*>)?.mapNotNull { (it as? Number)?.toInt() }.orEmpty(),
-                trendingCategory = snap?.getString("trendingCategory")?.takeIf { it.isNotBlank() } ?: defaults.trendingCategory,
-                recentCategory = snap?.getString("recentCategory")?.takeIf { it.isNotBlank() } ?: defaults.recentCategory
+                firstCategory = snap?.getString("firstCategory")?.takeIf { it.isNotBlank() }
             )
         }
 
@@ -156,44 +131,22 @@ object CloudContent {
         }
     }
 
+    private fun markLoaded() {
+        if (loadedLive.value != true) loadedLive.value = true
+    }
+
     /** Firestore category → chip. Hidden ones are skipped. Returns (order, type). */
     private fun toFoodType(doc: DocumentSnapshot): Pair<Long, FoodType>? {
         // "all" is the app's own "All" chip
         if (doc.getBoolean("hidden") == true || doc.id == FoodType.ALL.id) return null
         val en = doc.getString("nameEn")?.takeIf { it.isNotBlank() } ?: return null
-        val drink = when (doc.getString("drink")) {
-            "soft" -> DrinkKind.SOFT
-            "cocktail" -> DrinkKind.COCKTAIL
-            else -> null
-        }
-        val search = (doc.get("mealDbSearch") as? List<*>)?.mapNotNull { it as? String }.orEmpty()
         val type = FoodType(
             id = doc.id,
             en = en,
             km = doc.getString("nameKm").orEmpty(),
-            khmerKey = doc.id,
-            mealCategory = doc.getString("mealDbCategory")?.takeIf { it.isNotBlank() },
-            searchWords = search,
-            drink = drink,
-            adultOnly = doc.getBoolean("adultOnly") == true || drink == DrinkKind.COCKTAIL,
+            adultOnly = doc.getBoolean("adultOnly") == true || doc.getString("drink") == "cocktail",
             icon = doc.getString("icon").orEmpty()
         )
         return (doc.getLong("order") ?: 999L) to type
     }
-}
-
-/**
- * This list without the world dishes admins hid; updates when either changes.
- * [filter] gets the current value and the hidden card ids.
- */
-fun <T> LiveData<T>.withoutHiddenDishes(filter: (T, Set<String>) -> T): LiveData<T> {
-    val source = this
-    val out = MediatorLiveData<T>()
-    val update = {
-        val value = source.value
-        if (value != null) out.value = filter(value, CloudContent.hiddenNow())
-    }
-    out.addSource(source) { update() }
-    out.addSource(CloudContent.hiddenDishes) { update() }
-    return out
 }

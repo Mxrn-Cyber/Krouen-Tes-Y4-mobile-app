@@ -63,8 +63,8 @@ function growthChart(weeks) {
 }
 
 export async function renderOverview(view, { store, go }) {
-  const [users, recipes, categories, notes, hiddenDishes] = await Promise.all([
-    store.listUsers(), store.listRecipes(), store.listCategories(), store.listAnnouncements(), store.listHiddenDishes()]);
+  const [users, recipes, categories, notes] = await Promise.all([
+    store.listUsers(), store.listRecipes(), store.listCategories(), store.listAnnouncements()]);
   const weekAgo = Date.now() - 7 * DAY;
   const published = recipes.filter(r => r.status === 'published').length;
   const pending = recipes.filter(r => r.status === 'pending');
@@ -88,7 +88,7 @@ export async function renderOverview(view, { store, go }) {
   ];
 
   if (!recipes.length) {
-    const importBtn = h('button', { class: 'btn btn-primary' }, 'Import built-in content');
+    const importBtn = h('button', { class: 'btn btn-primary' }, 'Import sample content');
     importBtn.addEventListener('click', async () => {
       importBtn.disabled = true;
       try {
@@ -103,7 +103,7 @@ export async function renderOverview(view, { store, go }) {
     });
     children.push(h('div', { class: 'callout', style: 'margin-bottom:18px; display:flex; gap:16px; align-items:center; justify-content:space-between; flex-wrap:wrap' },
       h('div', {}, h('strong', { text: 'No recipes yet. ' }),
-        'Import the 13 Khmer recipes and 16 categories the app ships with, then edit them here.'),
+        'Start from 13 sample Khmer recipes and 16 categories, then edit or delete them. Or add your own on Recipes and Categories.'),
       importBtn));
   }
 
@@ -114,8 +114,7 @@ export async function renderOverview(view, { store, go }) {
     stat('Waiting for review', pending.length, pending.length ? 'Open Recipes to approve' : 'Nothing to review', pending.length > 0),
     stat('Categories', categories.length, `${categories.filter(c => c.hidden).length} hidden`),
     stat('Blocked users', blocked),
-    stat('Notifications in the app', notes.filter(n => n.status === 'published').length, `${notes.filter(n => n.status !== 'published').length} drafts`),
-    stat('Hidden online dishes', hiddenDishes.length, 'See Online dishes')
+    stat('Notifications in the app', notes.filter(n => n.status === 'published').length, `${notes.filter(n => n.status !== 'published').length} drafts`)
   ));
 
   const recent = [...users].filter(u => u.createdAt).sort((a, b) => b.createdAt - a.createdAt).slice(0, 6);

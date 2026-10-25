@@ -14,25 +14,18 @@ const toDate = t => (t && typeof t.toDate === 'function') ? t.toDate() : null;
 // Category: Firestore fields ↔ dashboard shape
 function categoryFromDoc(d) {
   const x = d.data();
-  let source = { type: 'none', value: '' };
-  if (x.drink === 'soft') source = { type: 'drinks', value: '' };
-  else if (x.drink === 'cocktail') source = { type: 'cocktails', value: '' };
-  else if (x.mealDbCategory) source = { type: 'mealCategory', value: x.mealDbCategory };
-  else if (Array.isArray(x.mealDbSearch) && x.mealDbSearch.length) source = { type: 'mealSearch', value: x.mealDbSearch.join(', ') };
   return {
     id: d.id, nameEn: x.nameEn || d.id, nameKm: x.nameKm || '', icon: x.icon || '',
-    order: x.order ?? 999, hidden: !!x.hidden, adultOnly: !!x.adultOnly, source
+    order: x.order ?? 999, hidden: !!x.hidden, adultOnly: !!x.adultOnly || x.drink === 'cocktail'
   };
 }
 
 function categoryToDoc(c) {
-  const s = c.source || { type: 'none' };
   return {
     nameEn: c.nameEn.trim(), nameKm: (c.nameKm || '').trim(), icon: (c.icon || '').trim(),
-    order: Number(c.order) || 0, hidden: !!c.hidden, adultOnly: !!c.adultOnly || s.type === 'cocktails',
-    mealDbCategory: s.type === 'mealCategory' ? s.value.trim() : null,
-    mealDbSearch: s.type === 'mealSearch' ? s.value.split(',').map(w => w.trim()).filter(Boolean) : [],
-    drink: s.type === 'drinks' ? 'soft' : s.type === 'cocktails' ? 'cocktail' : null,
+    order: Number(c.order) || 0, hidden: !!c.hidden, adultOnly: !!c.adultOnly,
+    // Old online-source fields (TheMealDB / TheCocktailDB) are cleared
+    mealDbCategory: null, mealDbSearch: [], drink: null,
     updatedAt: serverTimestamp()
   };
 }
@@ -152,20 +145,6 @@ export async function createFirebaseStore(config) {
     },
 
     // ----- First-time import -----
-    // ----- Online dishes (TheMealDB / TheCocktailDB) hidden from the app -----
-    async listHiddenDishes() {
-      const snap = await getDocs(collection(db, 'hiddenDishes'));
-      return snap.docs.map(d => ({ ...d.data(), id: d.id, hiddenAt: toDate(d.data().hiddenAt) }));
-    },
-    async hideDish(dish) {
-      await setDoc(doc(db, 'hiddenDishes', dish.id), {
-        name: dish.name || '', image: dish.image || '', kind: dish.kind, hiddenAt: serverTimestamp()
-      });
-    },
-    async showDish(id) {
-      await deleteDoc(doc(db, 'hiddenDishes', id));
-    },
-
     // ----- Home page -----
     async getHomeSettings() {
       const snap = await getDoc(doc(db, 'settings', 'home'));
@@ -173,7 +152,7 @@ export async function createFirebaseStore(config) {
     },
     async saveHomeSettings(s) {
       await setDoc(doc(db, 'settings', 'home'), {
-        featured: s.featured, trendingCategory: s.trendingCategory, recentCategory: s.recentCategory,
+        featured: s.featured, firstCategory: s.firstCategory || null,
         updatedAt: serverTimestamp()
       });
     },

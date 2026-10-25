@@ -21,5 +21,7 @@ class Repository(private val mealDao: Dao) {
 
     suspend fun deleteMeal(meal: MealDB) = mealDao.deleteMeal(meal)
 
+    suspend fun deleteWorldDishes() = mealDao.deleteWorldDishes()
+
 
 }

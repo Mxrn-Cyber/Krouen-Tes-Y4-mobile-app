@@ -33,7 +33,6 @@ export function createDemoStore() {
   let admins = [{ uid: 'demo-admin', email: 'admin@example.com', name: 'Demo admin', addedAt: new Date() }];
   let requests = [{ uid: 'demo-req', email: 'new.helper@example.com', name: 'New helper', requestedAt: new Date() }];
   let nextId = 1;
-  let hidden = [];
   let home = {};
   let announcements = [{
     id: 'demo-note-1', status: 'published',
@@ -86,10 +85,6 @@ export function createDemoStore() {
     async rejectAdminRequest(uid) { requests = requests.filter(r => r.uid !== uid); },
     async removeAdmin(uid) { admins = admins.filter(a => a.uid !== uid); },
 
-    async listHiddenDishes() { return hidden.map(d => ({ ...d })); },
-    async hideDish(d) { hidden = hidden.filter(x => x.id !== d.id); hidden.push({ id: d.id, name: d.name, image: d.image, kind: d.kind, hiddenAt: new Date() }); },
-    async showDish(id) { hidden = hidden.filter(x => x.id !== id); },
-
     async getHomeSettings() { return { ...home }; },
     async saveHomeSettings(s) { home = { ...s, updatedAt: new Date() }; },
 
@@ -121,7 +116,7 @@ export function createDemoStore() {
         status: 'pending', authorName: 'Cook 07', createdAt: now, updatedAt: now
       });
       const have = new Set(categories.map(c => c.id));
-      const added = DEFAULT_CATEGORIES.filter(c => !have.has(c.id)).map(c => ({ ...c, source: { ...c.source } }));
+      const added = DEFAULT_CATEGORIES.filter(c => !have.has(c.id)).map(c => ({ ...c }));
       categories = [...categories, ...added];
       return { categories: added.length, recipes: list.length };
     }

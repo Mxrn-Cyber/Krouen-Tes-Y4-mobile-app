@@ -5,12 +5,11 @@ import { renderCategories } from './view-categories.js';
 import { renderRecipes } from './view-recipes.js';
 import { renderUsers } from './view-users.js';
 import { renderHome } from './view-home.js';
-import { renderOnline } from './view-online.js';
 import { renderNotifications } from './view-notifications.js';
 
 const VIEWS = {
   overview: renderOverview, home: renderHome, categories: renderCategories, recipes: renderRecipes,
-  online: renderOnline, notifications: renderNotifications, users: renderUsers
+  notifications: renderNotifications, users: renderUsers
 };
 const isDemo = new URLSearchParams(location.search).has('demo');
 

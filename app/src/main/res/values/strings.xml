@@ -20,7 +20,6 @@
     <string name="recent_recipe">Recent recipe</string>
     <string name="see_all">See all</string>
     <string name="detail">Detail</string>
-    <string name="recipe_with">%1$s recipe</string>
     <string name="by_author">By %1$s</string>
     <string name="default_author">Krouen Tes</string>
     <string name="krouen_pick">Krouen Tes pick</string>
@@ -125,7 +124,7 @@ Tap the green + to create one.</string>
     <string name="log_out">Log out</string>
     <string name="change_photo">Change photo</string>
     <!-- Khmer recipes -->
-    <string name="khmer_dishes">Khmer dishes</string>
+    <string name="khmer_dishes">Featured dishes</string>
     <string name="khmer_region">Cambodia</string>
     <string name="photo_credit">Photo: %1$s · %2$s · Wikimedia Commons</string>
     <plurals name="recipe_count">
@@ -134,23 +133,25 @@ Tap the green + to create one.</string>
     </plurals>
 
     <!-- Categories tab (filter + sort) -->
-    <string name="all_countries">All countries</string>
-    <string name="pick_country">Choose a country</string>
     <string name="sort_title">Sort by</string>
     <string name="sort_name">Name A–Z</string>
     <string name="sort_quickest">Quickest to cook</string>
     <string name="sort_fewest">Fewest ingredients</string>
     <string name="sort_serves">Serves most people</string>
-    <string name="browse_pick_hint">Showing Khmer dishes. Pick a type or a country to see more from around the world.</string>
-    <string name="browse_offline">No internet: showing built-in Khmer dishes only. Tap here to try again.</string>
-    <string name="browse_unsorted">Some online dishes don\'t list this, so they are shown last.</string>
-    <string name="browse_empty">No dishes match. Try another type or country.</string>
+    <string name="all_regions">All regions</string>
+    <string name="pick_region">Choose a region</string>
+    <string name="region_everywhere">Everywhere in Cambodia</string>
+    <string name="region_coast">Coast (Kampot, Kep)</string>
+    <string name="region_north">North</string>
+    <string name="region_northwest">Northwest</string>
+    <string name="region_uplands">Uplands</string>
+    <string name="content_waiting">Connect to the internet to load the recipes.</string>
+    <string name="home_empty">No recipes yet. New Khmer recipes will appear here soon.</string>
+    <string name="browse_empty">No recipes here yet. Try another category or region.</string>
     <string name="age_check_title">Are you 18 or older?</string>
     <string name="age_check_message">Cocktails contain alcohol. They are only for adults aged 18 and over.</string>
     <string name="age_check_yes">Yes, I\'m 18+</string>
     <string name="age_check_no">No</string>
-    <string name="drink_source">Recipe from TheCocktailDB</string>
-    <string name="drink_load_failed">Couldn\'t load this drink. Check your internet.</string>
 
     <!-- Splash + Log in / Sign up (redesign) -->
     <string name="app_name_other" translatable="false">គ្រឿងទេស</string>

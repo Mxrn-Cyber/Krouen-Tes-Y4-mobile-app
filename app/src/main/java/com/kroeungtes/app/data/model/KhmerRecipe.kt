@@ -1,9 +1,8 @@
 package com.kroeungtes.app.data.model
 
 /**
- * A Khmer recipe built into the app (assets/recipes/khmer_recipes.json),
- * already in the phone's language (Khmer or English).
- * Ids are negative (-101, -102 …) so they never clash with TheMealDB ids in the Wishlist.
+ * A recipe published in the admin dashboard, already in the phone's language (Khmer or English).
+ * Ids are negative (-101, -102 …); the Wishlist stores them by id.
  */
 data class KhmerRecipe(
     val id: Int,
@@ -20,7 +19,7 @@ data class KhmerRecipe(
     val photoAuthor: String?,
     val photoLicense: String?,
     val photoPage: String?,
-    /** English category ("Soup", "Fish" …) whatever the phone language — used by the Categories filters. */
+    /** Dashboard category id ("soup", "fish" …) whatever the phone language — used by the filters. */
     val categoryKey: String = "",
     /** everywhere, coast, north, northwest or uplands (set in the dashboard). */
     val region: String = "everywhere"

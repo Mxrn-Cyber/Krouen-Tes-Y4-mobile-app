@@ -4,30 +4,16 @@ import androidx.annotation.StringRes
 import com.kroeungtes.app.R
 import com.kroeungtes.app.data.model.RecipeCardItem
 
-/** Drinks come from TheCocktailDB; their ids start with this so the Recipe page knows where to load them. */
-const val DRINK_PREFIX = "drink-"
-
-enum class DrinkKind { SOFT, COCKTAIL }
-
 /**
- * A food type on the Categories screen (a chip), in English and Khmer, and where it finds dishes.
- * Admins manage these in the web dashboard (Firestore "categories"); [DEFAULTS] is the built-in set
- * used before the first download and when there is no internet on the very first start.
- * - [khmerKey]: our recipes whose category is this (built-in "Soup", or a dashboard category id)
- * - [mealCategory]: also TheMealDB category (filter.php?c=)
- * - [searchWords]: also TheMealDB name search (search.php?s=)
- * - [drink]: TheCocktailDB instead of food
- * - [adultOnly]: asks "Are you 18 or older?" first
+ * A category chip (Categories tab and Home), in English and Khmer.
+ * Admins create these in the web dashboard (Firestore "categories"); recipes point to one by [id].
+ * [adultOnly] asks "Are you 18 or older?" first.
  */
 data class FoodType(
     val id: String,
     private val en: String,
     private val km: String,
-    val khmerKey: String? = null,
-    val mealCategory: String? = null,
-    val searchWords: List<String> = emptyList(),
-    val drink: DrinkKind? = null,
-    val adultOnly: Boolean = drink == DrinkKind.COCKTAIL,
+    val adultOnly: Boolean = false,
     val icon: String = ""
 ) {
     fun label(khmer: Boolean): String = if (khmer) km.ifBlank { en } else en
@@ -37,82 +23,20 @@ data class FoodType(
 
     companion object {
         val ALL = FoodType("all", "All", "ទាំងអស់")
-
-        val DEFAULTS: List<FoodType> = listOf(
-            FoodType("beef", "Beef", "សាច់គោ", khmerKey = "beef", mealCategory = "Beef", icon = "🥩"),
-            FoodType("chicken", "Chicken", "សាច់មាន់", khmerKey = "chicken", mealCategory = "Chicken", icon = "🍗"),
-            FoodType("pork", "Pork", "សាច់ជ្រូក", khmerKey = "pork", mealCategory = "Pork", icon = "🥓"),
-            FoodType("fish", "Fish", "ត្រី", khmerKey = "fish", searchWords = listOf("fish"), icon = "🐟"),
-            FoodType("seafood", "Seafood", "គ្រឿងសមុទ្រ", khmerKey = "seafood", mealCategory = "Seafood", icon = "🦀"),
-            FoodType("soup", "Soup", "សម្ល", khmerKey = "soup", searchWords = listOf("soup"), icon = "🍲"),
-            FoodType("noodles", "Noodles", "មី និងគុយទាវ", khmerKey = "noodles", searchWords = listOf("noodle"), icon = "🍜"),
-            FoodType("salad", "Salad", "ញាំ និងសាឡាដ", khmerKey = "salad", searchWords = listOf("salad"), icon = "🥗"),
-            FoodType("dessert", "Dessert", "បង្អែម", khmerKey = "dessert", mealCategory = "Dessert", icon = "🍮"),
-            FoodType("cookies", "Cookies", "នំខូគី", khmerKey = "cookies", searchWords = listOf("cookie", "biscuit"), icon = "🍪"),
-            FoodType("vegetarian", "Vegetarian", "អាហារបួស", khmerKey = "vegetarian", mealCategory = "Vegetarian", icon = "🥦"),
-            FoodType("vegan", "Vegan", "អាហារបួសសុទ្ធ", khmerKey = "vegan", mealCategory = "Vegan", icon = "🌱"),
-            FoodType("breakfast", "Breakfast", "អាហារពេលព្រឹក", khmerKey = "breakfast", mealCategory = "Breakfast", icon = "🍳"),
-            FoodType("pasta", "Pasta", "ប៉ាស្តា", khmerKey = "pasta", mealCategory = "Pasta", icon = "🍝"),
-            FoodType("drinks", "Drinks", "ភេសជ្ជៈ", drink = DrinkKind.SOFT, icon = "☕"),
-            FoodType("cocktails", "Cocktails 18+", "ស្រាក្រឡុក 18+", drink = DrinkKind.COCKTAIL, icon = "🍸")
-        )
     }
 }
 
-/** A country to filter by. [api] is TheMealDB's "area" value. */
-class Country(val api: String, private val en: String, private val km: String) {
-    fun label(khmer: Boolean): String = if (khmer) km else en
-}
+/** Where in Cambodia a dish comes from (set on each recipe in the dashboard). */
+enum class Region(val key: String, @StringRes val label: Int) {
+    EVERYWHERE("everywhere", R.string.region_everywhere),
+    COAST("coast", R.string.region_coast),
+    NORTH("north", R.string.region_north),
+    NORTHWEST("northwest", R.string.region_northwest),
+    UPLANDS("uplands", R.string.region_uplands);
 
-object Countries {
-    /** Only the built-in Khmer dishes (TheMealDB has none from Cambodia). */
-    val CAMBODIA = Country("Cambodia", "Cambodia", "កម្ពុជា")
-
-    /** TheMealDB area values that returned dishes when checked on 25 Oct 2026, with the country name to show. */
-    val ALL: List<Country> = listOf(
-        CAMBODIA,
-        Country("Algerian", "Algeria", "អាល់ហ្សេរី"),
-        Country("Argentina", "Argentina", "អាហ្សង់ទីន"),
-        Country("Australian", "Australia", "អូស្ត្រាលី"),
-        Country("Canadian", "Canada", "កាណាដា"),
-        Country("Chinese", "China", "ចិន"),
-        Country("Croatian", "Croatia", "ក្រូអាស៊ី"),
-        Country("Egyptian", "Egypt", "អេហ្ស៊ីប"),
-        Country("France", "France", "បារាំង"),
-        Country("Greek", "Greece", "ក្រិក"),
-        Country("India", "India", "ឥណ្ឌា"),
-        Country("Irish", "Ireland", "អៀរឡង់"),
-        Country("Italian", "Italy", "អ៊ីតាលី"),
-        Country("Jamaican", "Jamaica", "ហ្សាម៉ាអ៊ីក"),
-        Country("Japanese", "Japan", "ជប៉ុន"),
-        Country("Kenyan", "Kenya", "កេនយ៉ា"),
-        Country("Malaysian", "Malaysia", "ម៉ាឡេស៊ី"),
-        Country("Mexican", "Mexico", "ម៉ិកស៊ិក"),
-        Country("Moroccan", "Morocco", "ម៉ារ៉ុក"),
-        Country("Netherlands", "Netherlands", "ហូឡង់"),
-        Country("Norway", "Norway", "ន័រវែស"),
-        Country("Filipino", "Philippines", "ហ្វីលីពីន"),
-        Country("Polish", "Poland", "ប៉ូឡូញ"),
-        Country("Portuguese", "Portugal", "ព័រទុយហ្គាល់"),
-        Country("Russian", "Russia", "រុស្ស៊ី"),
-        Country("Saudi Arabian", "Saudi Arabia", "អារ៉ាប៊ីសាអូឌីត"),
-        Country("Slovakia", "Slovakia", "ស្លូវ៉ាគី"),
-        Country("Spanish", "Spain", "អេស្ប៉ាញ"),
-        Country("Syrian", "Syria", "ស៊ីរី"),
-        Country("Thai", "Thailand", "ថៃ"),
-        Country("Tunisian", "Tunisia", "ទុយនីស៊ី"),
-        Country("Turkish", "Turkey", "តួកគី"),
-        Country("Ukrainian", "Ukraine", "អ៊ុយក្រែន"),
-        Country("British", "United Kingdom", "ចក្រភពអង់គ្លេស"),
-        Country("United States", "United States", "សហរដ្ឋអាមេរិក"),
-        Country("Uruguayan", "Uruguay", "អ៊ុយរូហ្គាយ"),
-        Country("Venezuela", "Venezuela", "វ៉េណេស៊ុយអេឡា"),
-        Country("Vietnamese", "Vietnam", "វៀតណាម")
-    )
-
-    /** Country name for a TheMealDB area value ("Thai" → "Thailand"); empty when unknown. */
-    fun labelFor(area: String?, khmer: Boolean): String =
-        ALL.firstOrNull { it.api.equals(area, ignoreCase = true) }?.label(khmer) ?: area.orEmpty()
+    companion object {
+        fun of(key: String?): Region = entries.firstOrNull { it.key == key } ?: EVERYWHERE
+    }
 }
 
 enum class SortBy(@StringRes val label: Int) {
@@ -122,18 +46,10 @@ enum class SortBy(@StringRes val label: Int) {
     SERVES_MOST(R.string.sort_serves)
 }
 
-/** A card plus the facts we can sort by (null = the source doesn't say). */
+/** A card plus the facts we can sort by. */
 data class BrowseItem(
     val card: RecipeCardItem,
     val cookMinutes: Int? = null,
     val ingredientCount: Int? = null,
     val serves: Int? = null
 )
-
-/** Hides drink names that aren't suitable for a family recipe app. */
-private val rudeWords = Regex(
-    """\b(ass|asshole|screwed|orgasm\w*|sex\w*|bitch\w*|fuck\w*|slut\w*|nipple\w*|dick\w*|pussy|penis|boob\w*|cum)\b""",
-    RegexOption.IGNORE_CASE
-)
-
-fun isSuitableName(name: String?): Boolean = !name.isNullOrBlank() && !rudeWords.containsMatchIn(name)

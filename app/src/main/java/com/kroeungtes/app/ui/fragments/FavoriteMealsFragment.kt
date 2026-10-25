@@ -24,11 +24,7 @@ import com.kroeungtes.app.ui.activities.MealDetailesActivity
 import com.kroeungtes.app.ui.common.Motion
 import com.kroeungtes.app.ui.common.aboveBar
 import com.kroeungtes.app.ui.common.fadeVisible
-import com.kroeungtes.app.ui.dialogs.MealBottomDialog
-import com.kroeungtes.app.ui.fragments.HomeFragment.Companion.CATEGORY_NAME
-import com.kroeungtes.app.ui.fragments.HomeFragment.Companion.MEAL_AREA
 import com.kroeungtes.app.ui.fragments.HomeFragment.Companion.MEAL_ID
-import com.kroeungtes.app.ui.fragments.HomeFragment.Companion.MEAL_NAME
 import com.kroeungtes.app.ui.fragments.HomeFragment.Companion.MEAL_STR
 import com.kroeungtes.app.ui.fragments.HomeFragment.Companion.MEAL_THUMB
 import com.kroeungtes.app.viewmodel.DetailsMVVM
@@ -42,6 +38,7 @@ class FavoriteMealsFragment : Fragment() {
     private lateinit var detailsMVVM: DetailsMVVM
     private lateinit var adapter: RecipeCardAdapter
     private var savedMeals: List<MealDB> = emptyList()
+    private var firstLoad = true
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -57,7 +54,6 @@ class FavoriteMealsFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         adapter = RecipeCardAdapter(
             onClick = { openRecipe(it) },
-            onLongClick = { detailsMVVM.getMealByIdBottomSheet(it.id) },
             onSaveToggle = { item, saved -> if (!saved) removeWithUndo(item.id) }
         )
         binding.favRecView.layoutManager =
@@ -65,15 +61,22 @@ class FavoriteMealsFragment : Fragment() {
         binding.favRecView.adapter = adapter
         attachSwipeToRemove()
 
+        firstLoad = true
+        // Rows kept for Undo after a swipe
         detailsMVVM.observeSaveMeal().observe(viewLifecycleOwner) { saved ->
-            val firstLoad = savedMeals.isEmpty()
-            savedMeals = saved.orEmpty().reversed()
-            adapter.submit(savedMeals.map { RecipeCardItem.from(it, getString(R.string.your_wishlist)) })
+            savedMeals = saved.orEmpty()
             adapter.setSavedIds(savedMeals.map { it.mealId.toString() }.toSet())
-            if (firstLoad) binding.favRecView.scheduleLayoutAnimation()
-            binding.tvFavEmpty.fadeVisible(savedMeals.isEmpty())
         }
-        observeBottomDialog()
+        // Only recipes that are still published show
+        detailsMVVM.savedRecipes.observe(viewLifecycleOwner) { recipes ->
+            val list = recipes.orEmpty()
+            adapter.submit(list.map { RecipeCardItem.from(it, getString(R.string.your_wishlist)) })
+            if (firstLoad && list.isNotEmpty()) {
+                firstLoad = false
+                binding.favRecView.scheduleLayoutAnimation()
+            }
+            binding.tvFavEmpty.fadeVisible(list.isEmpty())
+        }
     }
 
     private fun removeWithUndo(id: String) {
@@ -128,22 +131,6 @@ class FavoriteMealsFragment : Fragment() {
             }
         }
         ItemTouchHelper(callback).attachToRecyclerView(binding.favRecView)
-    }
-
-    private fun observeBottomDialog() {
-        detailsMVVM.observeMealBottomSheet().observe(viewLifecycleOwner) { details ->
-            val meal = details?.firstOrNull() ?: return@observe
-            MealBottomDialog().apply {
-                arguments = Bundle().apply {
-                    putString(CATEGORY_NAME, meal.strCategory)
-                    putString(MEAL_AREA, meal.strArea)
-                    putString(MEAL_NAME, meal.strMeal)
-                    putString(MEAL_THUMB, meal.strMealThumb)
-                    putString(MEAL_ID, meal.idMeal)
-                }
-            }.show(childFragmentManager, "Favorite bottom dialog")
-            detailsMVVM.consumeBottomSheet()
-        }
     }
 
     private fun openRecipe(item: RecipeCardItem) {

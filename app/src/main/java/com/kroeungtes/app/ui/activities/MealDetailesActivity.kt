@@ -9,7 +9,6 @@ import android.widget.PopupMenu
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.WindowCompat
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.DataSource
 import com.bumptech.glide.load.engine.GlideException
@@ -20,16 +19,13 @@ import com.google.android.material.snackbar.Snackbar
 import com.kroeungtes.app.R
 import com.kroeungtes.app.adapters.IngredientAdapter
 import com.kroeungtes.app.adapters.StepAdapter
-import com.kroeungtes.app.data.browse.DRINK_PREFIX
+import com.kroeungtes.app.data.browse.Region
+import com.kroeungtes.app.data.cloud.CloudContent
 import com.kroeungtes.app.data.local.KhmerRecipes
 import com.kroeungtes.app.data.local.MyRecipeStore
 import com.kroeungtes.app.data.local.ProfileStore
-import com.kroeungtes.app.data.model.Ingredient
-import com.kroeungtes.app.data.model.MealDB
-import com.kroeungtes.app.data.model.MealDetail
+import com.kroeungtes.app.data.model.KhmerRecipe
 import com.kroeungtes.app.data.model.MyRecipe
-import com.kroeungtes.app.data.model.RecipeText
-import com.kroeungtes.app.data.remote.RetrofitInstance
 import com.kroeungtes.app.databinding.ActivityMealDetailesBinding
 import com.kroeungtes.app.ui.common.EdgeToEdge
 import com.kroeungtes.app.ui.common.Images
@@ -41,12 +37,10 @@ import com.kroeungtes.app.ui.fragments.HomeFragment.Companion.MEAL_ID
 import com.kroeungtes.app.ui.fragments.HomeFragment.Companion.MEAL_STR
 import com.kroeungtes.app.ui.fragments.HomeFragment.Companion.MEAL_THUMB
 import com.kroeungtes.app.viewmodel.DetailsMVVM
-import kotlinx.coroutines.CancellationException
-import kotlinx.coroutines.launch
 
 /**
- * Recipe page. Works for TheMealDB recipes (loaded by id), the built-in Khmer recipes
- * (negative ids, from KhmerRecipes) and recipes the user made (ids starting with "local-").
+ * Recipe page. Works for the recipes published in the admin dashboard (negative ids, from
+ * KhmerRecipes) and recipes the user made on this phone (ids starting with "local-").
  */
 class MealDetailesActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMealDetailesBinding
@@ -55,7 +49,6 @@ class MealDetailesActivity : AppCompatActivity() {
     private var mealStr = ""
     private var mealThumb = ""
     private var ytUrl = ""
-    private var dtMeal: MealDetail? = null
     private var portion = 1
 
     /** True when the photo flew in from a card (shared-element transition). */
@@ -69,7 +62,6 @@ class MealDetailesActivity : AppCompatActivity() {
     }
 
     private val isLocal get() = mealId.startsWith(MyRecipeStore.LOCAL_PREFIX)
-    private val isDrink get() = mealId.startsWith(DRINK_PREFIX)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -108,31 +100,9 @@ class MealDetailesActivity : AppCompatActivity() {
 
         when {
             isLocal -> showLocalRecipe()
-            isDrink -> loadDrink()
-            KhmerRecipes.isKhmerId(mealId) -> showKhmerRecipe()
-            else -> loadFromApi()
+            KhmerRecipes.isKhmerId(mealId) -> waitForRecipe()
+            else -> finish() // e.g. an old link to a dish that isn't in the app any more
         }
-    }
-
-    // ---------- TheMealDB recipe ----------
-
-    private fun loadFromApi() {
-        binding.progressBar.visibility = View.VISIBLE
-        showSaved(isMealSavedInDatabase())
-        detailsMVVM.getMealById(mealId)
-        detailsMVVM.observeMealDetail().observe(this) { list ->
-            val meal = list?.firstOrNull() ?: return@observe
-            dtMeal = meal
-            ytUrl = meal.strYoutube.orEmpty()
-            showInfo(meal.strCategory.orEmpty(), meal.strArea.orEmpty())
-            ingredientAdapter.submit(Ingredient.fromMeal(meal))
-            stepAdapter.submit(RecipeText.steps(meal.strInstructions))
-            binding.rvIngredients.scheduleLayoutAnimation()
-            binding.imgYoutube.visibility = if (ytUrl.isBlank()) View.GONE else View.VISIBLE
-            binding.progressBar.visibility = View.GONE
-            binding.btnSave.visibility = View.VISIBLE
-        }
-        setUpSaveButton()
     }
 
     private fun setUpSaveButton() {
@@ -148,15 +118,7 @@ class MealDetailesActivity : AppCompatActivity() {
     }
 
     private fun saveMeal() {
-        val d = dtMeal
-        if (d == null) {
-            detailsMVVM.quickSave(mealId, mealStr, mealThumb)
-            return
-        }
-        detailsMVVM.insertMeal(
-            MealDB(d.idMeal.toInt(), d.strMeal, d.strArea.orEmpty(), d.strCategory.orEmpty(),
-                d.strInstructions.orEmpty(), d.strMealThumb.orEmpty(), d.strYoutube.orEmpty())
-        )
+        detailsMVVM.quickSave(mealId, mealStr, mealThumb)
     }
 
     private fun isMealSavedInDatabase(): Boolean = detailsMVVM.isMealSavedInDatabase(mealId)
@@ -170,42 +132,31 @@ class MealDetailesActivity : AppCompatActivity() {
         }
     }
 
-    // ---------- Drink from TheCocktailDB (Categories → Drinks / Cocktails) ----------
+    // ---------- Recipe from the dashboard ----------
 
-    private fun loadDrink() {
-        binding.progressBar.visibility = View.VISIBLE
-        binding.btnSave.visibility = View.GONE   // drinks can't go in the Wishlist yet
-        binding.imgYoutube.visibility = View.GONE
-        binding.tvAuthorName.text = getString(R.string.drink_source)
-        binding.tvAreaInfo.setCompoundDrawablesRelativeWithIntrinsicBounds(0, 0, 0, 0)
-        lifecycleScope.launch {
-            val drink = try {
-                RetrofitInstance.cocktailApi.lookup(mealId.removePrefix(DRINK_PREFIX)).drinks?.firstOrNull()
-            } catch (e: CancellationException) {
-                throw e
-            } catch (e: Exception) {
-                null
+    /**
+     * Recipes arrive from Firestore after the app starts (e.g. when Android reopens this page
+     * after closing the app), so wait for them; close only if it really isn't published any more.
+     */
+    private fun waitForRecipe() {
+        var shown = false
+        val check = {
+            if (!shown && !isFinishing) {
+                val recipe = KhmerRecipes.find(this, mealId.toInt())
+                when {
+                    recipe != null -> { shown = true; showKhmerRecipe(recipe) }
+                    CloudContent.loaded.value == true -> finish()
+                }
             }
-            binding.progressBar.visibility = View.GONE
-            if (drink == null) {
-                Snackbar.make(binding.root, R.string.drink_load_failed, Snackbar.LENGTH_LONG).show()
-                return@launch
-            }
-            mealStr = drink.strDrink.orEmpty().ifBlank { mealStr }
-            showInfo(drink.strCategory.orEmpty(), drink.strAlcoholic.orEmpty())
-            ingredientAdapter.submit(drink.ingredients())
-            stepAdapter.submit(RecipeText.steps(drink.strInstructions))
-            binding.rvIngredients.scheduleLayoutAnimation()
         }
+        CloudContent.loaded.observe(this) { check() }
+        KhmerRecipes.changes.observe(this) { check() }
     }
 
-    // ---------- Built-in Khmer recipe ----------
-
-    private fun showKhmerRecipe() {
-        val recipe = KhmerRecipes.find(this, mealId.toInt()) ?: run { finish(); return }
+    private fun showKhmerRecipe(recipe: KhmerRecipe) {
         mealStr = recipe.name
         showHeader(recipe.name, recipe.photoUrl.orEmpty())
-        showInfo(recipe.category, getString(R.string.khmer_region))
+        showInfo(recipe.category, getString(Region.of(recipe.region).label))
         if (recipe.otherName.isNotBlank()) {
             binding.tvTitleOther.text = recipe.otherName
             binding.tvTitleOther.visibility = View.VISIBLE

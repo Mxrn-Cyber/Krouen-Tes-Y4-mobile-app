@@ -2,32 +2,30 @@ package com.kroeungtes.app.ui.activities
 
 import android.content.Intent
 import android.os.Bundle
-import android.view.View
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.GridLayoutManager
 import com.kroeungtes.app.R
 import com.kroeungtes.app.adapters.RecipeCardAdapter
+import com.kroeungtes.app.data.cloud.CloudContent
 import com.kroeungtes.app.data.local.KhmerRecipes
 import com.kroeungtes.app.data.model.RecipeCardItem
 import com.kroeungtes.app.databinding.ActivityCategoriesBinding
-import com.kroeungtes.app.ui.common.Motion
 import com.kroeungtes.app.ui.common.EdgeToEdge
+import com.kroeungtes.app.ui.common.Motion
 import com.kroeungtes.app.ui.common.padForSystemBars
 import com.kroeungtes.app.ui.fragments.HomeFragment.Companion.CATEGORY_NAME
 import com.kroeungtes.app.ui.fragments.HomeFragment.Companion.MEAL_ID
 import com.kroeungtes.app.ui.fragments.HomeFragment.Companion.MEAL_STR
 import com.kroeungtes.app.ui.fragments.HomeFragment.Companion.MEAL_THUMB
 import com.kroeungtes.app.viewmodel.DetailsMVVM
-import com.kroeungtes.app.viewmodel.MealActivityMVVM
 
-/** "See all" screen: the built-in Khmer dishes, or every recipe in one TheMealDB category. */
+/** "See all" screen: Featured dishes, the newest recipes, or every recipe in one category. */
 class MealActivity : AppCompatActivity() {
     private lateinit var binding: ActivityCategoriesBinding
-    private lateinit var listMvvm: MealActivityMVVM
     private lateinit var detailsMvvm: DetailsMVVM
     private lateinit var adapter: RecipeCardAdapter
+    private var key = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -35,15 +33,10 @@ class MealActivity : AppCompatActivity() {
         binding = ActivityCategoriesBinding.inflate(layoutInflater)
         setContentView(binding.root)
         binding.root.padForSystemBars()
-        listMvvm = ViewModelProvider(this)[MealActivityMVVM::class.java]
         detailsMvvm = ViewModelProvider(this)[DetailsMVVM::class.java]
-
-        val category = intent.getStringExtra(CATEGORY_NAME).orEmpty()
-        val isKhmer = category == KhmerRecipes.LIST_KEY
+        key = intent.getStringExtra(CATEGORY_NAME).orEmpty()
 
         binding.btnListBack.setOnClickListener { finish() }
-        binding.tvListTitle.text = if (isKhmer) getString(R.string.khmer_dishes) else category
-
         adapter = RecipeCardAdapter(
             onClick = { open(it) },
             onSaveToggle = { item, saved ->
@@ -57,29 +50,27 @@ class MealActivity : AppCompatActivity() {
         detailsMvvm.observeSaveMeal().observe(this) { saved ->
             adapter.setSavedIds(saved.orEmpty().map { it.mealId.toString() }.toSet())
         }
-
-        if (isKhmer) {
-            show(KhmerRecipes.all(this).map { RecipeCardItem.from(it) })
-        } else {
-            binding.listLoading.visibility = View.VISIBLE
-            listMvvm.getMealsByCategory(category)
-            listMvvm.observeMeal().observe(this) { meals ->
-                binding.listLoading.visibility = View.GONE
-                if (meals.isNullOrEmpty()) {
-                    Toast.makeText(this, getString(R.string.no_results, category), Toast.LENGTH_SHORT).show()
-                    finish()
-                } else {
-                    val subtitle = getString(R.string.recipe_with, category)
-                    show(meals.map { RecipeCardItem.from(it, subtitle) })
-                }
-            }
-        }
+        // Follows changes admins make while this list is open
+        KhmerRecipes.changes.observe(this) { show() }
+        CloudContent.categories.observe(this) { show() }
+        CloudContent.home.observe(this) { show() }
     }
 
-    private fun show(items: List<RecipeCardItem>) {
-        adapter.submit(items)
-        binding.mealRecyclerview.scheduleLayoutAnimation()
-        binding.tvCategoryCount.text = resources.getQuantityString(R.plurals.recipe_count, items.size, items.size)
+    private fun show() {
+        val khmer = KhmerRecipes.isKhmerLanguage()
+        val (title, recipes) = when (key) {
+            KhmerRecipes.LIST_KEY -> getString(R.string.khmer_dishes) to CloudContent.homeKhmerDishes(this)
+            KhmerRecipes.NEWEST_KEY -> getString(R.string.recent_recipe) to KhmerRecipes.newest(this)
+            else -> {
+                val category = CloudContent.currentCategories().firstOrNull { it.id == key }
+                (category?.chipLabel(khmer) ?: key) to KhmerRecipes.inCategory(this, key)
+            }
+        }
+        val first = adapter.itemCount == 0
+        binding.tvListTitle.text = title
+        adapter.submit(recipes.map { RecipeCardItem.from(it) })
+        if (first) binding.mealRecyclerview.scheduleLayoutAnimation()
+        binding.tvCategoryCount.text = resources.getQuantityString(R.plurals.recipe_count, recipes.size, recipes.size)
     }
 
     private fun open(item: RecipeCardItem) {

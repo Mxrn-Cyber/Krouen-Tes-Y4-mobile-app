@@ -28,14 +28,12 @@ import com.kroeungtes.app.ui.fragments.HomeFragment.Companion.MEAL_ID
 import com.kroeungtes.app.ui.fragments.HomeFragment.Companion.MEAL_STR
 import com.kroeungtes.app.ui.fragments.HomeFragment.Companion.MEAL_THUMB
 import com.kroeungtes.app.viewmodel.DetailsMVVM
-import com.kroeungtes.app.viewmodel.SearchMVVM
 
-/** Search as you type: results refresh 400 ms after the user stops typing. */
+/** Search as you type in the dashboard's recipes (names in both languages, category, ingredients). */
 class SearchFragment : Fragment() {
 
     private var _binding: FragmentSearchBinding? = null
     private val binding get() = _binding!!
-    private lateinit var searchMvvm: SearchMVVM
     private lateinit var detailsMvvm: DetailsMVVM
     private lateinit var resultsAdapter: RecipeCardAdapter
 
@@ -45,7 +43,6 @@ class SearchFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        searchMvvm = ViewModelProvider(this)[SearchMVVM::class.java]
         detailsMvvm = ViewModelProvider(this)[DetailsMVVM::class.java]
     }
 
@@ -86,19 +83,9 @@ class SearchFragment : Fragment() {
             } else false
         }
 
-        searchMvvm.observeLoading().observe(viewLifecycleOwner) { loading ->
-            binding.searchProgress.visibility = if (loading == true) View.VISIBLE else View.INVISIBLE
-        }
-        searchMvvm.observeResults().observe(viewLifecycleOwner) { results ->
-            // Built-in Khmer dishes first (works offline), then TheMealDB matches
-            val khmer = KhmerRecipes.search(requireContext(), lastQuery).map { RecipeCardItem.from(it) }
-            val list = khmer + results.orEmpty().map { RecipeCardItem.from(it) }
-            resultsAdapter.submit(list)
-            binding.rvSearch.scheduleLayoutAnimation()
-            binding.tvSearchState.text = if (lastQuery.isBlank()) getString(R.string.search_start)
-            else getString(R.string.no_results, lastQuery)
-            binding.tvSearchState.fadeVisible(list.isEmpty())
-        }
+        binding.searchProgress.visibility = View.INVISIBLE
+        // Recipes changed in the dashboard while searching: run the search again
+        KhmerRecipes.changes.observe(viewLifecycleOwner) { showResults(animate = false) }
         detailsMvvm.observeSaveMeal().observe(viewLifecycleOwner) { saved ->
             resultsAdapter.setSavedIds(saved.orEmpty().map { it.mealId.toString() }.toSet())
         }
@@ -114,10 +101,20 @@ class SearchFragment : Fragment() {
         pendingSearch?.let { handler.removeCallbacks(it) }
         val task = Runnable {
             lastQuery = query.trim()
-            searchMvvm.search(lastQuery)
+            showResults(animate = true)
         }
         pendingSearch = task
         handler.postDelayed(task, delayMs)
+    }
+
+    private fun showResults(animate: Boolean) {
+        val b = _binding ?: return
+        val list = KhmerRecipes.search(requireContext(), lastQuery).map { RecipeCardItem.from(it) }
+        resultsAdapter.submit(list)
+        if (animate) b.rvSearch.scheduleLayoutAnimation()
+        b.tvSearchState.text = if (lastQuery.isBlank()) getString(R.string.search_start)
+        else getString(R.string.no_results, lastQuery)
+        b.tvSearchState.fadeVisible(list.isEmpty())
     }
 
     private fun openRecipe(item: RecipeCardItem) {

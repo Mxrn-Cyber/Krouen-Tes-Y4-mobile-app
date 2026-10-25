@@ -52,7 +52,7 @@
                 app:drawableStartCompat="@drawable/ic_baseline_search_24"
                 app:drawableTint="@color/text_secondary" />
 
-            <!-- Built-in Khmer dishes (always first) -->
+            <!-- Featured dishes (admins pick them in the dashboard) -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -90,8 +90,21 @@
                 android:paddingEnd="8dp"
                 app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
 
-            <!-- Category chips: tap to change the Trending row -->
+            <!-- No recipes published yet -->
+            <TextView
+                android:id="@+id/tv_home_empty"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:paddingStart="@dimen/screen_padding"
+                android:paddingEnd="@dimen/screen_padding"
+                android:text="@string/home_empty"
+                android:textAppearance="@style/Text.Body"
+                android:visibility="gone" />
+
+            <!-- Category chips (from the dashboard): tap to change the row below -->
             <HorizontalScrollView
+                android:id="@+id/chip_scroll"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="14dp"
@@ -117,6 +130,7 @@
                 android:orientation="vertical">
 
                 <LinearLayout
+                    android:id="@+id/trending_header"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/section_gap"
@@ -140,7 +154,7 @@
                         android:layout_height="wrap_content" />
                 </LinearLayout>
 
-                <!-- Skeleton shown while Trending loads -->
+                <!-- Skeleton shown until the recipes arrive (first start) -->
                 <HorizontalScrollView
                     android:id="@+id/skeleton"
                     android:layout_width="match_parent"

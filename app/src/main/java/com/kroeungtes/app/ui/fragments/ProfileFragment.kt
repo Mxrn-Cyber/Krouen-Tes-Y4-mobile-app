@@ -20,7 +20,7 @@ import com.kroeungtes.app.adapters.RecipeCardAdapter
 import com.kroeungtes.app.data.cloud.UserDirectory
 import com.kroeungtes.app.data.local.MyRecipeStore
 import com.kroeungtes.app.data.local.ProfileStore
-import com.kroeungtes.app.data.model.MealDB
+import com.kroeungtes.app.data.model.KhmerRecipe
 import com.kroeungtes.app.data.model.MyRecipe
 import com.kroeungtes.app.data.model.RecipeCardItem
 import com.kroeungtes.app.databinding.DialogEditProfileBinding
@@ -45,7 +45,7 @@ class ProfileFragment : Fragment() {
     private lateinit var adapter: RecipeCardAdapter
 
     private var myRecipes: List<MyRecipe> = emptyList()
-    private var saved: List<MealDB> = emptyList()
+    private var saved: List<KhmerRecipe> = emptyList()
     private var showingSaved = false
 
     private val pickAvatar = registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
@@ -96,8 +96,8 @@ class ProfileFragment : Fragment() {
             updateStats()
             showList(animate = false)
         }
-        detailsMvvm.observeSaveMeal().observe(viewLifecycleOwner) { list ->
-            saved = list.orEmpty().reversed()
+        detailsMvvm.savedRecipes.observe(viewLifecycleOwner) { list ->
+            saved = list.orEmpty()
             updateStats()
             showList(animate = false)
         }

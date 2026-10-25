@@ -46,24 +46,4 @@ object RecipeText {
     private fun format(v: Double): String =
         if (v % 1.0 == 0.0) v.toLong().toString()
         else String.format(Locale.US, "%.2f", v).trimEnd('0').trimEnd('.')
-
-    /**
-     * Splits TheMealDB instructions into steps: by line, dropping "STEP 1" labels and
-     * leading numbers; one long paragraph is split into sentences.
-     */
-    fun steps(instructions: String?): List<String> {
-        if (instructions.isNullOrBlank()) return emptyList()
-        val label = Regex("""^(step\s*\d+[:.)-]?|\d+[.)])\s*""", RegexOption.IGNORE_CASE)
-        var lines = instructions.split(Regex("""\r?\n"""))
-            .map { it.trim() }
-            .filter { it.isNotEmpty() }
-            .filterNot { Regex("""^(step\s*)?\d+[:.)]?$""", RegexOption.IGNORE_CASE).matches(it) }
-            .map { it.replaceFirst(label, "").trim() }
-            .filter { it.isNotEmpty() }
-        if (lines.size <= 1) {
-            lines = (lines.firstOrNull() ?: instructions).split(Regex("""(?<=[.!?])\s+"""))
-                .map { it.trim() }.filter { it.length > 1 }
-        }
-        return lines
-    }
 }
