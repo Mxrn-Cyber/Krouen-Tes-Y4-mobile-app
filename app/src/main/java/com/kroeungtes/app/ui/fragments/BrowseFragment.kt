@@ -1,0 +1,207 @@
+package com.kroeungtes.app.ui.fragments
+
+import android.content.Intent
+import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
+import androidx.recyclerview.widget.GridLayoutManager
+import com.google.android.material.chip.Chip
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.android.material.snackbar.Snackbar
+import com.kroeungtes.app.R
+import com.kroeungtes.app.adapters.RecipeCardAdapter
+import com.kroeungtes.app.data.browse.Countries
+import com.kroeungtes.app.data.browse.DrinkKind
+import com.kroeungtes.app.data.browse.FoodType
+import com.kroeungtes.app.data.browse.SortBy
+import com.kroeungtes.app.data.local.AgeGate
+import com.kroeungtes.app.data.local.KhmerRecipes
+import com.kroeungtes.app.data.model.RecipeCardItem
+import com.kroeungtes.app.databinding.FragmentBrowseBinding
+import com.kroeungtes.app.ui.activities.MealDetailesActivity
+import com.kroeungtes.app.ui.common.Motion
+import com.kroeungtes.app.ui.common.aboveBar
+import com.kroeungtes.app.ui.common.riseIn
+import com.kroeungtes.app.ui.fragments.HomeFragment.Companion.MEAL_ID
+import com.kroeungtes.app.ui.fragments.HomeFragment.Companion.MEAL_STR
+import com.kroeungtes.app.ui.fragments.HomeFragment.Companion.MEAL_THUMB
+import com.kroeungtes.app.viewmodel.BrowseMVVM
+import com.kroeungtes.app.viewmodel.DetailsMVVM
+
+/**
+ * Categories tab: filter dishes by type (chips) and country, and sort them
+ * (name, quickest, fewest ingredients, serves most). Cocktails ask "18 or older?" first.
+ */
+class BrowseFragment : Fragment() {
+
+    private var _binding: FragmentBrowseBinding? = null
+    private val binding get() = _binding!!
+
+    private lateinit var browseMvvm: BrowseMVVM
+    private lateinit var detailsMvvm: DetailsMVVM
+    private lateinit var adapter: RecipeCardAdapter
+
+    /** Chip view id → the type it stands for. */
+    private val chipTypes = mutableMapOf<Int, FoodType>()
+    private val khmer: Boolean get() = KhmerRecipes.isKhmerLanguage()
+
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+        _binding = FragmentBrowseBinding.inflate(inflater, container, false)
+        return binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        // Kept by the activity, so the chosen filters survive switching tabs
+        browseMvvm = ViewModelProvider(requireActivity())[BrowseMVVM::class.java]
+        detailsMvvm = ViewModelProvider(this)[DetailsMVVM::class.java]
+
+        adapter = RecipeCardAdapter(
+            onClick = { open(it) },
+            onSaveToggle = { item, saved -> toggleSave(item, saved) }
+        )
+        binding.browseList.layoutManager =
+            GridLayoutManager(requireContext(), resources.getInteger(R.integer.meal_list_columns), GridLayoutManager.VERTICAL, false)
+        binding.browseList.adapter = adapter
+
+        buildTypeChips(browseMvvm.observeState().value?.type ?: FoodType.ALL)
+        binding.btnCountry.setOnClickListener { pickCountry() }
+        binding.btnSort.setOnClickListener { pickSort() }
+        binding.tvBrowseHint.setOnClickListener {
+            if (browseMvvm.observeState().value?.offline == true) browseMvvm.retry()
+        }
+
+        detailsMvvm.observeSaveMeal().observe(viewLifecycleOwner) { saved ->
+            adapter.setSavedIds(saved.orEmpty().map { it.mealId.toString() }.toSet())
+        }
+        browseMvvm.observeState().observe(viewLifecycleOwner) { render(it) }
+
+        binding.tvBrowseTitle.riseIn(delay = 0, distanceDp = 16f)
+        binding.filterRow.riseIn(delay = 80, distanceDp = 16f)
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+    }
+
+    // ---------- Filters ----------
+
+    private fun buildTypeChips(selected: FoodType) {
+        val group = binding.typeChips
+        group.setOnCheckedStateChangeListener(null)
+        group.removeAllViews()
+        chipTypes.clear()
+        FoodType.entries.forEachIndexed { index, type ->
+            val chip = layoutInflater.inflate(R.layout.item_category_chip, group, false) as Chip
+            chip.id = View.generateViewId()
+            chip.text = type.label(khmer)
+            chipTypes[chip.id] = type
+            group.addView(chip)
+            if (type == selected) group.check(chip.id)
+            // Chips fade in one after another
+            chip.alpha = 0f
+            chip.animate().alpha(1f).setStartDelay(25L * index).setDuration(220).start()
+        }
+        group.setOnCheckedStateChangeListener { _, checkedIds ->
+            val type = checkedIds.firstOrNull()?.let { chipTypes[it] } ?: return@setOnCheckedStateChangeListener
+            onTypePicked(type)
+        }
+    }
+
+    private fun onTypePicked(type: FoodType) {
+        val ctx = context ?: return
+        if (type.drink == DrinkKind.COCKTAIL && !AgeGate.isAdult(ctx)) {
+            val previous = browseMvvm.observeState().value?.type ?: FoodType.ALL
+            MaterialAlertDialogBuilder(ctx)
+                .setTitle(R.string.age_check_title)
+                .setMessage(R.string.age_check_message)
+                .setPositiveButton(R.string.age_check_yes) { _, _ ->
+                    AgeGate.confirmAdult(ctx)
+                    browseMvvm.setType(type)
+                }
+                .setNegativeButton(R.string.age_check_no) { _, _ -> selectChip(previous) }
+                .setOnCancelListener { selectChip(previous) }
+                .show()
+            return
+        }
+        browseMvvm.setType(type)
+    }
+
+    /** Puts the selection back on [type] (after "No" on the age check). */
+    private fun selectChip(type: FoodType) {
+        val id = chipTypes.entries.firstOrNull { it.value == type }?.key ?: return
+        _binding?.typeChips?.check(id)
+    }
+
+    private fun pickCountry() {
+        val current = browseMvvm.observeState().value?.country
+        val labels = listOf(getString(R.string.all_countries)) + Countries.ALL.map { it.label(khmer) }
+        val checked = if (current == null) 0 else Countries.ALL.indexOf(current) + 1
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle(R.string.pick_country)
+            .setSingleChoiceItems(labels.toTypedArray(), checked) { dialog, which ->
+                browseMvvm.setCountry(if (which == 0) null else Countries.ALL[which - 1])
+                dialog.dismiss()
+            }
+            .show()
+    }
+
+    private fun pickSort() {
+        val current = browseMvvm.observeState().value?.sort ?: SortBy.NAME
+        val options = SortBy.entries
+        val labels = options.map { getString(it.label) }
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle(R.string.sort_title)
+            .setSingleChoiceItems(labels.toTypedArray(), options.indexOf(current)) { dialog, which ->
+                browseMvvm.setSort(options[which])
+                dialog.dismiss()
+            }
+            .show()
+    }
+
+    // ---------- List ----------
+
+    private fun render(s: BrowseMVVM.State) {
+        val b = _binding ?: return
+        b.btnCountry.text = s.country?.label(khmer) ?: getString(R.string.all_countries)
+        // Drinks don't have a country
+        b.btnCountry.visibility = if (s.type.drink != null) View.GONE else View.VISIBLE
+        b.btnSort.text = getString(s.sort.label)
+        b.browseLoading.visibility = if (s.loading) View.VISIBLE else View.GONE
+
+        adapter.submit(s.items.map { it.card })
+        if (!s.loading) b.browseList.scheduleLayoutAnimation()
+        b.tvBrowseCount.text = resources.getQuantityString(R.plurals.recipe_count, s.items.size, s.items.size)
+        b.tvBrowseEmpty.visibility = if (!s.loading && s.items.isEmpty()) View.VISIBLE else View.GONE
+
+        val hints = buildList {
+            if (s.offline) add(getString(R.string.browse_offline))
+            if (s.type == FoodType.ALL && s.country == null && !s.offline) add(getString(R.string.browse_pick_hint))
+            if (s.someUnsorted && !s.loading) add(getString(R.string.browse_unsorted))
+        }
+        b.tvBrowseHint.text = hints.joinToString("\n")
+        b.tvBrowseHint.visibility = if (hints.isEmpty()) View.GONE else View.VISIBLE
+    }
+
+    private fun toggleSave(item: RecipeCardItem, saved: Boolean) {
+        if (saved) detailsMvvm.quickSave(item.id, item.name, item.image) else detailsMvvm.deleteMealById(item.id)
+        Snackbar.make(binding.root,
+            if (saved) R.string.saved_to_wishlist else R.string.removed_from_wishlist,
+            Snackbar.LENGTH_SHORT
+        ).aboveBar().setAction(R.string.undo) {
+            if (saved) detailsMvvm.deleteMealById(item.id) else detailsMvvm.quickSave(item.id, item.name, item.image)
+        }.show()
+    }
+
+    private fun open(item: RecipeCardItem) {
+        Motion.openRecipe(requireActivity(), Intent(requireContext(), MealDetailesActivity::class.java).apply {
+            putExtra(MEAL_ID, item.id)
+            putExtra(MEAL_STR, item.name)
+            putExtra(MEAL_THUMB, item.image.orEmpty())
+        })
+    }
+}

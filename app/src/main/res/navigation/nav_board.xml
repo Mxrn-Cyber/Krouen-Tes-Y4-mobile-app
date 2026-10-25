@@ -21,9 +21,9 @@
         tools:layout="@layout/fragment_favorite_meals" />
     <fragment
         android:id="@+id/categoryFragment"
-        android:name="com.kroeungtes.app.ui.fragments.CategoryFragment"
-        android:label="fragment_category"
-        tools:layout="@layout/fragment_category" />
+        android:name="com.kroeungtes.app.ui.fragments.BrowseFragment"
+        android:label="fragment_browse"
+        tools:layout="@layout/fragment_browse" />
     <fragment
         android:id="@+id/searchFragment"
         android:name="com.kroeungtes.app.ui.fragments.SearchFragment"

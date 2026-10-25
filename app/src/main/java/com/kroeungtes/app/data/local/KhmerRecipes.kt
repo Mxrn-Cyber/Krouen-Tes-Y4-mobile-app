@@ -94,6 +94,7 @@ object KhmerRecipes {
         photoUrl = photo?.url,
         photoAuthor = photo?.author,
         photoLicense = photo?.license,
-        photoPage = photo?.page
+        photoPage = photo?.page,
+        categoryKey = category?.en.orEmpty()
     )
 }

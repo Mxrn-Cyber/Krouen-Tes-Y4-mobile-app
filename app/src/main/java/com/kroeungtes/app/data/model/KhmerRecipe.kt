@@ -19,5 +19,7 @@ data class KhmerRecipe(
     val photoUrl: String?,
     val photoAuthor: String?,
     val photoLicense: String?,
-    val photoPage: String?
+    val photoPage: String?,
+    /** English category ("Soup", "Fish" …) whatever the phone language — used by the Categories filters. */
+    val categoryKey: String = ""
 )

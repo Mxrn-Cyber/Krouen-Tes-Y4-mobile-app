@@ -11,7 +11,9 @@ data class RecipeCardItem(
     val subtitle: String,
     val isLocal: Boolean = false,
     /** Person who made it (user's own recipes). Null = picked by Krouen Tes from the recipe library. */
-    val author: String? = null
+    val author: String? = null,
+    /** False for things that can't go in the Wishlist yet (drinks). */
+    val savable: Boolean = true
 ) {
     companion object {
         fun from(meal: Meal, subtitle: String) = RecipeCardItem(meal.idMeal, meal.strMeal, meal.strMealThumb, subtitle)

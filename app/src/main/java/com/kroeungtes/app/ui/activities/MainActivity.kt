@@ -38,6 +38,7 @@ class MainActivity : AppCompatActivity() {
 
     private val tabs = listOf(
         Tab(R.id.homeFragment, R.drawable.ic_nav_home, R.string.nav_home),
+        Tab(R.id.categoryFragment, R.drawable.ic_nav_category, R.string.nav_category),
         Tab(R.id.favoriteMeals, R.drawable.ic_nav_bookmark, R.string.nav_wishlist),
         Tab(R.id.notificationsFragment, R.drawable.ic_nav_bell, R.string.nav_notifications),
         Tab(R.id.profileFragment, R.drawable.ic_nav_profile, R.string.nav_profile)

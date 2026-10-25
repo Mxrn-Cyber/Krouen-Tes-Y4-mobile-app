@@ -84,7 +84,7 @@ class RecipeCardAdapter(
 
     private fun bindSaved(holder: ViewHolder, item: RecipeCardItem, animate: Boolean) {
         val button = holder.binding.cardSave
-        if (onSaveToggle == null || item.isLocal) {
+        if (onSaveToggle == null || item.isLocal || !item.savable) {
             button.visibility = View.GONE
             return
         }
