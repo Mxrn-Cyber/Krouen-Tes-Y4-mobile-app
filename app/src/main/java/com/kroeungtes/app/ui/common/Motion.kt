@@ -138,3 +138,12 @@ fun com.google.android.material.snackbar.Snackbar.aboveBar(): com.google.android
     view.rootView.findViewById<View>(R.id.bottom_bar)?.let { anchorView = it }
     return this
 }
+
+/** Turns this view round and round (slow decoration). Cancel the returned animator in onDestroy. */
+fun View.spinForever(durationMs: Long = 30_000, clockwise: Boolean = true): ObjectAnimator =
+    ObjectAnimator.ofFloat(this, View.ROTATION, 0f, if (clockwise) 360f else -360f).apply {
+        duration = durationMs
+        repeatCount = ValueAnimator.INFINITE
+        interpolator = android.view.animation.LinearInterpolator()
+        start()
+    }

@@ -1,17 +1,23 @@
 package com.kroeungtes.app.ui.auth
 
+import android.animation.Animator
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.graphics.drawable.ColorDrawable
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Patterns
+import android.view.View
 import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
+import androidx.core.app.ActivityOptionsCompat
+import androidx.core.util.Pair as UtilPair
 import com.kroeungtes.app.R
+import com.kroeungtes.app.ui.common.pressScale
 import com.kroeungtes.app.ui.common.riseIn
+import com.kroeungtes.app.ui.common.spinForever
 import com.kroeungtes.app.ui.common.EdgeToEdge
 import com.kroeungtes.app.ui.common.marginForSystemBars
 import com.kroeungtes.app.ui.activities.MainActivity
@@ -22,6 +28,9 @@ class LoginActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityLoginBinding
     private lateinit var firebaseAuth: FirebaseAuth
+    /** Slowly turning corner blobs, stopped in onDestroy. */
+    private val spins = mutableListOf<Animator>()
+
     @SuppressLint("MissingInflatedId")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -30,9 +39,16 @@ class LoginActivity : AppCompatActivity() {
         setContentView(binding.root)
         binding.authScroll.marginForSystemBars(ime = true)
         firebaseAuth = FirebaseAuth.getInstance()
-        binding.loginTitle.riseIn(delay = 0, distanceDp = 16f)
-        binding.loginSubtitle.riseIn(delay = 90, distanceDp = 16f)
-        binding.loginCard.riseIn(delay = 180, distanceDp = 48f, duration = 520)
+        // The wok arrives from the splash screen; the rest rises in one after another
+        binding.loginTitle.riseIn(delay = 120, distanceDp = 20f)
+        binding.loginSubtitle.riseIn(delay = 200, distanceDp = 20f)
+        listOf(
+            binding.loginEmailBox, binding.loginPasswordBox, binding.forgotPassword, binding.loginButton,
+            binding.loginOrRow, binding.loginSocialRow, binding.signupRedirectText
+        ).forEachIndexed { i, view -> view.riseIn(delay = 280L + 60L * i, distanceDp = 28f, duration = 480) }
+        binding.loginButton.pressScale()
+        spins += binding.loginBlobTop.spinForever(40_000)
+        spins += binding.loginBlobBottom.spinForever(32_000, clockwise = false)
         // Social sign-in is shown in the design but not connected yet
         val comingSoon = android.view.View.OnClickListener {
             Toast.makeText(this, R.string.coming_soon, Toast.LENGTH_SHORT).show()
@@ -77,9 +93,21 @@ class LoginActivity : AppCompatActivity() {
             dialog.show()
         }
         binding.signupRedirectText.setOnClickListener {
-            val signupIntent = Intent(this, SignupActivity::class.java)
-            startActivity(signupIntent)
+            // Logo, title and green button glide over to the Sign-up screen
+            val options = ActivityOptionsCompat.makeSceneTransitionAnimation(
+                this,
+                UtilPair<View, String>(binding.loginLogo, binding.loginLogo.transitionName),
+                UtilPair<View, String>(binding.loginTitle, binding.loginTitle.transitionName),
+                UtilPair<View, String>(binding.loginButton, binding.loginButton.transitionName)
+            )
+            startActivity(Intent(this, SignupActivity::class.java), options.toBundle())
         }
+    }
+
+    override fun onDestroy() {
+        spins.forEach { it.cancel() }
+        spins.clear()
+        super.onDestroy()
     }
     //Outside onCreate
     private fun compareEmail(email: EditText){

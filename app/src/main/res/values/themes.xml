@@ -28,7 +28,7 @@
 
     <!-- Splash: full green screen with the logo, no bars -->
     <style name="Theme.KrouenTes.Splash">
-        <item name="android:windowBackground">@color/brand_splash</item>
+        <item name="android:windowBackground">@drawable/bg_splash_gradient</item>
         <item name="android:statusBarColor">@color/brand_splash</item>
         <item name="android:navigationBarColor">@color/brand_splash</item>
     </style>

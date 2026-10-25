@@ -1,32 +1,217 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- Splash: green gradient, white blob, the wok drops in and bounces, name slides up, steam rises -->
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/splash_root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/brand_splash"
+    android:background="@drawable/bg_splash_gradient"
+    android:clipChildren="false"
+    android:clipToPadding="false"
     tools:context=".ui.splash.SplashActivity">
 
-    <ImageView
-        android:id="@+id/splash_logo"
+    <!-- Soft circles in the corners -->
+    <View
+        android:id="@+id/splash_circle_top"
         android:layout_width="220dp"
         android:layout_height="220dp"
-        android:contentDescription="@string/app_name"
-        android:src="@drawable/logo_krouen_tes"
+        android:alpha="0.18"
+        android:background="@drawable/bg_circle_white"
+        android:translationX="-70dp"
+        android:translationY="-60dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <View
+        android:id="@+id/splash_circle_bottom"
+        android:layout_width="300dp"
+        android:layout_height="300dp"
+        android:alpha="0.12"
+        android:background="@drawable/bg_circle_white"
+        android:translationX="110dp"
+        android:translationY="100dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <!-- Turning see-through blob + white blob -->
+    <ImageView
+        android:id="@+id/splash_blob_back"
+        android:layout_width="300dp"
+        android:layout_height="300dp"
+        android:importantForAccessibility="no"
+        android:src="@drawable/splash_blob_back"
+        app:layout_constraintBottom_toBottomOf="@id/splash_blob"
+        app:layout_constraintEnd_toEndOf="@id/splash_blob"
+        app:layout_constraintStart_toStartOf="@id/splash_blob"
+        app:layout_constraintTop_toTopOf="@id/splash_blob" />
+
+    <ImageView
+        android:id="@+id/splash_blob"
+        android:layout_width="260dp"
+        android:layout_height="260dp"
+        android:importantForAccessibility="no"
+        android:src="@drawable/splash_blob"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.36" />
+
+    <!-- Small floating dots around the blob -->
+    <View
+        android:id="@+id/splash_dot_1"
+        android:layout_width="14dp"
+        android:layout_height="14dp"
+        android:alpha="0.85"
+        android:background="@drawable/bg_circle_white"
+        app:layout_constraintStart_toStartOf="@id/splash_blob"
+        app:layout_constraintTop_toTopOf="@id/splash_blob" />
+
+    <View
+        android:id="@+id/splash_dot_2"
+        android:layout_width="9dp"
+        android:layout_height="9dp"
+        android:layout_marginTop="24dp"
+        android:alpha="0.85"
+        android:background="@drawable/bg_circle_white"
+        app:layout_constraintEnd_toEndOf="@id/splash_blob"
+        app:layout_constraintTop_toTopOf="@id/splash_blob" />
+
+    <View
+        android:id="@+id/splash_dot_3"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:layout_marginStart="8dp"
+        android:alpha="0.85"
+        android:background="@drawable/bg_circle_white"
+        app:layout_constraintBottom_toBottomOf="@id/splash_blob"
+        app:layout_constraintStart_toStartOf="@id/splash_blob" />
+
+    <!-- The wok (flies to the Log-in screen) -->
+    <ImageView
+        android:id="@+id/splash_wok"
+        android:layout_width="190dp"
+        android:layout_height="wrap_content"
+        android:adjustViewBounds="true"
+        android:contentDescription="@string/app_name"
+        android:src="@drawable/logo_wok"
+        android:transitionName="brand_logo"
+        app:layout_constraintBottom_toBottomOf="@id/splash_blob"
+        app:layout_constraintEnd_toEndOf="@id/splash_blob"
+        app:layout_constraintStart_toStartOf="@id/splash_blob"
+        app:layout_constraintTop_toTopOf="@id/splash_blob" />
+
+    <!-- Steam puffs that rise from the wok -->
+    <View
+        android:id="@+id/splash_steam_1"
+        android:layout_width="10dp"
+        android:layout_height="10dp"
+        android:layout_marginTop="8dp"
+        android:alpha="0"
+        android:background="@drawable/bg_circle_white"
+        app:layout_constraintEnd_toEndOf="@id/splash_wok"
+        app:layout_constraintHorizontal_bias="0.38"
+        app:layout_constraintStart_toStartOf="@id/splash_wok"
+        app:layout_constraintTop_toTopOf="@id/splash_wok" />
+
+    <View
+        android:id="@+id/splash_steam_2"
+        android:layout_width="8dp"
+        android:layout_height="8dp"
+        android:layout_marginTop="4dp"
+        android:alpha="0"
+        android:background="@drawable/bg_circle_white"
+        app:layout_constraintEnd_toEndOf="@id/splash_wok"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="@id/splash_wok"
+        app:layout_constraintTop_toTopOf="@id/splash_wok" />
+
+    <View
+        android:id="@+id/splash_steam_3"
+        android:layout_width="12dp"
+        android:layout_height="12dp"
+        android:layout_marginTop="10dp"
+        android:alpha="0"
+        android:background="@drawable/bg_circle_white"
+        app:layout_constraintEnd_toEndOf="@id/splash_wok"
+        app:layout_constraintHorizontal_bias="0.62"
+        app:layout_constraintStart_toStartOf="@id/splash_wok"
+        app:layout_constraintTop_toTopOf="@id/splash_wok" />
+
+    <!-- Name, other-script name, tagline -->
+    <TextView
+        android:id="@+id/splash_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:fontFamily="@font/app_font_semibold"
+        android:text="@string/app_name"
+        android:textColor="@color/text_primary"
+        android:textSize="34sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/splash_blob" />
+
+    <TextView
+        android:id="@+id/splash_title_other"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:alpha="0.8"
+        android:fontFamily="@font/app_font_medium"
+        android:text="@string/app_name_other"
+        android:textColor="@color/text_primary"
+        android:textSize="18sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/splash_title" />
 
     <TextView
         android:id="@+id/splash_tagline"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="10dp"
+        android:alpha="0.75"
+        android:gravity="center"
+        android:paddingStart="32dp"
+        android:paddingEnd="32dp"
         android:text="@string/app_tagline"
-        android:textColor="@color/g_black"
-        android:textSize="16sp"
+        android:textColor="@color/text_primary"
+        android:textSize="14sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/splash_logo" />
+        app:layout_constraintTop_toBottomOf="@id/splash_title_other" />
+
+    <!-- Bouncing loading dots -->
+    <LinearLayout
+        android:id="@+id/splash_loader"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="40dp"
+        android:orientation="horizontal"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
+
+        <View
+            android:id="@+id/splash_load_1"
+            android:layout_width="8dp"
+            android:layout_height="8dp"
+            android:layout_margin="4dp"
+            android:background="@drawable/bg_circle_white" />
+
+        <View
+            android:id="@+id/splash_load_2"
+            android:layout_width="8dp"
+            android:layout_height="8dp"
+            android:layout_margin="4dp"
+            android:background="@drawable/bg_circle_white" />
+
+        <View
+            android:id="@+id/splash_load_3"
+            android:layout_width="8dp"
+            android:layout_height="8dp"
+            android:layout_margin="4dp"
+            android:background="@drawable/bg_circle_white" />
+    </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

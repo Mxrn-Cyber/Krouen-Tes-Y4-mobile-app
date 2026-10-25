@@ -55,7 +55,7 @@ Tap Save on a recipe to add it here.</string>
     <string name="email">Email</string>
     <string name="password">Password</string>
     <string name="confirm_password">Confirm password</string>
-    <string name="forgot_password">Forgot Password ?</string>
+    <string name="forgot_password">Forgot password?</string>
     <string name="or">or</string>
     <string name="continue_google">Continue with Google</string>
     <string name="continue_facebook">Continue with Facebook</string>
@@ -149,4 +149,14 @@ Tap the green + to create one.</string>
     <string name="age_check_no">No</string>
     <string name="drink_source">Recipe from TheCocktailDB</string>
     <string name="drink_load_failed">Couldn\'t load this drink. Check your internet.</string>
+
+    <!-- Splash + Log in / Sign up (redesign) -->
+    <string name="app_name_other" translatable="false">គ្រឿងទេស</string>
+    <string name="login_hello">Hello there,\nwelcome back</string>
+    <string name="login_hello_sub">Log in to keep cooking your favourite Khmer dishes.</string>
+    <string name="signup_hello">Join the\nKrouen Tes kitchen</string>
+    <string name="signup_hello_sub">Create an account to save recipes and share your own.</string>
+    <string name="or_continue">or continue with</string>
+    <string name="google" translatable="false">Google</string>
+    <string name="facebook" translatable="false">Facebook</string>
 </resources>

@@ -1,23 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Log-in screen — matches the slide: food background, white card, green button -->
+<!-- Log-in screen: white page, wok logo (flies in from the splash), big greeting, rounded fields, green button -->
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.auth.LoginActivity">
+    android:background="@color/white"
+    android:clipChildren="false">
+
+    <!-- Light green blobs in two corners (they turn slowly) -->
+    <ImageView
+        android:id="@+id/login_blob_top"
+        android:layout_width="260dp"
+        android:layout_height="260dp"
+        android:layout_gravity="top|end"
+        android:alpha="0.35"
+        android:importantForAccessibility="no"
+        android:src="@drawable/bg_auth_blob"
+        android:translationX="90dp"
+        android:translationY="-90dp" />
 
     <ImageView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:id="@+id/login_blob_bottom"
+        android:layout_width="200dp"
+        android:layout_height="200dp"
+        android:layout_gravity="bottom|start"
+        android:alpha="0.18"
         android:importantForAccessibility="no"
-        android:scaleType="centerCrop"
-        android:src="@drawable/bg_auth" />
-
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@color/auth_overlay" />
+        android:src="@drawable/bg_auth_blob"
+        android:translationX="-80dp"
+        android:translationY="80dp" />
 
     <ScrollView
         android:id="@+id/auth_scroll"
@@ -28,69 +40,66 @@
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingStart="@dimen/screen_padding"
-            android:paddingTop="48dp"
-            android:paddingEnd="@dimen/screen_padding"
-            android:paddingBottom="32dp">
+            android:paddingStart="24dp"
+            android:paddingTop="16dp"
+            android:paddingEnd="24dp"
+            android:paddingBottom="20dp">
 
-            <TextView
-                android:id="@+id/login_title"
-                android:layout_width="wrap_content"
+            <!-- The wok from the splash screen lands here -->
+            <ImageView
+                android:id="@+id/login_logo"
+                android:layout_width="120dp"
                 android:layout_height="wrap_content"
-                android:text="@string/welcome_back"
-                android:textAppearance="@style/Text.ScreenTitle"
-                app:layout_constraintEnd_toEndOf="parent"
+                android:adjustViewBounds="true"
+                android:contentDescription="@string/app_name"
+                android:src="@drawable/logo_wok"
+                android:transitionName="brand_logo"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
             <TextView
-                android:id="@+id/login_subtitle"
-                android:layout_width="wrap_content"
+                android:id="@+id/login_title"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="6dp"
-                android:text="@string/login_subtitle"
+                android:layout_marginTop="12dp"
+                android:lineSpacingExtra="2dp"
+                android:text="@string/login_hello"
+                android:textAppearance="@style/Text.ScreenTitle"
+                android:textSize="30sp"
+                android:transitionName="auth_title"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/login_logo" />
+
+            <TextView
+                android:id="@+id/login_subtitle"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="@string/login_hello_sub"
                 android:textAppearance="@style/Text.Body"
+                android:textColor="@color/text_secondary"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/login_title" />
 
-            <!-- Card: stays max 440dp wide on tablets, full width on phones -->
+            <!-- Form: max 440dp wide on tablets -->
             <LinearLayout
-                android:id="@+id/login_card"
+                android:id="@+id/login_form"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="28dp"
-                android:background="@drawable/bg_auth_card"
-                android:elevation="2dp"
                 android:orientation="vertical"
-                android:padding="20dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/login_subtitle"
                 app:layout_constraintWidth_max="@dimen/max_form_width">
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_horizontal"
-                    android:text="@string/login"
-                    android:textAppearance="@style/Text.ScreenTitle"
-                    android:textSize="22sp" />
-
-                <TextView
-                    android:id="@+id/signupRedirectText"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_horizontal"
-                    android:padding="8dp"
-                    android:text="@string/no_account"
-                    android:textAppearance="@style/Text.Caption" />
-
                 <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/login_email_box"
                     style="@style/Widget.KrouenTes.TextField"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
                     android:hint="@string/email"
                     app:startIconDrawable="@drawable/email_24">
 
@@ -103,10 +112,11 @@
                 </com.google.android.material.textfield.TextInputLayout>
 
                 <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/login_password_box"
                     style="@style/Widget.KrouenTes.TextField"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="12dp"
+                    android:layout_marginTop="14dp"
                     android:hint="@string/password"
                     app:endIconMode="password_toggle"
                     app:startIconDrawable="@drawable/lock_24">
@@ -133,33 +143,77 @@
                     android:id="@+id/login_button"
                     style="@style/Widget.KrouenTes.PrimaryButton"
                     android:layout_width="match_parent"
-                    android:layout_marginTop="18dp"
-                    android:text="@string/log_in" />
+                    android:layout_marginTop="20dp"
+                    android:text="@string/log_in"
+                    android:transitionName="auth_button" />
 
-                <TextView
-                    android:layout_width="wrap_content"
+                <LinearLayout
+                    android:id="@+id/login_or_row"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="center_horizontal"
-                    android:layout_marginTop="12dp"
-                    android:layout_marginBottom="4dp"
-                    android:text="@string/or"
-                    android:textAppearance="@style/Text.Caption" />
+                    android:layout_marginTop="22dp"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
 
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/login_google"
-                    style="@style/Widget.KrouenTes.SocialButton"
-                    android:layout_width="match_parent"
-                    android:text="@string/continue_google"
-                    app:icon="@drawable/ic_person" />
+                    <View
+                        android:layout_width="0dp"
+                        android:layout_height="1dp"
+                        android:layout_weight="1"
+                        android:background="@color/divider" />
 
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/login_facebook"
-                    style="@style/Widget.KrouenTes.SocialButton"
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:paddingStart="12dp"
+                        android:paddingEnd="12dp"
+                        android:text="@string/or_continue"
+                        android:textAppearance="@style/Text.Caption" />
+
+                    <View
+                        android:layout_width="0dp"
+                        android:layout_height="1dp"
+                        android:layout_weight="1"
+                        android:background="@color/divider" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/login_social_row"
                     android:layout_width="match_parent"
-                    android:layout_marginTop="6dp"
-                    android:text="@string/continue_facebook"
-                    app:icon="@drawable/ic_person" />
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="14dp"
+                    android:orientation="horizontal">
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/login_google"
+                        style="@style/Widget.KrouenTes.SocialButton"
+                        android:layout_width="0dp"
+                        android:layout_marginEnd="6dp"
+                        android:layout_weight="1"
+                        android:text="@string/google" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/login_facebook"
+                        style="@style/Widget.KrouenTes.SocialButton"
+                        android:layout_width="0dp"
+                        android:layout_marginStart="6dp"
+                        android:layout_weight="1"
+                        android:text="@string/facebook" />
+                </LinearLayout>
             </LinearLayout>
+
+            <TextView
+                android:id="@+id/signupRedirectText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="28dp"
+                android:padding="10dp"
+                android:text="@string/no_account"
+                android:textAppearance="@style/Text.Body"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/login_form"
+                app:layout_constraintVertical_bias="1" />
         </androidx.constraintlayout.widget.ConstraintLayout>
     </ScrollView>
 </FrameLayout>

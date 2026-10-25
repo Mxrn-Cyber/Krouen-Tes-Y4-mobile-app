@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Soft white "blob" the wok sits on (splash screen) -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="260dp" android:height="260dp"
+    android:viewportWidth="200" android:viewportHeight="200">
+    <path android:fillColor="#FFFFFFFF"
+        android:pathData="M104,10 C146,8 184,34 192,76 C200,116 184,158 146,182 C110,204 60,198 32,170 C6,144 2,100 16,64 C30,30 62,12 104,10 Z" />
+</vector>

@@ -1,11 +1,14 @@
 package com.kroeungtes.app.ui.auth
 
+import android.animation.Animator
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Toast
 import com.kroeungtes.app.R
+import com.kroeungtes.app.ui.common.pressScale
 import com.kroeungtes.app.ui.common.riseIn
+import com.kroeungtes.app.ui.common.spinForever
 import com.kroeungtes.app.ui.common.EdgeToEdge
 import com.kroeungtes.app.ui.common.marginForSystemBars
 import com.kroeungtes.app.ui.activities.MainActivity
@@ -15,6 +18,9 @@ import com.google.firebase.auth.FirebaseAuth
 class SignupActivity : AppCompatActivity() {
     private lateinit var binding: ActivitySignupBinding
     private lateinit var firebaseAuth: FirebaseAuth
+    /** Slowly turning corner blobs, stopped in onDestroy. */
+    private val spins = mutableListOf<Animator>()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         EdgeToEdge.light(this)
@@ -22,9 +28,15 @@ class SignupActivity : AppCompatActivity() {
         setContentView(binding.root)
         binding.authScroll.marginForSystemBars(ime = true)
         firebaseAuth = FirebaseAuth.getInstance()
-        binding.signupTitle.riseIn(delay = 0, distanceDp = 16f)
-        binding.signupSubtitle.riseIn(delay = 90, distanceDp = 16f)
-        binding.signupCard.riseIn(delay = 180, distanceDp = 48f, duration = 520)
+        // Logo, title and button glide over from Log in; the other parts rise in
+        binding.signupSubtitle.riseIn(delay = 150, distanceDp = 20f)
+        listOf(
+            binding.signupEmailBox, binding.signupPasswordBox, binding.signupConfirmBox,
+            binding.signupOrRow, binding.signupSocialRow, binding.loginRedirectText
+        ).forEachIndexed { i, view -> view.riseIn(delay = 220L + 60L * i, distanceDp = 28f, duration = 480) }
+        binding.signupButton.pressScale()
+        spins += binding.signupBlobTop.spinForever(40_000)
+        spins += binding.signupBlobBottom.spinForever(32_000, clockwise = false)
         // Social sign-in is shown in the design but not connected yet
         val comingSoon = android.view.View.OnClickListener {
             Toast.makeText(this, R.string.coming_soon, Toast.LENGTH_SHORT).show()
@@ -56,8 +68,14 @@ class SignupActivity : AppCompatActivity() {
             }
         }
         binding.loginRedirectText.setOnClickListener {
-            // Back to Login (it is already under this screen)
-            finish()
+            // Back to Log in (it is already under this screen); the shared parts glide back
+            supportFinishAfterTransition()
         }
+    }
+
+    override fun onDestroy() {
+        spins.forEach { it.cancel() }
+        spins.clear()
+        super.onDestroy()
     }
 }

@@ -72,4 +72,21 @@
     <string name="age_check_no">ទេ</string>
     <string name="drink_source">រូបមន្តពី TheCocktailDB</string>
     <string name="drink_load_failed">មិនអាចផ្ទុកភេសជ្ជៈនេះបានទេ។ សូមពិនិត្យអ៊ីនធឺណិត។</string>
+
+    <!-- Splash + Log in / Sign up (redesign) -->
+    <string name="app_name_other">Krouen Tes</string>
+    <string name="login_hello">សួស្ដី!\nស្វាគមន៍ការត្រឡប់មកវិញ</string>
+    <string name="login_hello_sub">ចូលគណនី ដើម្បីបន្តចម្អិនម្ហូបខ្មែរដែលអ្នកចូលចិត្ត។</string>
+    <string name="signup_hello">ចូលរួមជាមួយ\nផ្ទះបាយគ្រឿងទេស</string>
+    <string name="signup_hello_sub">បង្កើតគណនី ដើម្បីរក្សាទុករូបមន្ត និងចែករំលែករូបមន្តរបស់អ្នក។</string>
+    <string name="or_continue">ឬបន្តជាមួយ</string>
+    <string name="log_in">ចូល</string>
+    <string name="sign_up">ចុះឈ្មោះ</string>
+    <string name="email">អ៊ីមែល</string>
+    <string name="password">ពាក្យសម្ងាត់</string>
+    <string name="confirm_password">បញ្ជាក់ពាក្យសម្ងាត់</string>
+    <string name="forgot_password">ភ្លេចពាក្យសម្ងាត់?</string>
+    <string name="have_account">មានគណនីរួចហើយ? <b>ចូល</b></string>
+    <string name="no_account">មិនទាន់មានគណនី? <b>ចុះឈ្មោះ</b></string>
+    <string name="coming_soon">នឹងមកដល់ឆាប់ៗ</string>
 </resources>
