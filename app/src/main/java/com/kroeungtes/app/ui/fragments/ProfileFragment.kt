@@ -24,7 +24,6 @@ import com.kroeungtes.app.data.model.RecipeCardItem
 import com.kroeungtes.app.databinding.DialogEditProfileBinding
 import com.kroeungtes.app.databinding.FragmentProfileBinding
 import com.kroeungtes.app.ui.activities.MealDetailesActivity
-import com.kroeungtes.app.ui.auth.LoginActivity
 import com.kroeungtes.app.ui.common.Motion
 import com.kroeungtes.app.ui.common.fadeVisible
 import com.kroeungtes.app.ui.common.pop
@@ -156,22 +155,17 @@ class ProfileFragment : Fragment() {
     private fun showMenu(anchor: View) {
         PopupMenu(requireContext(), anchor).apply {
             menu.add(0, 1, 0, R.string.change_photo)
-            menu.add(0, 2, 1, R.string.log_out)
+            menu.add(0, 2, 1, R.string.account_security)
+            menu.add(0, 3, 2, R.string.log_out)
             setOnMenuItemClickListener { item ->
                 when (item.itemId) {
                     1 -> pickAvatar.launch("image/*")
-                    2 -> logOut()
+                    2 -> AccountSecuritySheet.show(this@ProfileFragment)
+                    3 -> AccountSecuritySheet.confirmLogOut(this@ProfileFragment)
                 }
                 true
             }
         }.show()
-    }
-
-    private fun logOut() {
-        FirebaseAuth.getInstance().signOut()
-        startActivity(Intent(requireContext(), LoginActivity::class.java)
-            .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK))
-        requireActivity().finish()
     }
 
     private fun open(item: RecipeCardItem) {

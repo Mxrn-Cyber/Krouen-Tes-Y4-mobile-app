@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Profile → Account & security (bottom sheet) -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:paddingTop="20dp"
+    android:paddingBottom="24dp">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingStart="24dp"
+        android:paddingEnd="24dp"
+        android:text="@string/account_security"
+        android:textAppearance="@style/Text.Section" />
+
+    <TextView
+        android:id="@+id/sheet_email"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:paddingStart="24dp"
+        android:paddingEnd="24dp"
+        android:textAppearance="@style/Text.Caption" />
+
+    <LinearLayout
+        android:id="@+id/row_change_password"
+        style="@style/Widget.KrouenTes.SheetRow">
+
+        <ImageView
+            style="@style/Widget.KrouenTes.SheetIcon"
+            android:importantForAccessibility="no"
+            android:src="@drawable/lock_24" />
+
+        <TextView
+            style="@style/Widget.KrouenTes.SheetText"
+            android:text="@string/change_password" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/row_app_lock"
+        style="@style/Widget.KrouenTes.SheetRow">
+
+        <ImageView
+            style="@style/Widget.KrouenTes.SheetIcon"
+            android:importantForAccessibility="no"
+            android:src="@drawable/ic_fingerprint" />
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/app_lock"
+                android:textAppearance="@style/Text.Body" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/app_lock_hint"
+                android:textAppearance="@style/Text.Caption" />
+        </LinearLayout>
+
+        <com.google.android.material.switchmaterial.SwitchMaterial
+            android:id="@+id/switch_app_lock"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:clickable="false"
+            android:focusable="false"
+            app:thumbTint="@color/white"
+            app:trackTint="@color/brand_green" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/row_log_out"
+        style="@style/Widget.KrouenTes.SheetRow">
+
+        <ImageView
+            style="@style/Widget.KrouenTes.SheetIcon"
+            android:importantForAccessibility="no"
+            android:src="@drawable/ic_logout" />
+
+        <TextView
+            style="@style/Widget.KrouenTes.SheetText"
+            android:text="@string/log_out" />
+    </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginStart="24dp"
+        android:layout_marginTop="4dp"
+        android:layout_marginEnd="24dp"
+        android:layout_marginBottom="4dp"
+        android:background="@color/divider" />
+
+    <LinearLayout
+        android:id="@+id/row_delete_account"
+        style="@style/Widget.KrouenTes.SheetRow">
+
+        <ImageView
+            style="@style/Widget.KrouenTes.SheetIcon"
+            android:importantForAccessibility="no"
+            android:src="@drawable/ic_delete"
+            app:tint="@color/danger" />
+
+        <TextView
+            style="@style/Widget.KrouenTes.SheetText"
+            android:text="@string/delete_account"
+            android:textColor="@color/danger" />
+    </LinearLayout>
+</LinearLayout>

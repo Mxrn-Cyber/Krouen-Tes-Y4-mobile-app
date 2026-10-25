@@ -5,7 +5,10 @@
     <uses-permission android:name="android.permission.INTERNET" />
 
     <application
-        android:allowBackup="true"
+        android:name=".KrouenTesApp"
+        android:allowBackup="false"
+        android:networkSecurityConfig="@xml/network_security_config"
+        android:usesCleartextTraffic="false"
         android:enableOnBackInvokedCallback="true"
         tools:targetApi="tiramisu"
         android:icon="@mipmap/ic_launcher"
@@ -46,6 +49,12 @@
         <activity
             android:name=".ui.activities.MealDetailesActivity"
             android:exported="false" />
+
+        <!-- App lock screen (fingerprint / face / phone PIN) -->
+        <activity
+            android:name=".security.LockActivity"
+            android:exported="false"
+            android:launchMode="singleTop" />
 
         <!-- 4. Create recipe (green + button) -->
         <activity

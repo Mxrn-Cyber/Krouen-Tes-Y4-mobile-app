@@ -43,7 +43,11 @@ class SplashActivity : AppCompatActivity() {
     private var leaving = false
 
     private val openNext = Runnable {
-        val signedIn = FirebaseAuth.getInstance().currentUser != null
+        val auth = FirebaseAuth.getInstance()
+        val user = auth.currentUser
+        // Only verified emails get into the app; anyone else logs in again (and is asked to verify)
+        if (user != null && !user.isEmailVerified) auth.signOut()
+        val signedIn = user != null && user.isEmailVerified
         if (signedIn) {
             startActivity(Intent(this, MainActivity::class.java))
             @Suppress("DEPRECATION")

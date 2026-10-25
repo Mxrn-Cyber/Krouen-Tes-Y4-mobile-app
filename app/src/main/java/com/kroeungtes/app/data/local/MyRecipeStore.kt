@@ -49,6 +49,13 @@ object MyRecipeStore {
         null
     }
 
+    /** Removes every saved recipe and photo from the phone (log out with "remove data", or delete account). */
+    fun clear(context: Context) {
+        context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).edit().clear().commit()
+        File(context.filesDir, "photos").deleteRecursively()
+        live.postValue(emptyList())
+    }
+
     private fun load(context: Context): List<MyRecipe> {
         val json = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).getString(KEY, null)
             ?: return emptyList()

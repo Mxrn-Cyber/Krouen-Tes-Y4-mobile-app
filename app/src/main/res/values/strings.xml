@@ -159,4 +159,56 @@ Tap the green + to create one.</string>
     <string name="or_continue">or continue with</string>
     <string name="google" translatable="false">Google</string>
     <string name="facebook" translatable="false">Facebook</string>
+
+    <!-- Security: log in / sign up -->
+    <string name="ok">OK</string>
+    <string name="please_wait">Please wait…</string>
+    <string name="pw_rule_hint">At least 8 characters, with a letter and a number</string>
+    <string name="pw_too_short">Use at least 8 characters.</string>
+    <string name="pw_letter_number">Use at least one letter and one number.</string>
+    <string name="err_bad_email">Enter a valid email address.</string>
+    <string name="err_enter_password">Enter your password.</string>
+    <string name="err_passwords_differ">The passwords don\'t match.</string>
+    <string name="err_same_password">Choose a password you haven\'t used here.</string>
+    <string name="err_wrong_login">Email or password is wrong.</string>
+    <string name="err_email_in_use">This email already has an account. Try logging in.</string>
+    <string name="err_network">No internet connection. Check it and try again.</string>
+    <string name="err_too_many">Too many tries. Please wait a few minutes.</string>
+    <string name="err_login_again">For your safety, please log in again first.</string>
+    <string name="err_generic">Something went wrong. Please try again.</string>
+    <string name="login_wait">Try again in %1$d s</string>
+    <string name="verify_title">Verify your email</string>
+    <string name="verify_message">Open the link we sent to %1$s, then log in again. Can\'t find it? Check your spam folder or send a new link.</string>
+    <string name="verify_resend">Send new link</string>
+    <string name="verify_send_failed">Your account was made, but the email didn\'t send. Log in to get a new link.</string>
+    <string name="verify_sent">Link sent. Open it, then log in.</string>
+    <string name="verify_after_signup">We sent a link to %1$s. Open it to turn on your account, then log in.</string>
+    <string name="reset_title">Reset password</string>
+    <string name="reset_message">Enter your email and we\'ll send you a link to choose a new password.</string>
+    <string name="reset_send">Send link</string>
+    <string name="reset_sent">If an account uses that email, a reset link is on its way.</string>
+
+    <!-- Security: account -->
+    <string name="account_security">Account &amp; security</string>
+    <string name="change_password">Change password</string>
+    <string name="current_password">Current password</string>
+    <string name="new_password">New password</string>
+    <string name="password_changed">Password changed.</string>
+    <string name="log_out_title">Log out?</string>
+    <string name="log_out_wipe">Also remove my recipes, Wishlist and profile from this phone</string>
+    <string name="delete_account">Delete account</string>
+    <string name="delete_account_warning">This deletes your account for good and removes your recipes, Wishlist and profile from this phone. Enter your password to confirm.</string>
+    <string name="delete_forever">Delete</string>
+    <string name="account_deleted">Your account was deleted.</string>
+
+    <!-- Security: app lock -->
+    <string name="app_lock">App lock</string>
+    <string name="app_lock_hint">Fingerprint, face or phone PIN to open the app</string>
+    <string name="app_lock_no_screen_lock">Set up a screen lock (PIN, pattern, password or fingerprint) in your phone\'s Settings first.</string>
+    <string name="app_lock_prompt_title">Unlock Krouen Tes</string>
+    <string name="app_lock_prompt_sub">Use your fingerprint, face or phone PIN</string>
+    <string name="app_lock_prompt_turn_on">Confirm it\'s you to turn on App lock</string>
+    <string name="app_lock_locked">Krouen Tes is locked</string>
+    <string name="app_lock_locked_sub">Unlock to see your recipes.</string>
+    <string name="app_lock_unlock">Unlock</string>
 </resources>

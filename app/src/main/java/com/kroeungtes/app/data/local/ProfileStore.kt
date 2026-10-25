@@ -22,6 +22,11 @@ object ProfileStore {
             .putString("name", name).putString("bio", bio).apply()
     }
 
+    /** Forgets name, bio and photo (log out with "remove data", or delete account). */
+    fun clear(context: Context) {
+        context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).edit().clear().commit()
+    }
+
     fun saveAvatar(context: Context, path: String) {
         context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).edit().putString("avatar", path).apply()
     }

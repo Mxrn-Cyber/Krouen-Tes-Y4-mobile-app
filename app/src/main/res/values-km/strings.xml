@@ -89,4 +89,57 @@
     <string name="have_account">មានគណនីរួចហើយ? <b>ចូល</b></string>
     <string name="no_account">មិនទាន់មានគណនី? <b>ចុះឈ្មោះ</b></string>
     <string name="coming_soon">នឹងមកដល់ឆាប់ៗ</string>
+
+    <!-- Security: log in / sign up -->
+    <string name="ok">យល់ព្រម</string>
+    <string name="please_wait">សូមរង់ចាំ…</string>
+    <string name="pw_rule_hint">យ៉ាងតិច ៨ តួ មានអក្សរ និងលេខ</string>
+    <string name="pw_too_short">សូមប្រើយ៉ាងតិច ៨ តួ។</string>
+    <string name="pw_letter_number">សូមប្រើអក្សរយ៉ាងតិចមួយ និងលេខយ៉ាងតិចមួយ។</string>
+    <string name="err_bad_email">សូមបញ្ចូលអ៊ីមែលឲ្យបានត្រឹមត្រូវ។</string>
+    <string name="err_enter_password">សូមបញ្ចូលពាក្យសម្ងាត់។</string>
+    <string name="err_passwords_differ">ពាក្យសម្ងាត់មិនដូចគ្នាទេ។</string>
+    <string name="err_same_password">សូមជ្រើសពាក្យសម្ងាត់ថ្មីដែលមិនទាន់ប្រើ។</string>
+    <string name="err_wrong_login">អ៊ីមែល ឬពាក្យសម្ងាត់មិនត្រឹមត្រូវ។</string>
+    <string name="err_email_in_use">អ៊ីមែលនេះមានគណនីរួចហើយ។ សូមសាកល្បងចូល។</string>
+    <string name="err_network">គ្មានអ៊ីនធឺណិត។ សូមពិនិត្យ ហើយព្យាយាមម្ដងទៀត។</string>
+    <string name="err_too_many">ព្យាយាមច្រើនដងពេក។ សូមរង់ចាំប៉ុន្មាននាទី។</string>
+    <string name="err_login_again">ដើម្បីសុវត្ថិភាព សូមចូលគណនីម្ដងទៀតជាមុនសិន។</string>
+    <string name="err_generic">មានបញ្ហាអ្វីមួយ។ សូមព្យាយាមម្ដងទៀត។</string>
+    <string name="login_wait">ព្យាយាមម្ដងទៀតក្នុង %1$d វិនាទី</string>
+    <string name="verify_title">ផ្ទៀងផ្ទាត់អ៊ីមែលរបស់អ្នក</string>
+    <string name="verify_message">សូមបើកតំណដែលយើងបានផ្ញើទៅ %1$s រួចចូលគណនីម្ដងទៀត។ រកមិនឃើញ? សូមមើលក្នុងថត Spam ឬផ្ញើតំណថ្មី។</string>
+    <string name="verify_resend">ផ្ញើតំណថ្មី</string>
+    <string name="verify_send_failed">គណនីត្រូវបានបង្កើតហើយ ប៉ុន្តែអ៊ីមែលមិនបានផ្ញើទេ។ សូមចូលគណនី ដើម្បីទទួលតំណថ្មី។</string>
+    <string name="verify_sent">បានផ្ញើតំណហើយ។ សូមបើកវា រួចចូលគណនី។</string>
+    <string name="verify_after_signup">យើងបានផ្ញើតំណទៅ %1$s។ សូមបើកវាដើម្បីបើកដំណើរការគណនី រួចចូលគណនី។</string>
+    <string name="reset_title">កំណត់ពាក្យសម្ងាត់ឡើងវិញ</string>
+    <string name="reset_message">បញ្ចូលអ៊ីមែលរបស់អ្នក យើងនឹងផ្ញើតំណដើម្បីជ្រើសពាក្យសម្ងាត់ថ្មី។</string>
+    <string name="reset_send">ផ្ញើតំណ</string>
+    <string name="reset_sent">ប្រសិនបើមានគណនីប្រើអ៊ីមែលនោះ តំណកំណត់ឡើងវិញកំពុងផ្ញើទៅ។</string>
+
+    <!-- Security: account -->
+    <string name="account_security">គណនី និងសុវត្ថិភាព</string>
+    <string name="change_password">ប្ដូរពាក្យសម្ងាត់</string>
+    <string name="current_password">ពាក្យសម្ងាត់បច្ចុប្បន្ន</string>
+    <string name="new_password">ពាក្យសម្ងាត់ថ្មី</string>
+    <string name="password_changed">បានប្ដូរពាក្យសម្ងាត់ហើយ។</string>
+    <string name="log_out_title">ចាកចេញ?</string>
+    <string name="log_out_wipe">លុបរូបមន្ត បញ្ជីចូលចិត្ត និងប្រវត្តិរូបរបស់ខ្ញុំពីទូរស័ព្ទនេះផងដែរ</string>
+    <string name="delete_account">លុបគណនី</string>
+    <string name="delete_account_warning">វានឹងលុបគណនីរបស់អ្នកជារៀងរហូត ហើយលុបរូបមន្ត បញ្ជីចូលចិត្ត និងប្រវត្តិរូបពីទូរស័ព្ទនេះ។ សូមបញ្ចូលពាក្យសម្ងាត់ដើម្បីបញ្ជាក់។</string>
+    <string name="delete_forever">លុប</string>
+    <string name="account_deleted">គណនីរបស់អ្នកត្រូវបានលុបហើយ។</string>
+    <string name="change_photo">ប្ដូររូបថត</string>
+
+    <!-- Security: app lock -->
+    <string name="app_lock">ចាក់សោកម្មវិធី</string>
+    <string name="app_lock_hint">ស្នាមម្រាមដៃ មុខ ឬលេខកូដទូរស័ព្ទ ដើម្បីបើកកម្មវិធី</string>
+    <string name="app_lock_no_screen_lock">សូមកំណត់ការចាក់សោអេក្រង់ (លេខកូដ លំនាំ ពាក្យសម្ងាត់ ឬស្នាមម្រាមដៃ) ក្នុងការកំណត់ទូរស័ព្ទជាមុនសិន។</string>
+    <string name="app_lock_prompt_title">ដោះសោគ្រឿងទេស</string>
+    <string name="app_lock_prompt_sub">ប្រើស្នាមម្រាមដៃ មុខ ឬលេខកូដទូរស័ព្ទ</string>
+    <string name="app_lock_prompt_turn_on">បញ្ជាក់ថាជាអ្នក ដើម្បីបើកការចាក់សោកម្មវិធី</string>
+    <string name="app_lock_locked">គ្រឿងទេសត្រូវបានចាក់សោ</string>
+    <string name="app_lock_locked_sub">ដោះសោដើម្បីមើលរូបមន្តរបស់អ្នក។</string>
+    <string name="app_lock_unlock">ដោះសោ</string>
 </resources>
