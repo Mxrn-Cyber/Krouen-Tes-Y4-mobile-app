@@ -21,3 +21,7 @@ app/google-services.json
 /gradle/*
 !/gradle/wrapper/
 /gradle/wrapper/dists/
+
+# Admin dashboard: local Firebase config and deploy cache
+admin-dashboard/public/js/config.js
+admin-dashboard/.firebase/

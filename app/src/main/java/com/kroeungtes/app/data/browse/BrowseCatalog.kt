@@ -10,39 +10,53 @@ const val DRINK_PREFIX = "drink-"
 enum class DrinkKind { SOFT, COCKTAIL }
 
 /**
- * Food types on the Categories screen, in English and Khmer, and where each one finds dishes:
- * - [khmerKey]: category of the built-in Khmer recipes (assets/recipes/khmer_recipes.json)
- * - [mealCategory]: TheMealDB category (filter.php?c=)
- * - [searchWords]: TheMealDB name search (search.php?s=) when it has no such category
+ * A food type on the Categories screen (a chip), in English and Khmer, and where it finds dishes.
+ * Admins manage these in the web dashboard (Firestore "categories"); [DEFAULTS] is the built-in set
+ * used before the first download and when there is no internet on the very first start.
+ * - [khmerKey]: our recipes whose category is this (built-in "Soup", or a dashboard category id)
+ * - [mealCategory]: also TheMealDB category (filter.php?c=)
+ * - [searchWords]: also TheMealDB name search (search.php?s=)
  * - [drink]: TheCocktailDB instead of food
+ * - [adultOnly]: asks "Are you 18 or older?" first
  */
-enum class FoodType(
+data class FoodType(
+    val id: String,
     private val en: String,
     private val km: String,
     val khmerKey: String? = null,
     val mealCategory: String? = null,
     val searchWords: List<String> = emptyList(),
-    val drink: DrinkKind? = null
+    val drink: DrinkKind? = null,
+    val adultOnly: Boolean = drink == DrinkKind.COCKTAIL,
+    val icon: String = ""
 ) {
-    ALL("All", "ទាំងអស់"),
-    BEEF("Beef", "សាច់គោ", khmerKey = "Beef", mealCategory = "Beef"),
-    CHICKEN("Chicken", "សាច់មាន់", khmerKey = "Chicken", mealCategory = "Chicken"),
-    PORK("Pork", "សាច់ជ្រូក", khmerKey = "Pork", mealCategory = "Pork"),
-    FISH("Fish", "ត្រី", khmerKey = "Fish", searchWords = listOf("fish")),
-    SEAFOOD("Seafood", "គ្រឿងសមុទ្រ", khmerKey = "Seafood", mealCategory = "Seafood"),
-    SOUP("Soup", "សម្ល", khmerKey = "Soup", searchWords = listOf("soup")),
-    NOODLES("Noodles", "មី និងគុយទាវ", khmerKey = "Noodles", searchWords = listOf("noodle")),
-    SALAD("Salad", "ញាំ និងសាឡាដ", khmerKey = "Salad", searchWords = listOf("salad")),
-    DESSERT("Dessert", "បង្អែម", khmerKey = "Dessert", mealCategory = "Dessert"),
-    COOKIES("Cookies", "នំខូគី", searchWords = listOf("cookie", "biscuit")),
-    VEGETARIAN("Vegetarian", "អាហារបួស", mealCategory = "Vegetarian"),
-    VEGAN("Vegan", "អាហារបួសសុទ្ធ", mealCategory = "Vegan"),
-    BREAKFAST("Breakfast", "អាហារពេលព្រឹក", mealCategory = "Breakfast"),
-    PASTA("Pasta", "ប៉ាស្តា", mealCategory = "Pasta"),
-    DRINKS("Drinks", "ភេសជ្ជៈ", drink = DrinkKind.SOFT),
-    COCKTAILS("Cocktails 18+", "ស្រាក្រឡុក 18+", drink = DrinkKind.COCKTAIL);
+    fun label(khmer: Boolean): String = if (khmer) km.ifBlank { en } else en
 
-    fun label(khmer: Boolean): String = if (khmer) km else en
+    /** Text on the chip, with the icon in front. */
+    fun chipLabel(khmer: Boolean): String = if (icon.isBlank()) label(khmer) else "$icon ${label(khmer)}"
+
+    companion object {
+        val ALL = FoodType("all", "All", "ទាំងអស់")
+
+        val DEFAULTS: List<FoodType> = listOf(
+            FoodType("beef", "Beef", "សាច់គោ", khmerKey = "beef", mealCategory = "Beef", icon = "🥩"),
+            FoodType("chicken", "Chicken", "សាច់មាន់", khmerKey = "chicken", mealCategory = "Chicken", icon = "🍗"),
+            FoodType("pork", "Pork", "សាច់ជ្រូក", khmerKey = "pork", mealCategory = "Pork", icon = "🥓"),
+            FoodType("fish", "Fish", "ត្រី", khmerKey = "fish", searchWords = listOf("fish"), icon = "🐟"),
+            FoodType("seafood", "Seafood", "គ្រឿងសមុទ្រ", khmerKey = "seafood", mealCategory = "Seafood", icon = "🦀"),
+            FoodType("soup", "Soup", "សម្ល", khmerKey = "soup", searchWords = listOf("soup"), icon = "🍲"),
+            FoodType("noodles", "Noodles", "មី និងគុយទាវ", khmerKey = "noodles", searchWords = listOf("noodle"), icon = "🍜"),
+            FoodType("salad", "Salad", "ញាំ និងសាឡាដ", khmerKey = "salad", searchWords = listOf("salad"), icon = "🥗"),
+            FoodType("dessert", "Dessert", "បង្អែម", khmerKey = "dessert", mealCategory = "Dessert", icon = "🍮"),
+            FoodType("cookies", "Cookies", "នំខូគី", khmerKey = "cookies", searchWords = listOf("cookie", "biscuit"), icon = "🍪"),
+            FoodType("vegetarian", "Vegetarian", "អាហារបួស", khmerKey = "vegetarian", mealCategory = "Vegetarian", icon = "🥦"),
+            FoodType("vegan", "Vegan", "អាហារបួសសុទ្ធ", khmerKey = "vegan", mealCategory = "Vegan", icon = "🌱"),
+            FoodType("breakfast", "Breakfast", "អាហារពេលព្រឹក", khmerKey = "breakfast", mealCategory = "Breakfast", icon = "🍳"),
+            FoodType("pasta", "Pasta", "ប៉ាស្តា", khmerKey = "pasta", mealCategory = "Pasta", icon = "🍝"),
+            FoodType("drinks", "Drinks", "ភេសជ្ជៈ", drink = DrinkKind.SOFT, icon = "☕"),
+            FoodType("cocktails", "Cocktails 18+", "ស្រាក្រឡុក 18+", drink = DrinkKind.COCKTAIL, icon = "🍸")
+        )
+    }
 }
 
 /** A country to filter by. [api] is TheMealDB's "area" value. */

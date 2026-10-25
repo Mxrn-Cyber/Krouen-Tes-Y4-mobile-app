@@ -9,6 +9,7 @@ import android.widget.PopupMenu
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
 import com.bumptech.glide.Glide
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -16,6 +17,7 @@ import com.google.android.material.tabs.TabLayout
 import com.google.firebase.auth.FirebaseAuth
 import com.kroeungtes.app.R
 import com.kroeungtes.app.adapters.RecipeCardAdapter
+import com.kroeungtes.app.data.cloud.UserDirectory
 import com.kroeungtes.app.data.local.MyRecipeStore
 import com.kroeungtes.app.data.local.ProfileStore
 import com.kroeungtes.app.data.model.MealDB
@@ -32,6 +34,7 @@ import com.kroeungtes.app.ui.fragments.HomeFragment.Companion.MEAL_ID
 import com.kroeungtes.app.ui.fragments.HomeFragment.Companion.MEAL_STR
 import com.kroeungtes.app.ui.fragments.HomeFragment.Companion.MEAL_THUMB
 import com.kroeungtes.app.viewmodel.DetailsMVVM
+import kotlinx.coroutines.launch
 
 /** My profile (slide screen): photo, Edit profile, stats, Recipe / Saved tabs, Log out. */
 class ProfileFragment : Fragment() {
@@ -146,6 +149,8 @@ class ProfileFragment : Fragment() {
             .setPositiveButton(R.string.save) { _, _ ->
                 val name = dialog.edProfileName.text?.toString()?.trim().orEmpty().ifBlank { defaultName() }
                 ProfileStore.save(requireContext(), name, dialog.edProfileBio.text?.toString()?.trim().orEmpty())
+                val app = requireContext().applicationContext
+                viewLifecycleOwner.lifecycleScope.launch { UserDirectory.touch(app, name) }
                 bindProfile()
                 showList(animate = false)
                 binding.profileCard.pop()

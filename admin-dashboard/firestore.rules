@@ -1,0 +1,83 @@
+rules_version = '2';
+
+// Krouen Tes — who can read and change what.
+//  - Everyone can read categories and PUBLISHED recipes (the app shows them).
+//  - Only admins (a document in /admins/{uid}) can change content or users.
+//  - A user can create and update their own /users/{uid} profile, but never their
+//    "blocked" flag, their join date or someone else's phone number.
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function isAdmin() {
+      return signedIn() && exists(/databases/$(database)/documents/admins/$(request.auth.uid));
+    }
+
+    function isBlocked() {
+      let path = /databases/$(database)/documents/users/$(request.auth.uid);
+      return exists(path) && get(path).data.get('blocked', false) == true;
+    }
+
+    // ----- Content -----
+
+    match /categories/{categoryId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /recipes/{recipeId} {
+      // Published recipes are public; drafts, pending and hidden ones only for admins and their author
+      allow read: if resource.data.status == 'published'
+        || isAdmin()
+        || (signedIn() && resource.data.get('authorUid', '') == request.auth.uid);
+      // Users may only send a recipe for review (status "pending"), as themselves
+      allow create: if isAdmin()
+        || (signedIn() && !isBlocked()
+            && request.resource.data.status == 'pending'
+            && request.resource.data.authorUid == request.auth.uid);
+      allow update, delete: if isAdmin();
+    }
+
+    // ----- People -----
+
+    match /users/{uid} {
+      allow read: if isAdmin() || (signedIn() && request.auth.uid == uid);
+      allow create: if signedIn() && request.auth.uid == uid
+        && request.resource.data.keys().hasOnly(['name', 'phone', 'createdAt', 'lastSeenAt', 'blocked', 'platform'])
+        && request.resource.data.blocked == false
+        && request.resource.data.createdAt == request.time
+        && request.resource.data.phone == request.auth.token.get('phone_number', '');
+      allow update: if isAdmin()
+        || (signedIn() && request.auth.uid == uid
+            && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['name', 'lastSeenAt', 'phone'])
+            && request.resource.data.phone == request.auth.token.get('phone_number', ''));
+      // Deleting your account removes your profile too — but a blocked profile stays
+      // (otherwise deleting it would lift the block)
+      allow delete: if isAdmin()
+        || (signedIn() && request.auth.uid == uid && resource.data.get('blocked', false) == false);
+    }
+
+    // Dashboard admins (Google accounts). The first admin is added by hand in the Firebase console.
+    match /admins/{uid} {
+      allow get: if signedIn() && (request.auth.uid == uid || isAdmin());
+      allow list: if isAdmin();
+      // Admins can add or remove OTHER admins (never themselves, so nobody locks everyone out)
+      allow write: if isAdmin() && request.auth.uid != uid;
+    }
+
+    // "Please make me an admin" requests from the dashboard sign-in page
+    match /adminRequests/{uid} {
+      allow get: if signedIn() && (request.auth.uid == uid || isAdmin());
+      allow list: if isAdmin();
+      // Asking again (e.g. after a page reload) updates the same request
+      allow create, update: if signedIn() && request.auth.uid == uid
+        && request.resource.data.keys().hasOnly(['email', 'name', 'requestedAt'])
+        && request.resource.data.email == request.auth.token.get('email', '')
+        && request.resource.data.requestedAt == request.time;
+      allow delete: if isAdmin() || (signedIn() && request.auth.uid == uid);
+    }
+  }
+}

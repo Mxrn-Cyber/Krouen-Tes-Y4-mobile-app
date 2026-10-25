@@ -72,11 +72,13 @@ dependencies {
     implementation "androidx.lifecycle:lifecycle-livedata-ktx:$lifecycle_version"
     implementation "androidx.lifecycle:lifecycle-runtime-ktx:$lifecycle_version"
 
-    // Firebase (login / sign-up). BoM 34+ has no "-ktx" modules any more.
+    // Firebase (phone log-in + content and users managed from the admin dashboard).
+    // BoM 34+ has no "-ktx" modules any more.
     implementation platform('com.google.firebase:firebase-bom:34.0.0')
     implementation 'com.google.firebase:firebase-auth'
+    implementation 'com.google.firebase:firebase-firestore'
 
-    // Network: Retrofit (TheMealDB for now — Khmer recipes move to Firestore in phase 2)
+    // Network: Retrofit (TheMealDB / TheCocktailDB for world food and drinks)
     implementation 'com.squareup.retrofit2:retrofit:2.11.0'
     implementation 'com.squareup.retrofit2:converter-gson:2.11.0'
 

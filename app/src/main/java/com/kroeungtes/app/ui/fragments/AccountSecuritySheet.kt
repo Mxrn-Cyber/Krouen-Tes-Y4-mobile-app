@@ -1,6 +1,7 @@
 package com.kroeungtes.app.ui.fragments
 
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
 import android.view.WindowManager
 import androidx.appcompat.app.AlertDialog
@@ -16,6 +17,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.PhoneAuthCredential
 import com.kroeungtes.app.R
+import com.kroeungtes.app.data.cloud.UserDirectory
 import com.kroeungtes.app.databinding.DialogLogoutBinding
 import com.kroeungtes.app.databinding.DialogOtpCodeBinding
 import com.kroeungtes.app.databinding.SheetAccountSecurityBinding
@@ -216,6 +218,23 @@ object AccountSecuritySheet {
 
     private fun delete(activity: FragmentActivity, user: FirebaseUser) {
         val app = activity.applicationContext
+        appScope.launch {
+            // Remove the entry admins see while still signed in (the database rules need that).
+            // If that doesn't go through, keep the account so no phone number is left behind.
+            if (!UserDirectory.deleteMine()) {
+                if (activity.isFinishing || activity.isDestroyed) return@launch
+                MaterialAlertDialogBuilder(activity)
+                    .setTitle(R.string.delete_account)
+                    .setMessage(R.string.err_network)
+                    .setPositiveButton(R.string.ok, null)
+                    .show()
+                return@launch
+            }
+            deleteLogin(activity, app, user)
+        }
+    }
+
+    private fun deleteLogin(activity: FragmentActivity, app: Context, user: FirebaseUser) {
         user.delete().addOnCompleteListener { task ->
             if (!task.isSuccessful) {
                 if (activity.isFinishing || activity.isDestroyed) return@addOnCompleteListener

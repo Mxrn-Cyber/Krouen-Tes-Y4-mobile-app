@@ -10,6 +10,7 @@ import android.view.animation.OvershootInterpolator
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.doOnLayout
@@ -19,11 +20,16 @@ import android.view.animation.PathInterpolator
 import androidx.navigation.NavController
 import androidx.navigation.NavOptions
 import androidx.navigation.fragment.NavHostFragment
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.ListenerRegistration
 import com.kroeungtes.app.R
+import com.kroeungtes.app.data.cloud.UserDirectory
 import com.kroeungtes.app.databinding.ActivityMainBinding
 import com.kroeungtes.app.ui.common.EdgeToEdge
 import com.kroeungtes.app.ui.common.Motion
 import com.kroeungtes.app.ui.common.pop
+import com.kroeungtes.app.ui.auth.LoginActivity
+import kotlinx.coroutines.launch
 
 /**
  * Main screen with the curved bottom bar.
@@ -46,10 +52,17 @@ class MainActivity : AppCompatActivity() {
     private val tabViews = mutableListOf<View>()
     private var selected = -1
     private var slide: ValueAnimator? = null
+    /** Listens for an admin blocking this account in the dashboard. */
+    private var blockedWatch: ListenerRegistration? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         EdgeToEdge.light(this)
+        // Shows up in the admin dashboard (joined / last seen). Once per launch, not on rotation.
+        if (savedInstanceState == null) {
+            val app = applicationContext
+            lifecycleScope.launch { UserDirectory.touch(app) }
+        }
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
         applyInsets()
@@ -227,5 +240,31 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         }
+    }
+
+    override fun onStart() {
+        super.onStart()
+        blockedWatch?.remove()
+        blockedWatch = UserDirectory.watchBlocked { onAccountBlocked() }
+    }
+
+    override fun onStop() {
+        blockedWatch?.remove()
+        blockedWatch = null
+        super.onStop()
+    }
+
+    /** An admin paused this account: sign out and explain on the Log-in screen. */
+    private fun onAccountBlocked() {
+        if (isFinishing) return
+        blockedWatch?.remove()
+        blockedWatch = null
+        FirebaseAuth.getInstance().signOut()
+        startActivity(
+            Intent(this, LoginActivity::class.java)
+                .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
+                .putExtra(LoginActivity.EXTRA_MESSAGE, R.string.account_blocked)
+        )
+        finish()
     }
 }

@@ -21,5 +21,7 @@ data class KhmerRecipe(
     val photoLicense: String?,
     val photoPage: String?,
     /** English category ("Soup", "Fish" …) whatever the phone language — used by the Categories filters. */
-    val categoryKey: String = ""
+    val categoryKey: String = "",
+    /** everywhere, coast, north, northwest or uplands (set in the dashboard). */
+    val region: String = "everywhere"
 )

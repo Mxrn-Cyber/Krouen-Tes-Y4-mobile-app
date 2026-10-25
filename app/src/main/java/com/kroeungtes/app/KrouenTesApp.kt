@@ -4,6 +4,7 @@ import android.app.Activity
 import android.app.Application
 import android.content.Intent
 import android.os.Bundle
+import com.kroeungtes.app.data.cloud.CloudContent
 import com.kroeungtes.app.security.AppLock
 import com.kroeungtes.app.security.LockActivity
 import com.kroeungtes.app.ui.auth.LoginActivity
@@ -19,6 +20,8 @@ class KrouenTesApp : Application() {
 
     override fun onCreate() {
         super.onCreate()
+        // Categories and recipes from the admin dashboard (built-in content until they arrive)
+        CloudContent.start()
         registerActivityLifecycleCallbacks(object : ActivityLifecycleCallbacks {
             override fun onActivityCreated(activity: Activity, savedInstanceState: Bundle?) = Unit
 

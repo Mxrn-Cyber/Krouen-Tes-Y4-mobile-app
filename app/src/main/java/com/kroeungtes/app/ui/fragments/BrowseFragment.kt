@@ -14,9 +14,9 @@ import com.google.android.material.snackbar.Snackbar
 import com.kroeungtes.app.R
 import com.kroeungtes.app.adapters.RecipeCardAdapter
 import com.kroeungtes.app.data.browse.Countries
-import com.kroeungtes.app.data.browse.DrinkKind
 import com.kroeungtes.app.data.browse.FoodType
 import com.kroeungtes.app.data.browse.SortBy
+import com.kroeungtes.app.data.cloud.CloudContent
 import com.kroeungtes.app.data.local.AgeGate
 import com.kroeungtes.app.data.local.KhmerRecipes
 import com.kroeungtes.app.data.model.RecipeCardItem
@@ -46,6 +46,8 @@ class BrowseFragment : Fragment() {
 
     /** Chip view id → the type it stands for. */
     private val chipTypes = mutableMapOf<Int, FoodType>()
+    /** The categories the chips were last built from (they come from the admin dashboard). */
+    private var chipsFor: List<FoodType>? = null
     private val khmer: Boolean get() = KhmerRecipes.isKhmerLanguage()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
@@ -67,7 +69,12 @@ class BrowseFragment : Fragment() {
             GridLayoutManager(requireContext(), resources.getInteger(R.integer.meal_list_columns), GridLayoutManager.VERTICAL, false)
         binding.browseList.adapter = adapter
 
-        buildTypeChips(browseMvvm.observeState().value?.type ?: FoodType.ALL)
+        chipsFor = null
+        CloudContent.categories.observe(viewLifecycleOwner) { list ->
+            if (list == chipsFor) return@observe
+            chipsFor = list
+            buildTypeChips(list, browseMvvm.observeState().value?.type ?: FoodType.ALL)
+        }
         binding.btnCountry.setOnClickListener { pickCountry() }
         binding.btnSort.setOnClickListener { pickSort() }
         binding.tvBrowseHint.setOnClickListener {
@@ -90,18 +97,18 @@ class BrowseFragment : Fragment() {
 
     // ---------- Filters ----------
 
-    private fun buildTypeChips(selected: FoodType) {
+    private fun buildTypeChips(categories: List<FoodType>, selected: FoodType) {
         val group = binding.typeChips
         group.setOnCheckedStateChangeListener(null)
         group.removeAllViews()
         chipTypes.clear()
-        FoodType.entries.forEachIndexed { index, type ->
+        (listOf(FoodType.ALL) + categories).forEachIndexed { index, type ->
             val chip = layoutInflater.inflate(R.layout.item_category_chip, group, false) as Chip
             chip.id = View.generateViewId()
-            chip.text = type.label(khmer)
+            chip.text = type.chipLabel(khmer)
             chipTypes[chip.id] = type
             group.addView(chip)
-            if (type == selected) group.check(chip.id)
+            if (type.id == selected.id) group.check(chip.id)
             // Chips fade in one after another
             chip.alpha = 0f
             chip.animate().alpha(1f).setStartDelay(25L * index).setDuration(220).start()
@@ -114,7 +121,7 @@ class BrowseFragment : Fragment() {
 
     private fun onTypePicked(type: FoodType) {
         val ctx = context ?: return
-        if (type.drink == DrinkKind.COCKTAIL && !AgeGate.isAdult(ctx)) {
+        if (type.adultOnly && !AgeGate.isAdult(ctx)) {
             val previous = browseMvvm.observeState().value?.type ?: FoodType.ALL
             MaterialAlertDialogBuilder(ctx)
                 .setTitle(R.string.age_check_title)
@@ -133,7 +140,7 @@ class BrowseFragment : Fragment() {
 
     /** Puts the selection back on [type] (after "No" on the age check). */
     private fun selectChip(type: FoodType) {
-        val id = chipTypes.entries.firstOrNull { it.value == type }?.key ?: return
+        val id = chipTypes.entries.firstOrNull { it.value.id == type.id }?.key ?: return
         _binding?.typeChips?.check(id)
     }
 
@@ -167,6 +174,9 @@ class BrowseFragment : Fragment() {
 
     private fun render(s: BrowseMVVM.State) {
         val b = _binding ?: return
+        // Keep the checked chip in step when the list goes back to "All" by itself
+        val checked = chipTypes[b.typeChips.checkedChipId]
+        if (checked != null && checked.id != s.type.id) selectChip(s.type)
         b.btnCountry.text = s.country?.label(khmer) ?: getString(R.string.all_countries)
         // Drinks don't have a country
         b.btnCountry.visibility = if (s.type.drink != null) View.GONE else View.VISIBLE

@@ -200,6 +200,7 @@ Tap the green + to create one.</string>
     <string name="delete_account_warning">This deletes your account for good and removes your recipes, Wishlist and profile from this phone. Enter your password to confirm.</string>
     <string name="delete_forever">Delete</string>
     <string name="account_deleted">Your account was deleted.</string>
+    <string name="account_blocked">This account has been paused by the Krouen Tes team. Please contact PEPY if you think this is a mistake.</string>
 
     <!-- Security: app lock -->
     <string name="app_lock">App lock</string>

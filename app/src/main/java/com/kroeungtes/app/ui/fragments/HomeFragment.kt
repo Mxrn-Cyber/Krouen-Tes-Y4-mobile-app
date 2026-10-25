@@ -134,6 +134,11 @@ class HomeFragment : Fragment() {
     }
 
     private fun observeData() {
+        // Khmer dishes published or edited in the admin dashboard show up without a restart
+        KhmerRecipes.changes.observe(viewLifecycleOwner) {
+            val ctx = context ?: return@observe
+            khmerAdapter.submit(KhmerRecipes.all(ctx).map { RecipeCardItem.from(it) })
+        }
         homeMvvm.observeCategories().observe(viewLifecycleOwner) { response ->
             buildChips(response?.categories.orEmpty())
         }

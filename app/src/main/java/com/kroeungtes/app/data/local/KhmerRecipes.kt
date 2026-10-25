@@ -1,13 +1,16 @@
 package com.kroeungtes.app.data.local
 
 import android.content.Context
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import com.google.gson.Gson
 import com.kroeungtes.app.data.model.Ingredient
 import com.kroeungtes.app.data.model.KhmerRecipe
 import java.util.Locale
 
 /**
- * Loads the built-in Khmer recipes from assets/recipes/khmer_recipes.json.
+ * Khmer recipes: the ones admins publish in the dashboard (Firestore, via CloudContent), or the
+ * built-in assets/recipes/khmer_recipes.json until those have been downloaded.
  * Text comes back in Khmer when the phone language is Khmer, otherwise English.
  */
 object KhmerRecipes {
@@ -28,11 +31,46 @@ object KhmerRecipes {
     private data class RecipeJson(
         val id: Int, val name: Text, val category: Text?, val description: Text?,
         val serves: Int, val cookMinutes: Int, val ingredients: List<IngredientJson>?,
-        val steps: StepsJson?, val photo: PhotoJson?
+        val steps: StepsJson?, val photo: PhotoJson?,
+        /** Dashboard category id (Firestore recipes only). */
+        val categoryId: String? = null,
+        val region: String? = null
     )
     private data class FileJson(val recipes: List<RecipeJson>?)
 
     private var raw: List<RecipeJson>? = null
+    /** Published recipes from the dashboard; null = use the built-in file. */
+    private var cloud: List<RecipeJson>? = null
+    private val changesLive = MutableLiveData(0)
+
+    /** Goes up by one whenever the recipe list changes, so screens can refresh. */
+    val changes: LiveData<Int> get() = changesLive
+
+    /**
+     * Called by CloudContent with the published Firestore recipes (raw document data).
+     * [managed] = admins have set up the dashboard content, so an empty list really means "none"
+     * (otherwise the built-in recipes are shown).
+     */
+    fun setCloud(docs: List<Map<String, Any?>>, managed: Boolean) {
+        val gson = Gson()
+        val list = docs.mapNotNull { data ->
+            try {
+                val map = data.toMutableMap()
+                map.remove("createdAt")
+                map.remove("updatedAt")
+                map["id"] = (map["numId"] as? Number)?.toInt() ?: return@mapNotNull null
+                gson.fromJson(gson.toJsonTree(map), RecipeJson::class.java)
+                    ?.takeIf { it.name.en != null || it.name.km != null }
+            } catch (e: Exception) {
+                null
+            }
+        }.sortedByDescending { it.id } // -101 (first built-in) first, newest (most negative) last
+        val next = if (managed) list else list.ifEmpty { null }
+        if (next == cloud) return
+        cloud = next
+        cacheLang = null
+        changesLive.value = (changesLive.value ?: 0) + 1
+    }
     private var cacheLang: String? = null
     private var cache: List<KhmerRecipe> = emptyList()
 
@@ -63,6 +101,7 @@ object KhmerRecipes {
     }
 
     private fun load(context: Context): List<RecipeJson> {
+        cloud?.let { return it }
         raw?.let { return it }
         val list = try {
             context.assets.open(FILE).bufferedReader(Charsets.UTF_8).use { reader ->
@@ -95,6 +134,7 @@ object KhmerRecipes {
         photoAuthor = photo?.author,
         photoLicense = photo?.license,
         photoPage = photo?.page,
-        categoryKey = category?.en.orEmpty()
+        categoryKey = categoryId?.takeIf { it.isNotBlank() } ?: category?.en.orEmpty(),
+        region = region ?: "everywhere"
     )
 }

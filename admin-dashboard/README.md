@@ -1,0 +1,39 @@
+# Krouen Tes admin dashboard
+
+A small web page for the Krouen Tes team. It lets admins:
+
+- **Overview**: see users, new sign-ups this week, recipes waiting for review, and a 12-week audience growth chart.
+- **Categories**: add, edit, reorder, hide or delete the category chips in the app.
+- **Recipes**: add and edit Khmer recipes (English + Khmer), approve or reject, hide or publish.
+- **Users**: see app users (phone numbers are hidden until you click Show), block or unblock them, and manage dashboard admins.
+
+Changes reach the app within seconds. The app keeps an offline copy, and it uses its built-in recipes until the database has content.
+
+## Try it without Firebase
+
+Open `public/index.html?demo` through any local web server (for example `npx serve public`, then go to `/?demo`). Demo mode uses made-up data and saves nothing.
+
+## One-time setup (Firebase project `krouen-tes`)
+
+1. **Create the database.** In the Firebase console, open Firestore Database, then Create database. Choose production mode and a region close to Cambodia, such as `asia-southeast1` (Singapore). You can't change the region later.
+2. **Turn on Google sign-in.** Open Authentication, then Sign-in method, and enable Google. Admins sign in with a Google account; app users keep using phone numbers.
+3. **Add a web app.** Open Project settings, then Your apps, then Add app (Web). You don't need to copy the config: Firebase Hosting provides it.
+4. **Install the tools and deploy.** On a computer with Node.js:
+   ```
+   npm install -g firebase-tools
+   firebase login
+   cd admin-dashboard
+   firebase deploy --only firestore,hosting
+   ```
+   The dashboard is then at `https://krouen-tes.web.app`.
+5. **Add the first admin.** Open the dashboard and sign in with Google. It shows your user ID and says you are not an admin yet. In the Firebase console, open Firestore, start a collection named `admins`, use your user ID as the document ID, and add a field `email` with your email. Reload the dashboard.
+6. **Import the built-in content.** On the Overview page, click **Import built-in content**. This copies the 13 Khmer recipes and 16 categories the app ships with, so you can edit them.
+
+After that, other people can sign in and click **Ask to become an admin**. Approve them on Users, under Dashboard admins.
+
+## Good to know
+
+- **Blocking a user** signs them out of the app the next time it is open with internet, and they can't post recipes. It does not delete their account.
+- **Deleting a category** is only possible when no recipe uses it. Use Hide to take it off the app for now.
+- **Security rules** are in `firestore.rules`. Anyone can read categories and published recipes. Only admins can change them. Users can only see and edit their own profile, and they can't unblock themselves.
+- **Running locally against the real database:** copy `public/js/config.example.js` to `public/js/config.js` and fill in the web app values. `config.js` is not committed.

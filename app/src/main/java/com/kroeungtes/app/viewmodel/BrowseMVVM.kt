@@ -4,6 +4,7 @@ import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.Observer
 import androidx.lifecycle.viewModelScope
 import com.kroeungtes.app.R
 import com.kroeungtes.app.data.browse.BrowseItem
@@ -14,6 +15,8 @@ import com.kroeungtes.app.data.browse.DrinkKind
 import com.kroeungtes.app.data.browse.FoodType
 import com.kroeungtes.app.data.browse.SortBy
 import com.kroeungtes.app.data.browse.isSuitableName
+import com.kroeungtes.app.data.cloud.CloudContent
+import com.kroeungtes.app.data.local.AgeGate
 import com.kroeungtes.app.data.local.KhmerRecipes
 import com.kroeungtes.app.data.model.Drink
 import com.kroeungtes.app.data.model.Ingredient
@@ -50,11 +53,38 @@ class BrowseMVVM(application: Application) : AndroidViewModel(application) {
     private val state = MutableLiveData(State())
     private val current: State get() = state.value ?: State()
     private var raw: List<BrowseItem> = emptyList()
+    /** The online part of [raw], kept so Khmer dishes can be refreshed without downloading again. */
+    private var online: List<BrowseItem> = emptyList()
     private var job: Job? = null
     private val collator: Collator = Collator.getInstance(Locale.getDefault())
 
+    /** Admins published, edited or removed Khmer dishes in the dashboard. */
+    private var seenChange = KhmerRecipes.changes.value
+    private val recipesObserver = Observer<Int> { change ->
+        if (change == seenChange) return@Observer
+        seenChange = change
+        refreshKhmer()
+    }
+
+    /** Admins changed the categories: follow the chosen one, or go back to "All" if it is gone. */
+    private val categoriesObserver = Observer<List<FoodType>> { list ->
+        val chosen = current.type
+        if (chosen == FoodType.ALL) return@Observer
+        val fresh = list.firstOrNull { it.id == chosen.id }
+            ?.takeIf { !it.adultOnly || AgeGate.isAdult(getApplication()) }
+        setType(fresh ?: FoodType.ALL)
+    }
+
     init {
         load()
+        KhmerRecipes.changes.observeForever(recipesObserver)
+        CloudContent.categories.observeForever(categoriesObserver)
+    }
+
+    override fun onCleared() {
+        KhmerRecipes.changes.removeObserver(recipesObserver)
+        CloudContent.categories.removeObserver(categoriesObserver)
+        super.onCleared()
     }
 
     fun observeState(): LiveData<State> = state
@@ -99,15 +129,26 @@ class BrowseMVVM(application: Application) : AndroidViewModel(application) {
             }
             // The user may have picked something else while we waited
             if (type != current.type || country != current.country) return@launch
+            this@BrowseMVVM.online = online.orEmpty()
             raw = khmer + online.orEmpty()
             state.value = withItems(current.copy(loading = false, offline = online == null), raw)
         }
     }
 
-    // ---------- Built-in Khmer dishes ----------
+    private fun refreshKhmer() {
+        // A download is running: start again so it uses the new dishes
+        if (current.loading) {
+            load()
+            return
+        }
+        raw = khmerDishes(current.type, current.country) + online
+        state.value = withItems(current, raw)
+    }
+
+    // ---------- Khmer dishes (dashboard or built-in) ----------
 
     private fun khmerDishes(type: FoodType, country: Country?): List<BrowseItem> {
-        if (type.drink != null) return emptyList()
+        // Drinks categories can hold Khmer drinks too, if admins add some
         if (country != null && country !== Countries.CAMBODIA) return emptyList()
         val app = getApplication<Application>()
         return KhmerRecipes.all(app)

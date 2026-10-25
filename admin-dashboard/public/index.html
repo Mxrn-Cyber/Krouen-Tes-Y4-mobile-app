@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Krouen Tes Admin</title>
+  <link rel="icon" type="image/png" href="img/logo_wok.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Kantumruy+Pro:wght@400;500;600&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/admin.css">
+</head>
+<body>
+  <!-- Sign-in (Google account; must be on the admin list) -->
+  <section id="signin" class="signin" hidden>
+    <div class="signin-card">
+      <img src="img/logo_wok.png" alt="" class="signin-logo">
+      <h1>Krouen Tes Admin</h1>
+      <p class="muted" id="signin-text">Sign in with the Google account an admin added to the dashboard.</p>
+      <button id="btn-signin" class="btn btn-primary btn-wide">Sign in with Google</button>
+      <div id="signin-extra"></div>
+    </div>
+  </section>
+
+  <!-- Dashboard -->
+  <div id="shell" class="shell" hidden>
+    <aside class="sidebar">
+      <div class="brand">
+        <img src="img/logo_wok.png" alt="">
+        <div>
+          <strong>Krouen Tes</strong>
+          <span>Admin</span>
+        </div>
+      </div>
+      <nav id="nav">
+        <button data-view="overview" class="nav-item">Overview</button>
+        <button data-view="categories" class="nav-item">Categories</button>
+        <button data-view="recipes" class="nav-item">Recipes</button>
+        <button data-view="users" class="nav-item">Users</button>
+      </nav>
+      <div class="me">
+        <span id="me-email" class="muted"></span>
+        <button id="btn-signout" class="btn btn-ghost btn-small">Sign out</button>
+      </div>
+    </aside>
+    <main id="view" class="view" tabindex="-1"></main>
+  </div>
+
+  <div id="demo-banner" class="demo-banner" hidden>Demo mode — sample data only, nothing is saved.</div>
+  <dialog id="modal" class="modal"></dialog>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>

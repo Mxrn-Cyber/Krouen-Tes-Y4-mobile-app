@@ -130,6 +130,7 @@
     <string name="delete_account_warning">វានឹងលុបគណនីរបស់អ្នកជារៀងរហូត ហើយលុបរូបមន្ត បញ្ជីចូលចិត្ត និងប្រវត្តិរូបពីទូរស័ព្ទនេះ។ សូមបញ្ចូលពាក្យសម្ងាត់ដើម្បីបញ្ជាក់។</string>
     <string name="delete_forever">លុប</string>
     <string name="account_deleted">គណនីរបស់អ្នកត្រូវបានលុបហើយ។</string>
+    <string name="account_blocked">គណនីនេះត្រូវបានផ្អាកដោយក្រុមការងារ គ្រឿងទេស។ សូមទាក់ទង PEPY ប្រសិនបើអ្នកគិតថានេះជាកំហុស។</string>
     <string name="change_photo">ប្ដូររូបថត</string>
 
     <!-- Security: app lock -->
