@@ -203,7 +203,7 @@
     </style>
 
     <!-- Rows of the Account & security sheet -->
-    <style name="Widget.KrouenTes.SheetRow">
+    <style name="Widget.KrouenTes.SheetRow" parent="">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:minHeight">56dp</item>
@@ -217,13 +217,13 @@
         <item name="android:paddingTop">8dp</item>
         <item name="android:paddingBottom">8dp</item>
     </style>
-    <style name="Widget.KrouenTes.SheetIcon">
+    <style name="Widget.KrouenTes.SheetIcon" parent="">
         <item name="android:layout_width">24dp</item>
         <item name="android:layout_height">24dp</item>
         <item name="android:layout_marginEnd">16dp</item>
         <item name="tint">@color/brand_green</item>
     </style>
-    <style name="Widget.KrouenTes.SheetText">
+    <style name="Widget.KrouenTes.SheetText" parent="">
         <item name="android:layout_width">0dp</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:layout_weight">1</item>
