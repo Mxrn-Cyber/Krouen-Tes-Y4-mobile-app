@@ -142,4 +142,28 @@
     <string name="app_lock_locked">គ្រឿងទេសត្រូវបានចាក់សោ</string>
     <string name="app_lock_locked_sub">ដោះសោដើម្បីមើលរូបមន្តរបស់អ្នក។</string>
     <string name="app_lock_unlock">ដោះសោ</string>
+
+    <!-- Phone number + SMS code (OTP) sign-in -->
+    <string name="otp_title">សូមស្វាគមន៍មកកាន់\nគ្រឿងទេស</string>
+    <string name="otp_subtitle">ចូល ឬបង្កើតគណនីដោយប្រើលេខទូរស័ព្ទរបស់អ្នក។ យើងនឹងផ្ញើលេខកូដ ៦ ខ្ទង់តាមសារ SMS។</string>
+    <string name="otp_note">លេខទូរស័ព្ទរបស់អ្នកប្រើសម្រាប់តែការចូលគណនីប៉ុណ្ណោះ។ ក្រុមហ៊ុនទូរស័ព្ទអាចគិតថ្លៃសារ SMS។</string>
+    <string name="phone_number">លេខទូរស័ព្ទ</string>
+    <string name="phone_helper">លេខកម្ពុជា ឬចាប់ផ្ដើមដោយ + សម្រាប់ប្រទេសផ្សេង</string>
+    <string name="send_code">ផ្ញើលេខកូដ</string>
+    <string name="verify">ផ្ទៀងផ្ទាត់</string>
+    <string name="code_hint">លេខកូដ ៦ ខ្ទង់</string>
+    <string name="code_sent_to">បញ្ចូលលេខកូដដែលយើងបានផ្ញើទៅ %1$s</string>
+    <string name="change_number">ប្ដូរលេខ</string>
+    <string name="resend_code">ផ្ញើលេខកូដម្ដងទៀត</string>
+    <string name="resend_in">ផ្ញើម្ដងទៀតក្នុង %1$d វិនាទី</string>
+    <string name="err_bad_phone">សូមបញ្ចូលលេខទូរស័ព្ទឲ្យបានត្រឹមត្រូវ។</string>
+    <string name="err_enter_code">សូមបញ្ចូលលេខកូដ ៦ ខ្ទង់។</string>
+    <string name="err_wrong_code">លេខកូដមិនត្រឹមត្រូវ។ សូមពិនិត្យសារ SMS ហើយព្យាយាមម្ដងទៀត។</string>
+    <string name="err_code_expired">លេខកូដនេះផុតកំណត់ហើយ។ សូមផ្ញើលេខកូដថ្មី។</string>
+    <string name="err_sms_not_enabled">ការចូលតាម SMS មិនទាន់បើកសម្រាប់កម្មវិធីនេះនៅឡើយ។ សូមព្យាយាមម្ដងទៀតនៅពេលក្រោយ។</string>
+    <string name="name_title">តើយើងគួរហៅអ្នកថាអ្វី?</string>
+    <string name="name_message">បង្ហាញនៅលើប្រវត្តិរូប និងរូបមន្តរបស់អ្នក។</string>
+    <string name="skip">រំលង</string>
+    <string name="delete_account_otp_warning">វានឹងលុបគណនីរបស់អ្នកជារៀងរហូត ហើយលុបរូបមន្ត បញ្ជីចូលចិត្ត និងប្រវត្តិរូបពីទូរស័ព្ទនេះ។ ដើម្បីបញ្ជាក់ យើងនឹងផ្ញើលេខកូដទៅ %1$s។</string>
+    <string name="delete_account_warning_plain">វានឹងលុបគណនីរបស់អ្នកជារៀងរហូត ហើយលុបរូបមន្ត បញ្ជីចូលចិត្ត និងប្រវត្តិរូបពីទូរស័ព្ទនេះ។</string>
 </resources>

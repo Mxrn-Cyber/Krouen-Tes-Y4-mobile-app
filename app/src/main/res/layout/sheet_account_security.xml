@@ -26,20 +26,6 @@
         android:textAppearance="@style/Text.Caption" />
 
     <LinearLayout
-        android:id="@+id/row_change_password"
-        style="@style/Widget.KrouenTes.SheetRow">
-
-        <ImageView
-            style="@style/Widget.KrouenTes.SheetIcon"
-            android:importantForAccessibility="no"
-            android:src="@drawable/lock_24" />
-
-        <TextView
-            style="@style/Widget.KrouenTes.SheetText"
-            android:text="@string/change_password" />
-    </LinearLayout>
-
-    <LinearLayout
         android:id="@+id/row_app_lock"
         style="@style/Widget.KrouenTes.SheetRow">
 

@@ -28,13 +28,10 @@
             </intent-filter>
         </activity>
 
-        <!-- 2. Sign-up / Log-in -->
+        <!-- 2. Log in / sign up with phone number + SMS code -->
         <activity
             android:name=".ui.auth.LoginActivity"
-            android:exported="false"
-            android:windowSoftInputMode="adjustResize" />
-        <activity
-            android:name=".ui.auth.SignupActivity"
+            android:configChanges="orientation|screenSize|screenLayout|smallestScreenSize|keyboardHidden"
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
 

@@ -211,4 +211,29 @@ Tap the green + to create one.</string>
     <string name="app_lock_locked">Krouen Tes is locked</string>
     <string name="app_lock_locked_sub">Unlock to see your recipes.</string>
     <string name="app_lock_unlock">Unlock</string>
+
+    <!-- Phone number + SMS code (OTP) sign-in -->
+    <string name="otp_title">Welcome to\nKrouen Tes</string>
+    <string name="otp_subtitle">Log in or create an account with your phone number. We\'ll text you a 6-digit code.</string>
+    <string name="otp_note">Your number is only used to sign you in. SMS charges from your phone company may apply.</string>
+    <string name="phone_number">Phone number</string>
+    <string name="phone_helper">Cambodian number, or start with + for another country</string>
+    <string name="phone_placeholder" translatable="false">012 345 678</string>
+    <string name="send_code">Send code</string>
+    <string name="verify">Verify</string>
+    <string name="code_hint">6-digit code</string>
+    <string name="code_sent_to">Enter the code we sent to %1$s</string>
+    <string name="change_number">Change number</string>
+    <string name="resend_code">Resend code</string>
+    <string name="resend_in">Resend in %1$d s</string>
+    <string name="err_bad_phone">Enter a valid phone number.</string>
+    <string name="err_enter_code">Enter the 6-digit code.</string>
+    <string name="err_wrong_code">That code is wrong. Check the SMS and try again.</string>
+    <string name="err_code_expired">This code has expired. Send a new one.</string>
+    <string name="err_sms_not_enabled">SMS sign-in isn\'t switched on for this app yet. Please try again later.</string>
+    <string name="name_title">What should we call you?</string>
+    <string name="name_message">Shown on your profile and your recipes.</string>
+    <string name="skip">Skip</string>
+    <string name="delete_account_otp_warning">This deletes your account for good and removes your recipes, Wishlist and profile from this phone. To confirm, we\'ll text a code to %1$s.</string>
+    <string name="delete_account_warning_plain">This deletes your account for good and removes your recipes, Wishlist and profile from this phone.</string>
 </resources>

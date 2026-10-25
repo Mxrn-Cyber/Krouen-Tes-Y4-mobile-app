@@ -7,7 +7,6 @@ import android.os.Bundle
 import com.kroeungtes.app.security.AppLock
 import com.kroeungtes.app.security.LockActivity
 import com.kroeungtes.app.ui.auth.LoginActivity
-import com.kroeungtes.app.ui.auth.SignupActivity
 import com.kroeungtes.app.ui.splash.SplashActivity
 
 /**
@@ -53,6 +52,5 @@ class KrouenTesApp : Application() {
 
     /** Screens shown before log-in, and the lock screen itself, are never covered. */
     private fun isProtected(activity: Activity): Boolean =
-        activity !is LockActivity && activity !is SplashActivity &&
-            activity !is LoginActivity && activity !is SignupActivity
+        activity !is LockActivity && activity !is SplashActivity && activity !is LoginActivity
 }

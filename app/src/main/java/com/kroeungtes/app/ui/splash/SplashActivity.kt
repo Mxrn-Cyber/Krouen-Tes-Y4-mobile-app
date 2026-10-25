@@ -17,14 +17,17 @@ import android.view.animation.LinearInterpolator
 import android.view.animation.OvershootInterpolator
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityOptionsCompat
+import androidx.lifecycle.lifecycleScope
 import com.google.firebase.auth.FirebaseAuth
 import com.kroeungtes.app.databinding.ActivitySplashBinding
+import com.kroeungtes.app.security.LocalData
 import com.kroeungtes.app.ui.activities.MainActivity
 import com.kroeungtes.app.ui.auth.LoginActivity
 import com.kroeungtes.app.ui.common.EdgeToEdge
 import com.kroeungtes.app.ui.common.padForSystemBars
 import com.kroeungtes.app.ui.common.riseIn
 import androidx.core.util.Pair as UtilPair
+import kotlinx.coroutines.launch
 
 /**
  * Loading screen (User Flow step 1), with motion:
@@ -45,14 +48,18 @@ class SplashActivity : AppCompatActivity() {
     private val openNext = Runnable {
         val auth = FirebaseAuth.getInstance()
         val user = auth.currentUser
-        // Only verified emails get into the app; anyone else logs in again (and is asked to verify)
-        if (user != null && !user.isEmailVerified) auth.signOut()
-        val signedIn = user != null && user.isEmailVerified
-        if (signedIn) {
-            startActivity(Intent(this, MainActivity::class.java))
-            @Suppress("DEPRECATION")
-            overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
-            finish()
+        // Accounts now sign in with a phone number + SMS code; older email sessions log in again
+        val signedIn = user != null && !user.phoneNumber.isNullOrBlank()
+        if (user != null && !signedIn) auth.signOut()
+        if (signedIn && user != null) {
+            lifecycleScope.launch {
+                // Data left by a different account on this phone is removed first
+                LocalData.claimFor(this@SplashActivity, user.uid)
+                startActivity(Intent(this@SplashActivity, MainActivity::class.java))
+                @Suppress("DEPRECATION")
+                overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
+                finish()
+            }
         } else {
             // The wok flies from here to the top of the Log-in screen
             val options = ActivityOptionsCompat.makeSceneTransitionAnimation(

@@ -101,12 +101,14 @@ class ProfileFragment : Fragment() {
     }
 
     private fun defaultName(): String =
-        FirebaseAuth.getInstance().currentUser?.email?.substringBefore("@") ?: getString(R.string.default_author)
+        FirebaseAuth.getInstance().currentUser?.displayName?.takeIf { it.isNotBlank() } ?: getString(R.string.default_author)
 
     private fun bindProfile() {
         val profile = ProfileStore.load(requireContext(), defaultName())
         binding.tvProfileName.text = profile.name
-        binding.tvProfileEmail.text = FirebaseAuth.getInstance().currentUser?.email.orEmpty()
+        // Phone number (accounts sign in with an SMS code)
+        val user = FirebaseAuth.getInstance().currentUser
+        binding.tvProfileEmail.text = user?.phoneNumber ?: user?.email.orEmpty()
         binding.tvProfileBio.text = profile.bio.ifBlank { getString(R.string.bio_empty) }
         Glide.with(this).load(profile.avatarPath ?: R.drawable.logo_krouen_tes)
             .placeholder(R.drawable.logo_krouen_tes).into(binding.imgAvatar)
