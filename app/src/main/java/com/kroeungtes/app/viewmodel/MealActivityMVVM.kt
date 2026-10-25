@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.kroeungtes.app.data.cloud.withoutHiddenDishes
 import com.kroeungtes.app.data.model.Meal
 import com.kroeungtes.app.data.model.MealsResponse
 import com.kroeungtes.app.data.remote.RetrofitInstance
@@ -13,6 +14,8 @@ import retrofit2.Response
 
 class MealActivityMVVM():ViewModel() {
     private var mutableMeal = MutableLiveData<List<Meal>>()
+    // World dishes admins hid never show
+    private val visibleMeals = mutableMeal.withoutHiddenDishes { meals, hidden -> meals.filter { it.idMeal !in hidden } }
 
     fun getMealsByCategory(category:String){
         RetrofitInstance.foodApi.getMealsByCategory(category).enqueue(object : Callback<MealsResponse>{
@@ -29,6 +32,6 @@ class MealActivityMVVM():ViewModel() {
     }
 
     fun observeMeal():LiveData<List<Meal>>{
-        return mutableMeal
+        return visibleMeals
     }
 }

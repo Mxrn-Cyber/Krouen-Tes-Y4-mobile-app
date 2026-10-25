@@ -152,6 +152,57 @@ export async function createFirebaseStore(config) {
     },
 
     // ----- First-time import -----
+    // ----- Online dishes (TheMealDB / TheCocktailDB) hidden from the app -----
+    async listHiddenDishes() {
+      const snap = await getDocs(collection(db, 'hiddenDishes'));
+      return snap.docs.map(d => ({ ...d.data(), id: d.id, hiddenAt: toDate(d.data().hiddenAt) }));
+    },
+    async hideDish(dish) {
+      await setDoc(doc(db, 'hiddenDishes', dish.id), {
+        name: dish.name || '', image: dish.image || '', kind: dish.kind, hiddenAt: serverTimestamp()
+      });
+    },
+    async showDish(id) {
+      await deleteDoc(doc(db, 'hiddenDishes', id));
+    },
+
+    // ----- Home page -----
+    async getHomeSettings() {
+      const snap = await getDoc(doc(db, 'settings', 'home'));
+      return snap.exists() ? snap.data() : {};
+    },
+    async saveHomeSettings(s) {
+      await setDoc(doc(db, 'settings', 'home'), {
+        featured: s.featured, trendingCategory: s.trendingCategory, recentCategory: s.recentCategory,
+        updatedAt: serverTimestamp()
+      });
+    },
+
+    // ----- Notifications (the app's bell tab) -----
+    async listAnnouncements() {
+      const snap = await getDocs(collection(db, 'announcements'));
+      return snap.docs.map(d => {
+        const x = d.data();
+        return { ...x, id: d.id, createdAt: toDate(x.createdAt), updatedAt: toDate(x.updatedAt), publishedAt: toDate(x.publishedAt) };
+      }).sort((a, b) => (b.createdAt?.getTime() ?? Infinity) - (a.createdAt?.getTime() ?? Infinity));
+    },
+    async saveAnnouncement(a) {
+      const { id, createdAt, updatedAt, publishedAt, ...data } = a;
+      data.updatedAt = serverTimestamp();
+      // The first time it goes out it gets a date; editing it later doesn't make it "new" again
+      data.publishedAt = publishedAt || (a.status === 'published' ? serverTimestamp() : null);
+      if (id) {
+        await setDoc(doc(db, 'announcements', id), data, { merge: true });
+        return id;
+      }
+      data.createdAt = serverTimestamp();
+      const ref = await addDoc(collection(db, 'announcements'), data);
+      return ref.id;
+    },
+    async deleteAnnouncement(id) {
+      await deleteDoc(doc(db, 'announcements', id));
+    },
+
     async importBuiltIns(recipes) {
       // Categories admins already have are left as they are
       const existing = new Set((await getDocs(collection(db, 'categories'))).docs.map(d => d.id));

@@ -75,15 +75,25 @@ class BrowseMVVM(application: Application) : AndroidViewModel(application) {
         setType(fresh ?: FoodType.ALL)
     }
 
+    /** Admins hid or showed a world dish: take it out of (or back into) the list. */
+    private var seenHidden = CloudContent.hiddenNow()
+    private val hiddenObserver = Observer<Set<String>> { hidden ->
+        if (hidden == seenHidden) return@Observer
+        seenHidden = hidden
+        if (!current.loading) state.value = withItems(current, raw)
+    }
+
     init {
         load()
         KhmerRecipes.changes.observeForever(recipesObserver)
         CloudContent.categories.observeForever(categoriesObserver)
+        CloudContent.hiddenDishes.observeForever(hiddenObserver)
     }
 
     override fun onCleared() {
         KhmerRecipes.changes.removeObserver(recipesObserver)
         CloudContent.categories.removeObserver(categoriesObserver)
+        CloudContent.hiddenDishes.removeObserver(hiddenObserver)
         super.onCleared()
     }
 
@@ -246,7 +256,10 @@ class BrowseMVVM(application: Application) : AndroidViewModel(application) {
 
     // ---------- Sorting ----------
 
-    private fun withItems(s: State, list: List<BrowseItem>): State {
+    private fun withItems(s: State, all: List<BrowseItem>): State {
+        // World dishes admins hid never show
+        val hidden = CloudContent.hiddenNow()
+        val list = if (hidden.isEmpty()) all else all.filter { it.card.id !in hidden }
         val key: ((BrowseItem) -> Int?)? = when (s.sort) {
             SortBy.NAME -> null
             SortBy.QUICKEST -> { item -> item.cookMinutes }

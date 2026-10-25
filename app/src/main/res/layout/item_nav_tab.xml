@@ -17,6 +17,18 @@
         app:tint="@color/nav_inactive"
         tools:src="@drawable/ic_nav_home" />
 
+    <!-- Shown on the bell tab when there are new notifications -->
+    <View
+        android:id="@+id/tab_dot"
+        android:layout_width="10dp"
+        android:layout_height="10dp"
+        android:layout_gravity="center"
+        android:background="@drawable/bg_dot_unread"
+        android:importantForAccessibility="no"
+        android:translationX="10dp"
+        android:translationY="-10dp"
+        android:visibility="gone" />
+
     <TextView
         android:id="@+id/tab_label"
         android:layout_width="match_parent"

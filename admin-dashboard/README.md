@@ -3,8 +3,11 @@
 A small web page for the Krouen Tes team. It lets admins:
 
 - **Overview**: see users, new sign-ups this week, recipes waiting for review, and a 12-week audience growth chart.
+- **Home page**: choose which Khmer dishes the first row on Home shows (and their order), and which world-food groups fill the Trending and Recent recipe rows.
 - **Categories**: add, edit, reorder, hide or delete the category chips in the app.
 - **Recipes**: add and edit Khmer recipes (English + Khmer), approve or reject, hide or publish.
+- **Online dishes**: browse the world food and drinks that come from TheMealDB and TheCocktailDB, and hide any of them from the app. They can't be edited: they belong to those services.
+- **Notifications**: write news (English + Khmer, optional picture and recipe link) for the app's bell tab. People see a dot on the bell; phones don't get a pop-up alert yet.
 - **Users**: see app users (phone numbers are hidden until you click Show), block or unblock them, and manage dashboard admins.
 
 Changes reach the app within seconds. The app keeps an offline copy, and it uses its built-in recipes until the database has content.
@@ -30,6 +33,16 @@ Open `public/index.html?demo` through any local web server (for example `npx ser
 6. **Import the built-in content.** On the Overview page, click **Import built-in content**. This copies the 13 Khmer recipes and 16 categories the app ships with, so you can edit them.
 
 After that, other people can sign in and click **Ask to become an admin**. Approve them on Users, under Dashboard admins.
+
+## Updating the dashboard
+
+After changes to this folder, publish again from `admin-dashboard`:
+
+```
+firebase deploy --only firestore,hosting
+```
+
+This sends the database rules and the web page together. New pages need their new rules, so always deploy both.
 
 ## Good to know
 

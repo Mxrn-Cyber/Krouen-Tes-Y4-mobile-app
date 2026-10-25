@@ -108,6 +108,8 @@ Tap Save on a recipe to add it here.</string>
     <string name="notifications_title">You\'re all caught up</string>
     <string name="notifications_empty">No notifications yet. We\'ll let you know here when new Khmer recipes arrive.</string>
     <string name="explore_recipes">Explore recipes</string>
+    <string name="open_recipe">Open recipe →</string>
+    <string name="nav_notifications_new">Notifications, new messages</string>
     <string name="my_profile">My profile</string>
     <string name="edit_profile">Edit profile</string>
     <string name="name">Name</string>

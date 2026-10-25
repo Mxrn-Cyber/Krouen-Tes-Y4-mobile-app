@@ -63,7 +63,8 @@ function growthChart(weeks) {
 }
 
 export async function renderOverview(view, { store, go }) {
-  const [users, recipes, categories] = await Promise.all([store.listUsers(), store.listRecipes(), store.listCategories()]);
+  const [users, recipes, categories, notes, hiddenDishes] = await Promise.all([
+    store.listUsers(), store.listRecipes(), store.listCategories(), store.listAnnouncements(), store.listHiddenDishes()]);
   const weekAgo = Date.now() - 7 * DAY;
   const published = recipes.filter(r => r.status === 'published').length;
   const pending = recipes.filter(r => r.status === 'pending');
@@ -112,7 +113,9 @@ export async function renderOverview(view, { store, go }) {
     stat('Published recipes', published),
     stat('Waiting for review', pending.length, pending.length ? 'Open Recipes to approve' : 'Nothing to review', pending.length > 0),
     stat('Categories', categories.length, `${categories.filter(c => c.hidden).length} hidden`),
-    stat('Blocked users', blocked)
+    stat('Blocked users', blocked),
+    stat('Notifications in the app', notes.filter(n => n.status === 'published').length, `${notes.filter(n => n.status !== 'published').length} drafts`),
+    stat('Hidden online dishes', hiddenDishes.length, 'See Online dishes')
   ));
 
   const recent = [...users].filter(u => u.createdAt).sort((a, b) => b.createdAt - a.createdAt).slice(0, 6);

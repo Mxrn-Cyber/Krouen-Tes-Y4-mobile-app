@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.kroeungtes.app.data.cloud.withoutHiddenDishes
 import com.kroeungtes.app.data.model.MealDetail
 import com.kroeungtes.app.data.model.RandomMealResponse
 import com.kroeungtes.app.data.remote.RetrofitInstance
@@ -14,6 +15,8 @@ import retrofit2.Response
 /** Live search: every query returns the full list of matches (empty list = nothing found). */
 class SearchMVVM : ViewModel() {
     private val results = MutableLiveData<List<MealDetail>>()
+    // World dishes admins hid never show
+    private val visibleResults = results.withoutHiddenDishes { list, hidden -> list.filter { it.idMeal !in hidden } }
     private val loading = MutableLiveData(false)
     private var lastCall: Call<RandomMealResponse>? = null
 
@@ -42,6 +45,6 @@ class SearchMVVM : ViewModel() {
         }
     }
 
-    fun observeResults(): LiveData<List<MealDetail>> = results
+    fun observeResults(): LiveData<List<MealDetail>> = visibleResults
     fun observeLoading(): LiveData<Boolean> = loading
 }

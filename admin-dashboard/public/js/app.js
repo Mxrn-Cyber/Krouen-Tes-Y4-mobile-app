@@ -4,8 +4,14 @@ import { renderOverview } from './view-overview.js';
 import { renderCategories } from './view-categories.js';
 import { renderRecipes } from './view-recipes.js';
 import { renderUsers } from './view-users.js';
+import { renderHome } from './view-home.js';
+import { renderOnline } from './view-online.js';
+import { renderNotifications } from './view-notifications.js';
 
-const VIEWS = { overview: renderOverview, categories: renderCategories, recipes: renderRecipes, users: renderUsers };
+const VIEWS = {
+  overview: renderOverview, home: renderHome, categories: renderCategories, recipes: renderRecipes,
+  online: renderOnline, notifications: renderNotifications, users: renderUsers
+};
 const isDemo = new URLSearchParams(location.search).has('demo');
 
 /** Firebase config: from Firebase Hosting (/__/firebase/init.json), else js/config.js for local testing. */

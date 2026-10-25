@@ -33,6 +33,17 @@ export function createDemoStore() {
   let admins = [{ uid: 'demo-admin', email: 'admin@example.com', name: 'Demo admin', addedAt: new Date() }];
   let requests = [{ uid: 'demo-req', email: 'new.helper@example.com', name: 'New helper', requestedAt: new Date() }];
   let nextId = 1;
+  let hidden = [];
+  let home = {};
+  let announcements = [{
+    id: 'demo-note-1', status: 'published',
+    titleEn: 'Welcome to Krouen Tes', titleKm: 'សូមស្វាគមន៍មកកាន់ គ្រឿងទេស',
+    bodyEn: 'New Khmer recipes arrive every month. Save the ones you like to your wishlist.',
+    bodyKm: 'រូបមន្តខ្មែរថ្មីៗមកដល់រៀងរាល់ខែ។ រក្សាទុករូបមន្តដែលអ្នកចូលចិត្ត។',
+    imageUrl: '', recipeNumId: null,
+    createdAt: new Date(Date.now() - 3 * 86_400_000), updatedAt: new Date(Date.now() - 3 * 86_400_000),
+    publishedAt: new Date(Date.now() - 3 * 86_400_000)
+  }];
   const me = { uid: 'demo-admin', email: 'admin@example.com', name: 'Demo admin' };
 
   return {
@@ -74,6 +85,28 @@ export function createDemoStore() {
     async approveAdmin(req) { admins.push({ uid: req.uid, email: req.email, name: req.name, addedAt: new Date() }); requests = requests.filter(r => r.uid !== req.uid); },
     async rejectAdminRequest(uid) { requests = requests.filter(r => r.uid !== uid); },
     async removeAdmin(uid) { admins = admins.filter(a => a.uid !== uid); },
+
+    async listHiddenDishes() { return hidden.map(d => ({ ...d })); },
+    async hideDish(d) { hidden = hidden.filter(x => x.id !== d.id); hidden.push({ id: d.id, name: d.name, image: d.image, kind: d.kind, hiddenAt: new Date() }); },
+    async showDish(id) { hidden = hidden.filter(x => x.id !== id); },
+
+    async getHomeSettings() { return { ...home }; },
+    async saveHomeSettings(s) { home = { ...s, updatedAt: new Date() }; },
+
+    async listAnnouncements() { return announcements.map(a => ({ ...a })).sort((a, b) => b.createdAt - a.createdAt); },
+    async saveAnnouncement(a) {
+      const now = new Date();
+      const publishedAt = a.publishedAt || (a.status === 'published' ? now : null);
+      if (a.id) {
+        const i = announcements.findIndex(x => x.id === a.id);
+        announcements[i] = { ...announcements[i], ...a, publishedAt, updatedAt: now };
+        return a.id;
+      }
+      const id = `demo-note-${++nextId}`;
+      announcements.push({ ...a, id, publishedAt, createdAt: now, updatedAt: now });
+      return id;
+    },
+    async deleteAnnouncement(id) { announcements = announcements.filter(a => a.id !== id); },
 
     async importBuiltIns(list) {
       const now = new Date();

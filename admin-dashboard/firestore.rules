@@ -41,6 +41,24 @@ service cloud.firestore {
       allow update, delete: if isAdmin();
     }
 
+    // World dishes (TheMealDB / TheCocktailDB ids) admins hid from the app
+    match /hiddenDishes/{dishId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // App-wide settings, e.g. settings/home (Khmer row, Trending and Recent rows)
+    match /settings/{settingId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // News for the app's Notifications tab; drafts only for admins
+    match /announcements/{noteId} {
+      allow read: if resource.data.status == 'published' || isAdmin();
+      allow write: if isAdmin();
+    }
+
     // ----- People -----
 
     match /users/{uid} {

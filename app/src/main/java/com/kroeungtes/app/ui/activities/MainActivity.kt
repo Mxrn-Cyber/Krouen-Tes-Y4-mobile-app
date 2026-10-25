@@ -24,6 +24,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.ListenerRegistration
 import com.kroeungtes.app.R
 import com.kroeungtes.app.data.cloud.UserDirectory
+import com.kroeungtes.app.data.local.NotificationsSeen
 import com.kroeungtes.app.databinding.ActivityMainBinding
 import com.kroeungtes.app.ui.common.EdgeToEdge
 import com.kroeungtes.app.ui.common.Motion
@@ -72,6 +73,8 @@ class MainActivity : AppCompatActivity() {
         navController = navHost.navController
 
         buildTabs()
+        // Dot on the bell when the team sent news since the tab was last opened
+        NotificationsSeen.unread(this).observe(this) { count -> showUnreadDot(count > 0) }
         // Keep the bar in sync with Back and with links like "See all" → Wishlist
         navController.addOnDestinationChangedListener { _, destination, _ ->
             val index = tabs.indexOfFirst { it.destination == destination.id }
@@ -155,6 +158,13 @@ class MainActivity : AppCompatActivity() {
             binding.tabRow.addView(view)
             tabViews.add(view)
         }
+    }
+
+    private fun showUnreadDot(show: Boolean) {
+        val index = tabs.indexOfFirst { it.destination == R.id.notificationsFragment }
+        val tab = tabViews.getOrNull(index) ?: return
+        tab.findViewById<View>(R.id.tab_dot).visibility = if (show) View.VISIBLE else View.GONE
+        tab.contentDescription = getString(if (show) R.string.nav_notifications_new else tabs[index].label)
     }
 
     private fun navigateTo(index: Int) {
